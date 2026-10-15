@@ -1,17 +1,18 @@
 services:
   - type: web
-    name: ai-grandma
+    name: askama
     runtime: python
     plan: free
+    region: singapore
     buildCommand: pip install -r requirements.txt
     startCommand: python -m uvicorn src.api.app:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
     envVars:
       - key: PYTHON_VERSION
-        value: "3.12"
+        value: "3.12.14"
       - key: DASHSCOPE_API_KEY
         sync: false
       - key: DASHSCOPE_WORKSPACE_ID
         sync: false
       - key: LLM_MODEL
-        value: qwen-plus
+        value: qwen3.8-max
