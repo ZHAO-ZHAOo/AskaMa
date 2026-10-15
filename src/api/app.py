@@ -214,7 +214,6 @@ async def health():
             "provider": llm_client.provider,
             "mode": llm_mode,
             "model": getattr(llm_client, "model", None),
-            "base_url": getattr(llm_client, "base_url", None),
             "intake_enabled": os.getenv("LLM_INTAKE_ENABLED", "1") != "0",
         },
     }
