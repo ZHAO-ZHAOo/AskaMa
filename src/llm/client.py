@@ -17,6 +17,8 @@
     LLM_BASE_URL           显式覆盖 base_url（优先级最高）
     LLM_MODEL              模型名，默认 qwen-plus
     LLM_TIMEOUT            单次调用超时秒数，默认 15；超时后由 intake 回退关键词规则
+    LLM_ENABLE_THINKING    设为 1 才开启思考模式；默认关闭（qwen3.8-max 默认思考，
+                           intake 实测 12–31s，关闭后 2–4s 且抽取结果一致）
 """
 
 from __future__ import annotations
@@ -133,6 +135,8 @@ class DashScopeClient(LLMClient):
             model=self.model,
             messages=messages,
             temperature=temperature,
+            # DashScope 扩展参数；对不支持思考的模型无影响
+            extra_body={"enable_thinking": _env("LLM_ENABLE_THINKING") == "1"},
         )
         content = getattr(resp.choices[0].message, "content", None)
         return (content or "").strip()

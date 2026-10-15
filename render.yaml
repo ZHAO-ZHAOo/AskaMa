@@ -16,3 +16,5 @@ services:
         sync: false
       - key: LLM_MODEL
         value: qwen3.8-max
+      - key: LLM_TIMEOUT
+        value: "10"

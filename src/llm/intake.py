@@ -12,12 +12,20 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from .client import LLMClient
 from ..config_loader import ConfigBundle
+
+log = logging.getLogger("askama.llm")
+
+
+def _model_name(llm: Any) -> str:
+    return getattr(llm, "model", None) or getattr(llm, "provider", None) or type(llm).__name__
 
 # ---------------------------------------------------------------- keyword 规则（迁移自 orchestrator）
 
@@ -396,17 +404,27 @@ def llm_intake(text: str, config: ConfigBundle, llm: LLMClient) -> Optional[Inta
 
     返回 None 表示调用失败或输出完全不可用（调用方回退 keyword）。
     """
+    started = time.monotonic()
     try:
         messages = [
             {"role": "system", "content": build_intake_prompt(config)},
             {"role": "user", "content": f"用户主诉：{text}"},
         ]
         raw = llm.complete(messages, temperature=0.0)
-    except Exception:
+    except Exception as exc:
+        # 只记录错误类型 / 耗时 / 模型名，不记录用户输入或模型输出
+        log.warning(
+            "LLM intake failed, falling back to keyword rules: %s after %.1fs (model=%s)",
+            type(exc).__name__, time.monotonic() - started, _model_name(llm),
+        )
         return None  # 网络 / 鉴权 / 超时等 → 回退 keyword
 
     parsed = parse_json(raw)
     if not parsed:
+        log.warning(
+            "LLM intake output not valid JSON, falling back to keyword rules after %.1fs (model=%s)",
+            time.monotonic() - started, _model_name(llm),
+        )
         return None
 
     module = parsed.get("module")
