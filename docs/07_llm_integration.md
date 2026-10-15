@@ -75,7 +75,7 @@ run_intake(text, config, llm, enabled)
 
 ```
 provider=dashscope  model=qwen3.8-max
-base_url=https://ws-teqzyu1e1m9hziaq.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+base_url=https://ws-xxxxx.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
 ```
 
 ### 5.2 端到端五场景
