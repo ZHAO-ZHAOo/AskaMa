@@ -16,6 +16,7 @@
     DASHSCOPE_WORKSPACE_ID 业务空间 ID（在百炼控制台"业务空间详情"查看）
     LLM_BASE_URL           显式覆盖 base_url（优先级最高）
     LLM_MODEL              模型名，默认 qwen-plus
+    LLM_TIMEOUT            单次调用超时秒数，默认 15；超时后由 intake 回退关键词规则
 """
 
 from __future__ import annotations
@@ -31,8 +32,8 @@ DASHSCOPE_SINGAPORE_BASE_URL = (
 DASHSCOPE_INTL_BASE_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
 
 DEFAULT_MODEL = "qwen-plus"
-DEFAULT_TIMEOUT = 60  # 秒
-DEFAULT_MAX_RETRIES = 2
+DEFAULT_TIMEOUT = 15  # 秒；线上不能让单个请求长时间占住服务
+DEFAULT_MAX_RETRIES = 0  # 不重试：失败立即回退关键词规则，避免等待时间翻倍
 
 
 def _load_dotenv(path: Optional[str] = None) -> None:
@@ -81,6 +82,14 @@ def resolve_base_url() -> str:
     return DASHSCOPE_INTL_BASE_URL
 
 
+def resolve_timeout() -> float:
+    """LLM_TIMEOUT 环境变量（秒），未配置或非法时用 DEFAULT_TIMEOUT。"""
+    try:
+        return float(_env("LLM_TIMEOUT") or DEFAULT_TIMEOUT)
+    except ValueError:
+        return float(DEFAULT_TIMEOUT)
+
+
 class LLMClient:
     """LLM 调用抽象接口。complete() 返回模型原始文本输出（期望为 JSON 字符串）。"""
 
@@ -100,7 +109,7 @@ class DashScopeClient(LLMClient):
         api_key: Optional[str] = None,
         model: Optional[str] = None,
         base_url: Optional[str] = None,
-        timeout: int = DEFAULT_TIMEOUT,
+        timeout: Optional[float] = None,
     ):
         from openai import OpenAI  # 延迟导入：未配置 key 时不强依赖该包
 
@@ -111,7 +120,13 @@ class DashScopeClient(LLMClient):
             )
         self.model = model or _env("LLM_MODEL") or DEFAULT_MODEL
         self.base_url = base_url or resolve_base_url()
-        self._client = OpenAI(api_key=self.api_key, base_url=self.base_url, timeout=timeout)
+        self.timeout = timeout or resolve_timeout()
+        self._client = OpenAI(
+            api_key=self.api_key,
+            base_url=self.base_url,
+            timeout=self.timeout,
+            max_retries=DEFAULT_MAX_RETRIES,
+        )
 
     def complete(self, messages: list[dict], temperature: float = 0.2) -> str:
         resp = self._client.chat.completions.create(

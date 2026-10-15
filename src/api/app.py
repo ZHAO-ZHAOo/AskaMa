@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import Body, FastAPI, Request, UploadFile, Form, Depends
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -235,7 +236,10 @@ async def chat(
     # Resolve answer value (can be string or int)
     actual_value = answer_value_int if answer_value_int is not None and is_answer else answer_value
 
-    response = run_pipeline(
+    # run_pipeline makes a blocking LLM call; keep it off the event loop so
+    # one slow request does not stall every other visitor.
+    response = await run_in_threadpool(
+        run_pipeline,
         user_text=message,
         session=session,
         config=config,
@@ -287,7 +291,11 @@ async def auth_register(request: Request, payload: dict[str, Any] = Body(...)):
         return JSONResponse({"error": "密码请使用 6–128 个字符。"}, status_code=400)
     if key in local_store["users"]:
         return JSONResponse({"error": "这个用户名已被使用，请直接登录。"}, status_code=409)
-    salt, password_hash = _password_hash(password)
+    # PBKDF2 is CPU-heavy; hash in a worker thread, then re-check the name in
+    # case a concurrent request registered it while we were waiting.
+    salt, password_hash = await run_in_threadpool(_password_hash, password)
+    if key in local_store["users"]:
+        return JSONResponse({"error": "这个用户名已被使用，请直接登录。"}, status_code=409)
     user = {"id": str(uuid.uuid4()), "username": username, "password_salt": salt, "password_hash": password_hash}
     local_store["users"][key] = user
     return _login_response(user, str(payload.get("guest_owner_id", "")))
@@ -298,7 +306,7 @@ async def auth_login(payload: dict[str, Any] = Body(...)):
     username = str(payload.get("username", "")).strip()
     password = str(payload.get("password", ""))
     user = local_store["users"].get(username.casefold())
-    if not user or not _verify_password(password, user):
+    if not user or not await run_in_threadpool(_verify_password, password, user):
         return JSONResponse({"error": "用户名或密码不正确。"}, status_code=401)
     return _login_response(user, str(payload.get("guest_owner_id", "")))
 
