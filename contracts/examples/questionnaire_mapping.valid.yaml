@@ -1,0 +1,67 @@
+# 仅格式示例，非真实问卷内容
+# This file is for FORMAT DEMONSTRATION ONLY.
+# All text fields say "[Format example only]". No real questionnaire content.
+
+meta:
+  id: questionnaire_mapping_example
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+questionnaire_version: "0.1.0"
+
+questions:
+  - question_id: PQ_PRIORITY
+    text:
+      en: "[Format example only]"
+    multi_select: false
+    required: true
+    options:
+      - option_id: nearest
+        label:
+          en: "[Format example only]"
+        effects:
+          - type: set_base_preset
+            preset_id: nearest
+      - option_id: budget
+        label:
+          en: "[Format example only]"
+        effects:
+          - type: set_base_preset
+            preset_id: budget_friendly
+
+  - question_id: PQ_TRAVEL_MODE
+    text:
+      en: "[Format example only]"
+    multi_select: false
+    required: false
+    options:
+      - option_id: public_transport
+        label:
+          en: "[Format example only]"
+        effects:
+          - type: set_profile_field
+            field: travel_mode
+            value: public_transport
+          - type: multiply
+            feature: travel_time
+            factor: 1.2
+      - option_id: driving
+        label:
+          en: "[Format example only]"
+        effects:
+          - type: set_profile_field
+            field: travel_mode
+            value: driving
+          - type: multiply
+            feature: travel_time
+            factor: 0.8
+
+combination:
+  start_from: default_weights
+  apply_order: question_order
+  clip_to_bounds: true
+  renormalize_to_sum_one: true
+  on_unanswered: use_default

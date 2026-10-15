@@ -1,0 +1,25 @@
+meta:
+  id: question_tree_fixture
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+module: heavy_bleeding
+required_slots:
+  - flow_compared_to_usual
+  - days_since_last_period_start
+questions:
+  - question_id: Q_FIXTURE_1
+    slot: flow_compared_to_usual
+    text:
+      en: "[Fixture only] How does your bleeding compare?"
+    answer_options:
+      - {value: much_less, label: {en: Much less}}
+      - {value: same, label: {en: About the same}}
+      - {value: much_more, label: {en: Much more}}
+    priority: 1
+stopping:
+  on_max_reached: grade_with_uncertainty
+  on_all_required_answered: grade
+max_questions: 5

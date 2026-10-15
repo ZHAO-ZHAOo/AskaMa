@@ -1,0 +1,25 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY and contains NO real user data.
+# Invalid: weight_profile.mode is "preset" but preset_id is missing.
+
+schema_version: "0.1.0"
+residency_status: citizen
+has_chas: "no"
+insurance: [none]
+ui_language: en
+travel_mode: public_transport
+use_current_location: false
+weight_profile:
+  mode: preset
+  # preset_id is missing — should fail the if/then constraint
+  weight_preset_version: "0.1.0"
+  updated_at: "2026-10-08T12:00:00Z"
+consent:
+  service: true
+  followup_contact: false
+  research_use: false
+  visit_history: false
+  consent_text_version: "0.1.0"
+  consented_at: "2026-10-08T12:00:00Z"
+created_at: "2026-10-08T12:00:00Z"
+updated_at: "2026-10-08T12:00:00Z"

@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/redflag_rules.schema.json",
+  "title": "Red-flag rules schema",
+  "description": "Schema for red-flag (emergency) rules. Red-flag rules are evaluated on every conversation turn. RED-FLAG RULES NEVER ENTER AUTOMATIC OPTIMIZATION; they can only be modified manually by a clinician.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "rules"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/meta" },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/rule" }
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "scope",
+        "condition",
+        "exit_type",
+        "on_unknown",
+        "rationale",
+        "needs_clinician_review",
+        "status"
+      ],
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "pattern": "^RF_[A-Z0-9_]+$"
+        },
+        "scope": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              { "enum": ["global"] },
+              { "$ref": "common.schema.json#/$defs/module_id" }
+            ]
+          }
+        },
+        "condition": { "$ref": "common.schema.json#/$defs/condition" },
+        "exit_type": { "$ref": "common.schema.json#/$defs/redflag_exit_type" },
+        "on_unknown": {
+          "enum": ["treat_as_false", "treat_as_true", "ask_followup"]
+        },
+        "followup_slots": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/slot_id" }
+        },
+        "near_miss_condition": { "$ref": "common.schema.json#/$defs/condition" },
+        "user_note": { "$ref": "common.schema.json#/$defs/i18n_text" },
+        "rationale": { "$ref": "common.schema.json#/$defs/i18n_text" },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title"],
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "publisher": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "accessed": { "type": "string", "format": "date" }
+            }
+          }
+        },
+        "needs_clinician_review": { "type": "boolean" },
+        "status": {
+          "enum": ["draft_unreviewed", "clinician_reviewed", "approved"]
+        },
+        "notes": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "on_unknown": { "const": "ask_followup" }
+            },
+            "required": ["on_unknown"]
+          },
+          "then": {
+            "type": "object",
+            "required": ["followup_slots"],
+            "properties": {
+              "followup_slots": {
+                "type": "array",
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

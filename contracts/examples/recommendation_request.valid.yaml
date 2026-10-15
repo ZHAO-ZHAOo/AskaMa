@@ -1,0 +1,25 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+session_id: "abc123def456ghi789"
+turn_id: 3
+level: SEE_DOCTOR_24_48H
+module: heavy_bleeding
+weights:
+  travel_time: 0.5
+  cost: 0.3
+  accessibility: 0.2
+weights_source: questionnaire
+weight_preset_version: "0.1.0"
+profile_fields:
+  residency_status: citizen
+  has_chas: "yes"
+  insurance: [none]
+  travel_mode: public_transport
+location:
+  planning_area: "[Format example area]"
+  ephemeral_coordinates:
+    lat: 1.3
+    lng: 103.8
+  source: device
+age_band: "18_24"

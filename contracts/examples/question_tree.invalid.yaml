@@ -1,0 +1,27 @@
+# 故意不合法：question_id 格式错误 + 缺少 required_slots
+
+meta:
+  id: question_tree_invalid
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+module: heavy_bleeding
+
+# required_slots 缺失，应该校验失败
+
+questions:
+  - question_id: invalid_id_format  # 不符合 ^Q_[A-Z0-9_]+$
+    slot: flow_compared_to_usual
+    text:
+      en: Format example only
+      zh: 仅格式示例
+    priority: 1
+
+stopping:
+  on_max_reached: grade_with_uncertainty
+  on_all_required_answered: grade
+
+max_questions: 5

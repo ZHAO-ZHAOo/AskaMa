@@ -1,0 +1,83 @@
+# AI Grandma demo 决策表 – irregular_or_intermenstrual_bleeding
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: decision_table_irregular_bleeding
+  version: 0.4.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+      url: "https://cks.nice.org.uk/topics/menorrhagia/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+module: irregular_or_intermenstrual_bleeding
+
+rows:
+  - row_id: DT_IB_001
+    when:
+      all_of:
+        - {slot: bleeding_between_periods, op: eq, value: true}
+        - {slot: unusual_discharge_or_odor, op: eq, value: true}
+    level: SEE_DOCTOR_24_48H
+    priority: 10
+    rationale:
+      en: "Intermenstrual bleeding with unusual discharge may indicate infection requiring prompt assessment."
+      zh: "经间期出血伴异常分泌物可能提示感染，应尽快就诊。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+  - row_id: DT_IB_002
+    when:
+      all_of:
+        - {slot: current_bleeding_days_so_far, op: gte, value: 14}
+    level: SEE_DOCTOR_24_48H
+    priority: 9
+    rationale:
+      en: "Bleeding (period or intermenstrual) lasting over 2 weeks warrants prompt assessment."
+      zh: "经期或经间期出血持续超过两周应尽快就诊。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+  - row_id: DT_IB_003
+    when:
+      all_of:
+        - {slot: bleeding_between_periods, op: eq, value: true}
+    level: BOOK_SOON
+    priority: 5
+    rationale:
+      en: "Intermenstrual bleeding should be assessed by a doctor."
+      zh: "经间期出血应由医生评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+  - row_id: DT_IB_004
+    when:
+      all_of:
+        - {slot: cycle_regularity, op: in, value: [very_irregular, no_established_pattern]}
+    level: BOOK_SOON
+    priority: 3
+    rationale:
+      en: "A very irregular or absent cycle pattern should be evaluated by a doctor."
+      zh: "周期非常不规律或完全没有规律应由医生评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+default_row:
+  level: SELF_CARE
+  rationale:
+    en: "Mild irregularity without red flags – suitable for home observation."
+    zh: "轻微不规则无红旗信号——适合居家观察。"
+
+conflict_resolution: highest_severity_wins
+
+uncertainty_policy:
+  mode: escalate_one_level

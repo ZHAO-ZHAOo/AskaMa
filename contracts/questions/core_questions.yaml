@@ -1,0 +1,240 @@
+# AI Grandma demo 追问树 – core（通用必问层）
+# 原型，未经临床审核，不是医疗建议。
+# v0.5.0: 无论主诉是四类中的哪一类，先做疼痛/出血/分泌物三大类筛查；
+# 有则追问细节（precondition 控制），无则跳过；与模块问题按 priority 混合穿插。
+
+meta:
+  id: question_tree_core
+  version: 0.5.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+      url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+    - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+      url: "https://cks.nice.org.uk/topics/menorrhagia/"
+  reviewer: null
+  last_verified: "2026-10-12"
+
+module: core
+
+required_slots: []
+
+questions:
+  # ==================== 疼痛（腹痛） ====================
+  - question_id: Q_CORE_PAIN_PRESENT
+    slot: pain_present
+    text:
+      en: "Are you having any abdominal pain or cramps right now?"
+      zh: "现在有腹痛或肚子疼吗？"
+    answer_options:
+      - {value: "false", label: {en: "No pain", zh: "没有腹痛"}}
+      - {value: "true", label: {en: "Yes, abdominal pain / cramps", zh: "有，肚子疼/腹痛"}}
+    priority: 1
+
+  - question_id: Q_CORE_PAIN_LOCATION
+    slot: pain_location
+    precondition: {slot: pain_present, op: eq, value: true}
+    text:
+      en: "Where is the pain located?"
+      zh: "疼痛主要在哪个位置？"
+    answer_options:
+      - {value: "lower_abdomen_middle", label: {en: "Lower abdomen, middle", zh: "下腹正中"}}
+      - {value: "lower_abdomen_one_side", label: {en: "Lower abdomen, one side", zh: "下腹一侧"}}
+      - {value: "whole_abdomen", label: {en: "Whole abdomen", zh: "整个腹部"}}
+      - {value: "lower_back", label: {en: "Lower back", zh: "后腰"}}
+      - {value: "other", label: {en: "Other", zh: "其他位置"}}
+    priority: 2
+
+  - question_id: Q_CORE_PAIN_QUALITY
+    slot: pain_quality
+    precondition: {slot: pain_present, op: eq, value: true}
+    text:
+      en: "What does the pain feel like?"
+      zh: "是怎样的疼法？"
+    answer_options:
+      - {value: "cramping", label: {en: "Cramping (coming in waves)", zh: "绞痛，一阵阵的"}}
+      - {value: "dull", label: {en: "Dull ache", zh: "钝痛"}}
+      - {value: "aching", label: {en: "Aching / pressure", zh: "隐痛/胀痛"}}
+      - {value: "stabbing", label: {en: "Stabbing", zh: "刺痛"}}
+      - {value: "tearing", label: {en: "Tearing / sharp", zh: "撕裂样剧痛"}}
+      - {value: "other", label: {en: "Other", zh: "其他"}}
+    priority: 2
+
+  - question_id: Q_CORE_PAIN_DURATION
+    slot: pain_duration
+    precondition: {slot: pain_present, op: eq, value: true}
+    text:
+      en: "How long has the pain been going on?"
+      zh: "疼痛持续多长时间了？"
+    answer_options:
+      - {value: "less_than_a_day", label: {en: "Less than a day", zh: "不到一天"}}
+      - {value: "1_to_2_days", label: {en: "1–2 days", zh: "1-2 天"}}
+      - {value: "3_to_7_days", label: {en: "3–7 days", zh: "3-7 天"}}
+      - {value: "over_a_week", label: {en: "More than a week", zh: "超过一周"}}
+    priority: 2
+
+  - question_id: Q_CORE_PAIN_SEVERITY
+    slot: pain_severity_0_10
+    precondition: {slot: pain_present, op: eq, value: true}
+    text:
+      en: "On a scale of 0 to 10, how bad is the pain?"
+      zh: "从 0 到 10 评分，疼痛有多严重？"
+    answer_options:
+      - value: "0"
+        label:
+          en: "0 – No pain at all"
+          zh: "0 – 不痛，完全没有感觉"
+      - value: "1"
+        label:
+          en: "1 – Barely noticeable: like a mosquito bite"
+          zh: "1 – 极轻微：像蚊子叮咬，几乎感觉不到"
+      - value: "2"
+        label:
+          en: "2 – Mild: like a paper cut, doesn't affect daily life"
+          zh: "2 – 轻微：像纸划伤手指，不影响日常生活"
+      - value: "3"
+        label:
+          en: "3 – Mild: like an injection, doesn't disturb sleep"
+          zh: "3 – 轻度：像打针扎一下，不影响睡眠"
+      - value: "4"
+        label:
+          en: "4 – Moderate: like a bee sting, disturbs sleep but you can still sleep"
+          zh: "4 – 中度：像蜜蜂蜇，影响睡眠但仍能入睡"
+      - value: "5"
+        label:
+          en: "5 – Moderate: like a sprained ankle, makes you stop and rest"
+          zh: "5 – 中度：像扭伤脚踝，需要停下来休息"
+      - value: "6"
+        label:
+          en: "6 – Moderately severe: like a migraine, hard to fall asleep"
+          zh: "6 – 中重度：像偏头痛发作，难以入睡"
+      - value: "7"
+        label:
+          en: "7 – Severe: like kidney stone colic, can't think clearly or sleep"
+          zh: "7 – 重度：像肾结石绞痛，痛到无法思考、不能入睡"
+      - value: "8"
+        label:
+          en: "8 – Severe: like a serious burn, sweating from the pain"
+          zh: "8 – 重度：像严重烧伤，痛到冒冷汗"
+      - value: "9"
+        label:
+          en: "9 – Very severe: near the limit of human endurance, barely able to speak"
+          zh: "9 – 极重度：接近人体能忍受的极限，几乎无法说话"
+      - value: "10"
+        label:
+          en: "10 – Worst imaginable: like stubbing your little toe hard on the bed frame, or a knife cut"
+          zh: "10 – 无法想象的剧痛：像小脚趾狠狠踢到床脚，或刀割"
+    priority: 2
+
+  # ==================== 出血 ====================
+  - question_id: Q_CORE_BLEEDING_PRESENT
+    slot: bleeding_present
+    text:
+      en: "Are you having any abnormal bleeding (outside your normal period, or unusually heavy)?"
+      zh: "现在有没有异常出血？（不在正常经期内的出血，或明显比平时多的出血）"
+    answer_options:
+      - {value: "false", label: {en: "No abnormal bleeding", zh: "没有异常出血"}}
+      - {value: "true", label: {en: "Yes, abnormal bleeding", zh: "有异常出血"}}
+    priority: 1
+
+  - question_id: Q_CORE_BLEEDING_AMOUNT
+    slot: flow_compared_to_usual
+    precondition: {slot: bleeding_present, op: eq, value: true}
+    text:
+      en: "How does the bleeding amount compare to your usual period?"
+      zh: "出血量和平时比怎么样？"
+    answer_options:
+      - {value: "much_less", label: {en: "Much less than usual", zh: "比平常少很多"}}
+      - {value: "a_bit_less", label: {en: "A bit less than usual", zh: "比平常少一点"}}
+      - {value: "same", label: {en: "About the same", zh: "和平常差不多"}}
+      - {value: "a_bit_more", label: {en: "A bit more than usual", zh: "比平常多一点"}}
+      - {value: "much_more", label: {en: "Much more than usual", zh: "比平常多很多"}}
+    priority: 2
+
+  - question_id: Q_CORE_BLEEDING_DURATION
+    slot: current_bleeding_days_so_far
+    precondition: {slot: bleeding_present, op: eq, value: true}
+    text:
+      en: "How many days has this bleeding episode lasted so far?"
+      zh: "这次出血到目前为止持续了几天？"
+    answer_options:
+      - {value: "1", label: {en: "1 day", zh: "1天"}}
+      - {value: "3", label: {en: "About 3 days", zh: "大概3天"}}
+      - {value: "7", label: {en: "About a week", zh: "大概一周"}}
+      - {value: "14", label: {en: "Over 2 weeks", zh: "超过两周"}}
+    priority: 2
+
+  - question_id: Q_CORE_BLEEDING_TRIGGER
+    slot: bleeding_trigger
+    precondition: {slot: bleeding_present, op: eq, value: true}
+    text:
+      en: "Was there anything that might have triggered the bleeding?"
+      zh: "出血前有没有可能的诱发行为或事件？"
+    answer_options:
+      - {value: "sexual_intercourse", label: {en: "After sex", zh: "性生活之后"}}
+      - {value: "strenuous_exercise", label: {en: "After strenuous exercise", zh: "剧烈运动之后"}}
+      - {value: "stress_or_fatigue", label: {en: "Stress / fatigue", zh: "压力大或劳累"}}
+      - {value: "emergency_contraception", label: {en: "After emergency contraception", zh: "服用紧急避孕药之后"}}
+      - {value: "recent_procedure", label: {en: "After a recent procedure", zh: "近期做过检查/手术"}}
+      - {value: "none_identified", label: {en: "No obvious trigger", zh: "没有明显诱因"}}
+      - {value: "other", label: {en: "Other", zh: "其他"}}
+    priority: 2
+
+  # ==================== 分泌物 ====================
+  - question_id: Q_CORE_DISCHARGE_PRESENT
+    slot: unusual_discharge_or_odor
+    text:
+      en: "Do you have any abnormal vaginal discharge or unusual odor?"
+      zh: "有没有异常分泌物或异味？"
+    answer_options:
+      - {value: "false", label: {en: "No", zh: "没有"}}
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+    priority: 1
+
+  - question_id: Q_CORE_DISCHARGE_COLOR
+    slot: discharge_color_consistency
+    precondition: {slot: unusual_discharge_or_odor, op: eq, value: true}
+    text:
+      en: "What does the discharge look like?"
+      zh: "分泌物是什么颜色/性状？"
+    answer_options:
+      - {value: "clear", label: {en: "Clear / watery", zh: "透明清亮"}}
+      - {value: "milky_white", label: {en: "Milky white", zh: "乳白色"}}
+      - {value: "yellow_green", label: {en: "Yellow / greenish", zh: "黄色/黄绿色"}}
+      - {value: "blood_streaked", label: {en: "Blood-streaked", zh: "带血丝"}}
+      - {value: "curd_like", label: {en: "Curd-like / clumpy", zh: "豆腐渣样"}}
+      - {value: "foamy", label: {en: "Foamy / frothy", zh: "泡沫状"}}
+      - {value: "other", label: {en: "Other", zh: "其他"}}
+    priority: 2
+
+  - question_id: Q_CORE_DISCHARGE_ODOR
+    slot: discharge_odor
+    precondition: {slot: unusual_discharge_or_odor, op: eq, value: true}
+    text:
+      en: "Does the discharge have an odor?"
+      zh: "分泌物有气味吗？"
+    answer_options:
+      - {value: "none", label: {en: "No odor", zh: "无味"}}
+      - {value: "fishy", label: {en: "Fishy", zh: "鱼腥味"}}
+      - {value: "foul", label: {en: "Foul / strong", zh: "恶臭/强烈异味"}}
+      - {value: "sour", label: {en: "Sour", zh: "酸味"}}
+      - {value: "other", label: {en: "Other", zh: "其他"}}
+    priority: 2
+
+  - question_id: Q_CORE_DISCHARGE_AMOUNT
+    slot: discharge_amount
+    precondition: {slot: unusual_discharge_or_odor, op: eq, value: true}
+    text:
+      en: "How much discharge is there compared to usual?"
+      zh: "分泌物的量跟平时比怎么样？"
+    answer_options:
+      - {value: "normal", label: {en: "Normal amount", zh: "量正常"}}
+      - {value: "increased", label: {en: "More than usual", zh: "比平时多"}}
+      - {value: "decreased", label: {en: "Less than usual", zh: "比平时少"}}
+    priority: 2
+
+stopping:
+  on_max_reached: grade_with_uncertainty
+  on_all_required_answered: grade
+
+max_questions: 30

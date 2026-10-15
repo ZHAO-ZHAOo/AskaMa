@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AskaMa · 问问阿嬷</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+English:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #e07a5f;
+            --primary-light: #f2cc8f;
+            --bg: #faf4ef;
+            --chat-bg: #ffffff;
+            --user-bg: #e07a5f;
+            --user-text: #ffffff;
+            --bot-bg: #f0e6e0;
+            --bot-text: #3d405b;
+            --border: #e8e0d8;
+            --danger: #e63946;
+            --warning: #f4a261;
+            --success: #81b29a;
+        }
+        body {
+            font-family: 'Noto Sans SC', 'Noto Sans English', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: #3d405b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        .header h1 {
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .header .subtitle {
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .lang-select, .settings-link {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .lang-select option { color: #333; }
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .message.bot {
+            background: var(--bot-bg);
+            color: var(--bot-text);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        .message.user {
+            background: var(--user-bg);
+            color: var(--user-text);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .message.system {
+            background: #fff3cd;
+            color: #856404;
+            align-self: center;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            border: 1px solid #ffc107;
+        }
+        .message.emergency {
+            background: #fde8e8;
+            border: 2px solid var(--danger);
+            border-radius: 12px;
+        }
+        .question-card {
+            background: white;
+            border: 2px solid var(--primary-light);
+            border-radius: 14px;
+            padding: 20px;
+            align-self: flex-start;
+            max-width: 85%;
+        }
+        .question-card .q-text {
+            font-size: 1.05rem;
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+        .question-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .question-option {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            text-align: left;
+            color: var(--bot-text);
+            font-family: inherit;
+        }
+        .question-option:hover {
+            border-color: var(--primary);
+            background: #fff;
+        }
+        .question-option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .input-area {
+            padding: 16px 20px;
+            background: var(--chat-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .input-area input {
+            flex: 1;
+            border: 2px solid var(--border);
+            border-radius: 24px;
+            padding: 12px 20px;
+            font-size: 0.95rem;
+            outline: none;
+            font-family: inherit;
+            color: var(--bot-text);
+        }
+        .input-area input:focus { border-color: var(--primary); }
+        .input-area button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+        .input-area button:hover { background: #c9593f; }
+        .input-area button:disabled { background: #ccc; cursor: not-allowed; }
+        .disclaimer {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 16px;
+            font-size: 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid #ffc107;
+            flex-shrink: 0;
+        }
+        .typing-indicator {
+            display: inline-block;
+            padding: 8px 12px;
+            background: var(--bot-bg);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #999;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+        .level-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .level-EMERGENCY_NOW { background: #fde8e8; color: var(--danger); }
+        .level-SEE_DOCTOR_24_48H { background: #fff0e6; color: #e76f51; }
+        .level-BOOK_SOON { background: #fff8e1; color: #f9a825; }
+        .level-SELF_CARE { background: #e8f5e9; color: var(--success); }
+        .language-toggle{display:flex;align-items:center;background:#f9e9da;border:1px solid #efdccb;border-radius:999px;padding:3px;gap:2px}.language-toggle button{border:0;border-radius:999px;background:transparent;color:#62483b;padding:6px 12px;font:600 13px inherit;cursor:pointer}.language-toggle button.active{background:#b5523b;color:#fffaf4}.lang-select{position:absolute;opacity:0;pointer-events:none}.welcome-note{margin:0 16px 12px;padding:12px 14px;background:#fdefd6;border-left:4px solid #f5b05a;border-radius:12px;color:#62483b;font-size:14px;line-height:1.55}.location-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:12px}.location-grid button{min-height:62px;border:1.5px solid #b5523b;border-radius:12px;background:#fffaf4;color:#a2452f;font:600 13px inherit;cursor:pointer}.location-grid button:nth-child(5){background:#fde3d8}.result-screen{margin:10px 0 24px;background:#fffaf4;border:1px solid #efdccb;border-top:8px solid #b5523b;border-radius:24px;overflow:hidden;box-shadow:0 6px 20px rgba(91,58,40,.12)}.result-screen.selfcare{border-top-color:#4a6b2e}.result-head{padding:22px;background:#f9e9da}.selfcare .result-head{background:#e8f0dc}.result-screen h2{margin:10px 0 0;font-size:27px;color:#3e2a21}.result-copy{padding:20px 22px;font-size:17px;line-height:1.65}.care-list{margin:0;padding:0 22px 10px;display:grid;gap:10px;list-style:none}.care-list li{padding:12px 14px;background:#fffaf4;border:1px solid #efdccb;border-radius:13px;line-height:1.5}.watch-box{margin:12px 22px 20px;padding:14px;background:#fdefd6;border-radius:14px;line-height:1.6}.summary-action{display:block;margin:20px 22px;border-radius:999px;padding:15px;background:#b5523b;color:#fffaf4;text-align:center;text-decoration:none;font-weight:800}.subtle-action{display:block;margin:0 22px 20px;border:2px solid #b5523b;border-radius:999px;padding:13px;color:#a2452f;background:#fffaf4;text-align:center;text-decoration:none;font-weight:800}.call-script{margin:16px 0 0;padding:16px;background:#fff2eb;border:1px solid #f0c5b5;border-radius:16px;color:#4b3025;line-height:1.6}.call-script-kicker{display:inline-block;margin-bottom:9px;border-radius:999px;padding:3px 10px;background:#f9d8ca;color:#9b3d2e;font-size:13px;font-weight:800}.call-script-main{margin:0 0 12px;font-weight:700}.call-script-field{display:grid;grid-template-columns:52px 1fr;gap:8px;padding:9px 0;border-top:1px solid #efd2c5;font-size:15px}.call-script-field strong{color:#9b3d2e}.call-script-field span{color:#62483b}
+        .emergency-screen{margin:10px 0 24px;background:#fffaf4;border:1px solid #efdccb;border-top:8px solid #b3261e;border-radius:24px;overflow:hidden;box-shadow:0 6px 20px rgba(91,58,40,.12)}.emergency-head{padding:24px 22px;background:#fdecea}.emergency-tag{display:inline-block;border:2px solid #b3261e;color:#b3261e;border-radius:999px;padding:3px 14px;font-weight:800}.emergency-head h2{margin:18px 0 20px;color:#b3261e;font-size:30px}.call995{display:block;background:#bd251f;color:#fff;text-align:center;text-decoration:none;border-radius:20px;padding:22px;font-size:28px;font-weight:800;box-shadow:0 5px 15px rgba(179,38,30,.25)}.emergency-head p{font-size:17px;line-height:1.55;margin:22px 0 0}.emergency-voice{padding:22px;border-bottom:1px solid #efdccb;display:flex;gap:14px;align-items:flex-start;font-size:18px;line-height:1.55}.emergency-voice img{width:54px;height:54px;border-radius:50%;flex:none}.emergency-section{padding:20px 22px;border-bottom:1px solid #efdccb}.emergency-section h3{margin:0 0 12px;font-size:18px;color:#62483b}.emergency-section ul{margin:0;padding-left:22px;font-size:17px;line-height:1.6}.where-chip{display:inline-block;border-radius:12px;background:#fde3d8;color:#a2452f;padding:8px 14px;font-weight:700;font-size:17px}.emergency-actions{padding:20px 22px;display:grid;gap:12px}.emergency-actions a,.emergency-actions button{display:block;width:100%;border-radius:999px;padding:15px;border:2px solid #b5523b;background:#fffaf4;color:#a2452f;font:700 17px inherit;text-align:center;text-decoration:none;cursor:pointer}.emergency-actions a{background:#b5523b;color:#fffaf4}
+        .result-screen.soon-care{border-top-color:#dc765f}.result-screen.book-care{border-top-color:#d89a4c}.soon-care .result-head{background:#ffe9df}.book-care .result-head{background:#fff0d8}.care-plan{padding:0 22px 4px}.care-plan-section{padding:16px 0;border-top:1px solid #f2dfd1}.care-plan-section h3{margin:0 0 8px;color:#765b51;font-size:16px}.care-plan-section p{margin:0;line-height:1.65}.care-plan-section ul{margin:0;padding:0;list-style:none;display:grid;gap:8px}.care-plan-section li{position:relative;padding-left:20px;line-height:1.55}.care-plan-section li:before{content:'•';position:absolute;left:4px;color:#ef8c78;font-size:20px;line-height:1}.map-action{display:block;margin:16px 22px 0;border:1.5px solid #ef8c78;border-radius:15px;padding:13px 14px;background:#fffaf4;color:#a95548;text-align:center;text-decoration:none;font-weight:800;line-height:1.35}.map-action:hover{background:#ffe8de}.result-screen .emergency-tag.soon-tag{border-color:#d66c56;color:#b65b49}.result-screen .emergency-tag.book-tag{border-color:#c7883e;color:#9b682e}
+        /* Result pages use document scrolling, so no triage advice can sit behind the fixed navigation. */
+        body.result-view{height:auto;min-height:100vh;overflow-y:auto;padding-bottom:100px}.result-view .chat-container{flex:none;min-height:auto;overflow:visible;padding-bottom:100px}.result-view .emergency-screen,.result-view .result-screen{margin-bottom:0}
+
+        /* AskaMa application shell */
+        :root{--aska-bg:#fbf1e6;--aska-surface:#fffaf4;--aska-panel:#f9e9da;--aska-line:#efdccb;--aska-ink:#3e2a21;--aska-muted:#62483b;--aska-primary:#b5523b;--aska-primary-soft:#fde3d8;--aska-sage:#e8f0dc;--aska-emg:#b3261e}
+        body{background:var(--aska-bg);color:var(--aska-ink);max-width:560px;margin:0 auto;padding-bottom:76px}
+        .topbar{position:sticky;top:0;z-index:10;background:#f5dfd1;backdrop-filter:blur(10px);border-bottom:1px solid #ddb7a3;box-shadow:0 2px 10px rgba(91,58,40,.08)}
+        .disclaimer{background:#fdefd6;color:var(--aska-muted);padding:9px 16px;font-size:13px;text-align:left;border:0}.disclaimer a{color:var(--aska-emg);font-weight:800;text-decoration:none;margin-left:4px}.disclaimer button{border:0;background:none;color:var(--aska-primary);text-decoration:underline;padding:0;margin-left:5px;font:inherit;cursor:pointer}
+        .header{background:transparent;color:var(--aska-ink);box-shadow:none;padding:14px 16px}.brand{display:flex;align-items:center;gap:10px}.brand img{width:42px;height:42px;border-radius:50%;background:var(--aska-primary-soft);object-fit:cover}.header h1{font-size:18px;color:var(--aska-ink)}.header .subtitle{color:var(--aska-muted);font-size:13px}.lang-select,.settings-link{background:var(--aska-surface);border:1.5px solid var(--aska-line);border-radius:999px;color:var(--aska-muted);padding:7px 10px}.settings-link{font-size:14px}.header-actions{display:flex;align-items:center;gap:7px}.urgent-top{display:inline-flex;align-items:center;gap:4px;border:1px solid #b3261e;border-radius:999px;background:#fff4f2;color:#b3261e;padding:7px 10px;text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}
+        .chat-container{background:var(--aska-bg);padding:18px 16px 12px;gap:14px}.message{max-width:82%;padding:12px 16px;border-radius:24px;line-height:1.6}.message.bot{background:var(--aska-surface);color:var(--aska-ink);border:1px solid var(--aska-line);border-bottom-left-radius:8px;box-shadow:0 1px 2px rgba(91,58,40,.06),0 6px 20px rgba(91,58,40,.08)}.message.user{background:var(--aska-primary);color:#fffaf4;border-bottom-right-radius:8px}.message.emergency{border-color:var(--aska-emg);background:#fdecea}.question-card{background:var(--aska-surface);border:1px solid var(--aska-line);border-radius:18px;box-shadow:0 1px 2px rgba(91,58,40,.06),0 6px 20px rgba(91,58,40,.08)}.question-option{border:1.5px solid var(--aska-primary);background:var(--aska-surface);color:var(--aska-primary);border-radius:999px}.question-option:hover{background:var(--aska-primary-soft)}.input-area{position:sticky;bottom:64px;background:rgba(251,241,230,.96);border-top:1px solid var(--aska-line);padding:12px 14px}.input-area input{background:var(--aska-surface);border:1.5px solid var(--aska-line);color:var(--aska-ink)}.input-area input:focus{border-color:#ee8c78}.input-area button{background:var(--aska-primary);border-radius:999px}.input-area button:hover{background:#a2452f}
+        .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:11;display:grid;grid-template-columns:repeat(3,1fr);width:100%;max-width:560px;height:64px;background:var(--aska-surface);border-top:1px solid var(--aska-line)}.tabbar button{border:0;background:none;color:#7c5f51;font:600 12px inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}.tabbar button span:first-child{font-size:21px}.tabbar button.active{color:var(--aska-primary)}.tabbar button.active span:first-child{background:var(--aska-primary-soft);border-radius:999px;padding:2px 14px}
+        .page-panel{display:none;min-height:calc(100vh - 170px);padding:20px 16px;background:var(--aska-bg)}.page-panel.active{display:block}.page-panel h2{margin:0 0 6px;font-size:22px}.page-panel .lead{color:var(--aska-muted);line-height:1.6;margin:0 0 16px}.card{background:var(--aska-surface);border:1px solid var(--aska-line);border-radius:18px;overflow:hidden;box-shadow:0 1px 2px rgba(91,58,40,.06)}.card h3{margin:0;padding:16px 18px 8px;font-size:16px}.field{display:grid;gap:6px;padding:10px 18px}.field label{font-size:14px;font-weight:600;color:var(--aska-muted)}.field input,.field select{font:inherit;padding:11px 12px;border:1.5px solid var(--aska-line);border-radius:12px;background:var(--aska-surface);color:var(--aska-ink)}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0}.save-btn,.summary-link{margin:16px 18px;display:block;width:calc(100% - 36px);border:0;border-radius:999px;background:var(--aska-primary);color:#fffaf4;padding:13px;font:700 15px inherit;text-align:center;text-decoration:none;cursor:pointer}.status{min-height:22px;margin:0 18px 12px;color:#4a6b2e;font-size:14px}.record{padding:14px 18px;border-top:1px solid var(--aska-line);color:var(--aska-ink)}.record-row{display:grid;grid-template-columns:1.45fr 1fr 1fr;gap:8px;align-items:center}.record-title{font-weight:800;font-size:13px}.record-row button,.record-row a{border:1px solid var(--aska-line);background:var(--aska-surface);color:var(--aska-primary);border-radius:10px;padding:9px 7px;text-align:center;text-decoration:none;font:700 12px inherit;cursor:pointer}.record-row a{background:var(--aska-primary-soft)}.record-dialogue{display:none;margin-top:10px;padding:10px;border-radius:10px;background:#fff7ef;font-size:13px;line-height:1.5}.record-dialogue.open{display:block}.record-dialogue p{margin:0 0 7px}.empty{padding:16px 18px;color:var(--aska-muted)}.list-button{width:100%;background:none;border:0;border-top:1px solid var(--aska-line);padding:16px 18px;display:flex;justify-content:space-between;text-align:left;font:inherit;color:var(--aska-ink);cursor:pointer}.sos{display:block;background:#fdecea;color:var(--aska-emg);border:1px solid #f3c3bf;border-radius:14px;padding:15px;text-decoration:none;font-weight:800;text-align:center;margin-top:16px}.modal{position:fixed;inset:0;z-index:20;background:rgba(62,42,33,.42);display:none;align-items:flex-end}.modal.open{display:flex}.modal .modal-card{width:100%;max-width:560px;margin:auto;background:var(--aska-surface);padding:24px 20px;border-radius:24px 24px 0 0;line-height:1.65}.modal h2{margin-top:0}.modal button{width:100%;border:0;border-radius:999px;background:var(--aska-primary);color:#fffaf4;padding:13px;font:700 15px inherit}.auth-form{display:grid;gap:10px}.auth-form input{width:100%;font:inherit;padding:11px 12px;border:1.5px solid var(--aska-line);border-radius:12px;background:var(--aska-surface)}.auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.auth-actions button{margin:0}.auth-actions .secondary{background:var(--aska-primary-soft);color:var(--aska-primary)}.auth-status{min-height:22px;margin:0;color:var(--aska-muted);font-size:13px}.new-chat{margin:0 16px 12px;width:calc(100% - 32px);border:1px solid #c98a72;border-radius:999px;background:#fffaf4;color:#9b452f;padding:9px;font:700 14px inherit;cursor:pointer}
+        @media(max-width:560px){body{border:0}}
+    </style>
+    <style>
+        /* Spacious, rounded shell: it feels like a gentle note rather than a stack of ruled boxes. */
+        body{max-width:680px;padding-bottom:82px}.tabbar{max-width:680px;height:70px;border:0;border-radius:30px 30px 0 0;box-shadow:0 -8px 22px rgba(91,58,40,.08)}
+        .topbar{background:linear-gradient(135deg,#f8ddd0 0%,#f7e9d8 100%);padding:0;border:0;border-radius:0 0 38px 38px;overflow:hidden;box-shadow:0 9px 22px rgba(91,58,40,.10)}
+        .header{padding:14px 22px}.brand{gap:10px}.brand img{width:43px;height:43px}.header h1{font-size:21px;margin:0}.header-actions{gap:8px}.urgent-top{padding:8px 11px;font-size:12px;background:rgba(255,250,244,.88)}.language-toggle{padding:4px}.language-toggle button{padding:7px 11px;font-size:13px}.new-chat{width:auto;margin:0;border:1px solid #cf8d75;background:#fffaf4;color:#9b452f;padding:8px 11px;font-size:13px;white-space:nowrap;box-shadow:0 2px 5px rgba(91,58,40,.08)}.topbar .welcome-note{margin:0;padding:10px 22px 13px;border-radius:0 0 38px 38px;background:rgba(255,243,204,.82);border-left:0;text-align:center;font-size:13px}.topbar .welcome-note button{font-size:13px}.chat-container{padding:24px 24px 16px;gap:18px}.message{max-width:86%;padding:16px 19px;border-radius:28px;line-height:1.7;font-size:16px}.message.bot{border-bottom-left-radius:12px}.message.user{border-bottom-right-radius:12px}.question-card{border-radius:25px}.input-area{bottom:70px;border:0;background:rgba(251,241,230,.93);padding:16px 22px 18px}.input-area input{min-height:50px;border-radius:26px;font-size:16px}.input-area button{min-height:50px;padding:0 24px;font-size:16px}.tabbar button{font-size:13px}.tabbar button span:first-child{font-size:22px}
+        /* Archive and account pages scroll as full documents, with clearance for the fixed bottom navigation. */
+        body.subpage{height:auto;min-height:100vh;overflow-y:auto;padding-bottom:100px;background:#fff8f3}.subpage .topbar{display:none}.subpage .page-panel{flex:none;min-height:calc(100vh - 70px);padding:34px 24px 118px;background:radial-gradient(circle at 100% 0,#fae6d8 0,transparent 31%),linear-gradient(180deg,#fffaf6 0%,#fbf1e6 100%)}
+        .subpage-title{padding:8px 5px 24px}.subpage-title .eyebrow{display:block;color:#b5523b;font-size:12px;font-weight:800;letter-spacing:.13em}.subpage-title h2{margin:4px 0 7px;font-size:32px;letter-spacing:-.04em}.subpage-title p{margin:0;color:var(--aska-muted);font-size:16px;line-height:1.6}.page-panel .lead{display:none}.page-panel .card{border-radius:28px 28px 36px 26px;box-shadow:0 10px 26px rgba(91,58,40,.08)}.page-panel .card h3{padding:21px 22px 10px;font-size:18px}.field{padding:11px 22px}.field input,.field select{border-radius:16px;padding:13px 14px;font-size:16px}.save-btn{margin:20px 22px;border-radius:18px;width:calc(100% - 44px);padding:15px;font-size:16px}
+        .account-hero{padding:24px;background:linear-gradient(135deg,#f5dacf,#fff1e9);border:1px solid #e6bda9;border-radius:34px 28px 38px 26px;box-shadow:0 12px 28px rgba(91,58,40,.10)}.account-summary{gap:15px}.account-summary img{width:62px;height:62px;border-radius:23px}.account-summary h3{font-size:22px}.account-summary p{font-size:15px}.account-badge{padding:4px 10px;font-size:12px}.account-action{width:100%;margin-top:20px;border:0;border-radius:18px;padding:14px 16px;background:rgba(255,253,250,.74);color:var(--aska-ink);display:flex;align-items:center;justify-content:space-between;text-align:left;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(150,91,70,.12)}.account-action-copy{display:grid;gap:4px}.account-action b{font-size:15px}.account-action small{font-size:13px;color:var(--aska-muted)}.account-action-arrow{font-size:25px;line-height:1;color:#a8543c}.settings-card{margin-top:20px;padding:8px;background:rgba(255,250,244,.84)}.settings-card .list-button,.settings-card .list-button:first-child{border:0;margin:4px 0;border-radius:17px;background:#fffdfb;padding:17px 16px}.settings-card .list-button span:first-child{display:grid;gap:6px}.settings-card .list-button small{display:block;font-size:13px;line-height:1.45}.sos{margin-top:20px;border-radius:20px;padding:17px;font-size:16px}
+        /* Home header: two relaxed rows keep the important actions easy to find without crowding the brand. */
+        .header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:13px 18px;align-items:center;padding:18px 28px 14px}.header-actions{grid-column:2;grid-row:1;gap:10px}.brand{min-width:0}.brand .subtitle{max-width:390px}.topbar-action-row{display:flex;justify-content:flex-end;padding:0 28px 13px}.topbar-action-row .new-chat{border-radius:18px;padding:10px 17px;background:#fff8f2;box-shadow:0 5px 12px rgba(112,64,44,.10)}
+        .topbar .welcome-note{display:flex;justify-content:center;align-items:center;gap:10px;padding:12px 28px 15px;border-radius:0 0 42px 42px;background:linear-gradient(135deg,#fff1cb,#fcede4);color:#6a4b3c}
+        #welcomeMessage{width:100%;max-width:100%;min-height:0;height:auto;align-self:flex-start;padding:16px 20px;border-radius:29px 29px 35px 22px;line-height:1.6;white-space:normal}.chat-container{align-content:flex-start}
+        /* Consultation history lives in a ChatGPT-like left drawer, leaving health records focused on cycle data. */
+        .topbar-action-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:8px}.topbar-action-row .action-left,.topbar-action-row .action-right{display:contents}.disclaimer-copy{min-width:0;color:#805d4d;font-size:11px;line-height:1.35;text-align:center}.history-toggle,.topbar-disclaimer{border:0;border-radius:999px;background:rgba(255,250,244,.76);color:#70483a;padding:9px 13px;font:700 13px inherit;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(174,109,82,.16);white-space:nowrap}.topbar-disclaimer{background:#f8dfd5;color:#925040}.history-sidebar{position:fixed;z-index:50;top:0;bottom:0;left:0;width:min(350px,86vw);padding:20px 14px;background:linear-gradient(160deg,#fff8f3,#f7e4d7);border-right:1px solid #e8c9b8;box-shadow:18px 0 42px rgba(75,44,30,.18);transform:translateX(-105%);transition:transform .24s ease;overflow-y:auto}.history-sidebar.open{transform:translateX(0)}.sidebar-scrim{position:fixed;inset:0;z-index:45;background:rgba(61,42,31,.28);opacity:0;visibility:hidden;transition:opacity .2s}.sidebar-scrim.open{opacity:1;visibility:visible}.history-sidebar-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 5px 16px}.history-sidebar-head h2{margin:0;font-size:22px}.history-sidebar-head p{margin:3px 0 0;color:var(--aska-muted);font-size:13px}.sidebar-close{width:34px;height:34px;border:0;border-radius:50%;background:#fffaf6;color:#87503e;font-size:22px;cursor:pointer}.history-sidebar .new-chat{display:block;width:100%;margin:0 0 14px;border-radius:17px;padding:12px;background:#b95740;color:#fffaf4;border:0;box-shadow:none}.history-sidebar .empty{margin-top:10px;border-radius:17px;background:rgba(255,255,255,.62);padding:15px;font-size:13px;line-height:1.55}.history-sidebar .record{margin:8px 0;padding:13px;border:0;border-radius:18px;background:rgba(255,253,250,.88);box-shadow:0 3px 10px rgba(91,58,40,.06)}.history-sidebar .record-row{grid-template-columns:1fr 1fr;gap:8px}.history-sidebar .record-title{grid-column:1/-1;font-size:14px}.history-sidebar .record-row button,.history-sidebar .record-row a{border:0;border-radius:12px;padding:10px 7px;background:#f8e5db;font-family:inherit;font-size:14px;font-weight:700;line-height:1.2;text-decoration:none;display:flex;align-items:center;justify-content:center}.history-sidebar .record-row a{background:#f4d2c5}.history-sidebar .record-dialogue{border-radius:14px;background:#fff7f1}
+        /* Palette sampled from the supplied AskaMa cover: cream paper, coral cardigan, apricot accents, and sage details. */
+        :root{--aska-bg:#fff3e3;--aska-surface:#fffdf8;--aska-panel:#ffe7db;--aska-line:#f2d3bd;--aska-ink:#513b36;--aska-muted:#765b51;--aska-primary:#f18b79;--aska-primary-soft:#ffd8d0;--aska-sage:#e7edc6;--aska-emg:#d85751;--primary:#f18b79;--primary-light:#f7b35e;--bg:#fff3e3;--chat-bg:#fffdf8;--bot-bg:#fff8ef;--bot-text:#513b36;--border:#f2d3bd;--danger:#d85751;--warning:#f5ad52;--success:#829441}
+        body{background:var(--aska-bg)}.topbar{background:linear-gradient(135deg,#ffdad0 0%,#fff0dc 100%);border-color:#f4c8b7;box-shadow:0 10px 24px rgba(154,88,70,.10)}.topbar .welcome-note{background:linear-gradient(135deg,#fff1cc,#fff6e5);color:#765b51}.urgent-top{border-color:#cf675b;background:#fff9f2;color:#bd584f}.language-toggle{background:#ffe8dd;border-color:#f5cdbd}.language-toggle button.active{background:#ed8a76}.history-toggle{background:#fff9f1;color:#765b51;box-shadow:inset 0 0 0 1px #f1d4c0}.topbar-disclaimer{background:#ffe4db;color:#a65a50}.topbar-action-row .new-chat{border-color:#e79580;background:#fffaf3;color:#ad5c4e}.message.bot{background:#fffdf8;border-color:#f2d3bd;box-shadow:0 3px 12px rgba(135,81,63,.08),0 8px 22px rgba(135,81,63,.07)}.message.user,.input-area button,.save-btn,.summary-action{background:#ef8c78}.question-option{border-color:#ef8c78;color:#b55c50}.question-option:hover{background:#ffe2d8}.input-area{background:rgba(255,243,227,.94)}.input-area input{border-color:#f2d3bd}.input-area input:focus{border-color:#ef8c78}.tabbar{background:#fffdf8}.tabbar button{color:#806258}.tabbar button.active{color:#dd7563}.tabbar button.active span:first-child{background:#ffe2d8}.page-panel,.subpage .page-panel{background:radial-gradient(circle at 100% 0,#ffe2d3 0,transparent 31%),linear-gradient(180deg,#fffaf2 0%,#fff3e3 100%)}.account-hero{background:linear-gradient(135deg,#ffe0d4,#fff4e7);border-color:#f1bda9;box-shadow:0 12px 28px rgba(135,81,63,.10)}.account-action{background:rgba(255,253,248,.86);box-shadow:inset 0 0 0 1px #f1d4c0}.account-action-arrow{color:#e47765}.settings-card{background:rgba(255,250,242,.88)}.sos{background:#fff0ed;color:#c95850;border-color:#f3b8ae}.history-sidebar{background:linear-gradient(160deg,#fff9f0,#ffe5d9);border-color:#f2c9b8}.history-sidebar .new-chat{background:#ef8c78}.history-sidebar .record-row button{background:#ffe8df;color:#a95e51}.history-sidebar .record-row a{background:#ffd8ca;color:#9e5147}.result-screen{border-color:#f2d3bd;border-top-color:#ef8c78}.result-head{background:#ffe5db}.selfcare .result-head,.watch-box{background:#edf0ce}.result-screen.selfcare{border-top-color:#829441}.emergency-screen{border-color:#f2d3bd;border-top-color:#d85751}.emergency-head{background:#ffebe8}.call995{background:#d85751;box-shadow:0 5px 15px rgba(196,78,71,.23)}
+        .brand img,.account-summary img{object-position:center 42%;border:2px solid rgba(255,255,255,.75)}.tabbar .tab-icon{width:22px;height:22px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}.tabbar button span:first-child{font-size:0;line-height:0}.tabbar .tab-icon-wrap{width:42px;height:28px;display:grid;place-items:center;border-radius:999px}.tabbar button.active .tab-icon-wrap{background:#ffe2d8}
+        @media(max-width:500px){body{max-width:100%}.header{display:flex;flex-wrap:wrap;padding:15px 18px 10px;gap:10px}.brand{width:100%}.brand img{width:42px;height:42px}.header h1{font-size:20px}.brand .subtitle{font-size:13px;line-height:1.45;max-width:100%}.header-actions{width:100%;justify-content:space-between;gap:8px}.urgent-top{padding:8px 12px;font-size:12px}.language-toggle button{padding:7px 11px}.topbar-action-row{display:flex;flex-wrap:wrap;padding:0 18px 12px}.topbar-action-row .action-left,.topbar-action-row .action-right{display:contents}.disclaimer-copy{order:4;flex-basis:100%;padding-top:2px}.topbar-action-row .new-chat{padding:8px 14px;font-size:13px}.topbar .welcome-note{display:none}.chat-container{padding:18px 16px 14px}#welcomeMessage{padding:18px 19px;border-radius:25px 25px 30px 18px;font-size:15px;line-height:1.65}.input-area{padding:13px 14px 16px}.subpage .page-panel{padding:28px 16px 94px}.subpage-title h2{font-size:30px}.message{font-size:15px}.account-hero{padding:20px}.account-summary h3{font-size:20px}}
+    </style>
+</head>
+<body>
+    <div class="sidebar-scrim" id="sidebarScrim"></div>
+    <aside class="history-sidebar" id="historySidebar" aria-label="问诊记录">
+        <div class="history-sidebar-head"><div><h2>问诊记录</h2><p>阿嬷陪你聊过的事情</p></div><button class="sidebar-close" type="button" id="closeHistory" aria-label="关闭问诊记录">×</button></div>
+        <button class="new-chat" type="button" id="sidebarNewChatBtn">＋ 开始新对话</button>
+        <div id="recordList" class="empty">尚无问诊记录。完成一次问诊后，摘要会显示在这里。</div>
+    </aside>
+    <div class="topbar">
+    <div class="header">
+        <div class="brand">
+            <img src="/static/grandma.png" alt="Grandma avatar">
+            <div><h1>AskaMa · 问问阿嬷</h1><div class="subtitle">先问问阿嬷：要不要去医院、去哪里、在家怎么照顾自己</div></div>
+        </div>
+        <div class="header-actions">
+            <a class="urgent-top" href="tel:995" aria-label="拨打 995 急诊电话">紧急就医995</a>
+            <select class="lang-select" id="langSelect" aria-hidden="true">
+                <option value="zh" selected>中文</option>
+                <option value="en">English</option>
+            </select>
+            <div class="language-toggle" aria-label="语言切换"><button type="button" class="active" data-lang="zh">中</button><button type="button" data-lang="en">EN</button></div>
+        </div>
+    </div>
+    <div class="topbar-action-row"><div class="action-left"><button class="history-toggle" type="button" id="historyToggle">☰ 问诊记录</button></div><span class="disclaimer-copy" id="disclaimerNote">阿嬷只能帮你掂量轻重，疾病诊断得听医生的呀。</span><div class="action-right"><button class="new-chat" type="button" id="newChatBtn">＋ 新对话</button><button class="topbar-disclaimer" type="button" id="openDisclaimer">免责声明</button></div></div>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="message bot" id="welcomeMessage">我在这里，有什么困扰或是不舒服，都可以安心说说。月经、出血、下腹疼痛、分泌物变化，或其他女性健康方面的疑问，都不用不好意思。阿嬷会帮你掂量轻重，告诉你需不需要就医，以及这时候怎样照顾自己。</div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="messageInput" placeholder="说说你的情况..." autocomplete="off">
+        <button id="sendBtn" onclick="sendMessage()">发送</button>
+    </div>
+
+    <section class="page-panel" id="recordsPage">
+        <header class="subpage-title"><span class="eyebrow">MY HEALTH VAULT</span><h2>健康档案</h2><p>记录周期信息，方便你下次和医生沟通。</p></header>
+        <div class="card"><h3>我的周期信息</h3>
+            <form id="profileForm">
+                <div class="field"><label for="nickname">称呼（可选）</label><input id="nickname" name="nickname" maxlength="20" placeholder="例如：小安"></div>
+                <div class="field"><label for="last_period">上次月经开始日期</label><input id="last_period" name="last_period" type="date"></div>
+                <div class="grid2"><div class="field"><label for="cycle_days">平时周期天数</label><input id="cycle_days" name="cycle_days" type="number" min="1" max="90"></div><div class="field"><label for="period_days">经期长度天数</label><input id="period_days" name="period_days" type="number" min="1" max="30"></div></div>
+                <div class="field"><label for="cycle_regular">周期是否规律</label><select id="cycle_regular" name="cycle_regular"><option value="">不填写</option><option>规律</option><option>不规律</option><option>不确定</option></select></div>
+                <div class="field"><label for="iud">是否放置节育环</label><select id="iud" name="iud"><option value="">不填写</option><option>是</option><option>否</option><option>不确定</option></select></div>
+                <div class="field"><label for="anticoagulants">最近是否服用抗凝药</label><select id="anticoagulants" name="anticoagulants"><option value="">不填写</option><option>是</option><option>否</option><option>不确定</option></select></div>
+                <div class="field"><label for="contraceptives">最近是否服用避孕药</label><select id="contraceptives" name="contraceptives"><option value="">不填写</option><option>是</option><option>否</option><option>不确定</option></select></div>
+                <button class="save-btn" type="submit">保存我的基本信息</button><p class="status" id="profileStatus"></p>
+            </form>
+        </div>
+    </section>
+
+    <section class="page-panel" id="mePage">
+        <header class="subpage-title"><span class="eyebrow">MY AskaMa</span><h2>我的</h2><p>管理你的账号、健康资料和使用说明。</p></header>
+        <section class="account-hero" aria-label="账号信息">
+            <div class="account-summary"><img src="/static/grandma.png" alt="Grandma avatar"><div><span class="account-badge" id="accountBadge">访客模式</span><h3 id="accountName">还没有登录</h3><p id="accountDescription">登录后，健康档案和问诊记录会绑定到你的账号。</p></div></div>
+            <button class="account-action" type="button" id="authEntry"><span class="account-action-copy"><b id="accountTitle">登录或注册</b><small id="accountInfo">管理登录方式与资料绑定</small></span><span class="account-action-arrow" aria-hidden="true">›</span></button>
+        </section>
+        <div class="card settings-card">
+            <button class="list-button" type="button" data-modal="disclaimerModal"><span><b>免责声明</b><small>使用前需要了解的事项</small></span><span>›</span></button>
+            <button class="list-button" type="button" data-modal="privacyModal"><span><b>隐私说明</b><small>资料的本地存储、使用范围与安全提醒</small></span><span>›</span></button>
+            <button class="list-button" type="button" data-modal="aboutModal"><span><b>关于 AskaMa</b><small>Tencent Cloud AI Hackathon 2026 参赛原型</small></span><span>›</span></button>
+        </div>
+        <a class="sos" href="tel:995">紧急情况：立即拨打 995</a>
+    </section>
+
+    <nav class="tabbar" aria-label="Primary navigation"><button class="active" type="button" data-page="chat"><span class="tab-icon-wrap"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 9 9 0 0 1-3.9-.9L4 19l1-3.2A7.2 7.2 0 0 1 4 12a7.5 7.5 0 0 1 8-7.5 7.5 7.5 0 0 1 8 7Z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/></svg></span><span>问阿嬷</span></button><button type="button" data-page="records"><span class="tab-icon-wrap"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M8 3v4M16 3v4M8 11h8M8 15h5"/></svg></span><span>健康档案</span></button><button type="button" data-page="me"><span class="tab-icon-wrap"><svg class="tab-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.4 3.2-5 7-5s6.2 1.6 7 5"/></svg></span><span>我的</span></button></nav>
+
+    <div class="modal" id="disclaimerModal"><div class="modal-card"><h2>免责声明</h2><p>Tencent Cloud AI Hackathon 2026 参赛原型。未经严谨医学审核，仅供演示参考</p><button type="button" data-close>我已了解</button></div></div>
+    <div class="modal" id="privacyModal"><div class="modal-card"><h2>隐私说明</h2><p>本页面仅在你主动点击保存时，才将周期信息与问诊摘要保存在本机的演示数据中。请不要输入真实姓名、地址、电话或其他敏感身份信息。</p><button type="button" data-close>关闭</button></div></div>
+    <div class="modal" id="aboutModal"><div class="modal-card"><h2>关于 AskaMa</h2><p>Tencent Cloud AI Hackathon 2026 参赛原型。未经严谨医学审核，仅供演示参考</p><button type="button" data-close>关闭</button></div></div>
+    <div class="modal" id="authModal"><div class="modal-card"><h2 id="authModalTitle">登录 / 注册</h2><p id="authIntro">登录后，这台设备已有的健康档案和问诊记录会绑定到你的账号。</p><form class="auth-form" id="authForm"><input id="authUsername" maxlength="30" autocomplete="username" placeholder="用户名（2–30 个字符，不含空格）"><input id="authPassword" type="password" minlength="6" maxlength="128" autocomplete="current-password" placeholder="密码（至少 6 个字符）"><p class="auth-status" id="authStatus"></p><div class="auth-actions" id="authActions"><button type="button" id="loginBtn">登录</button><button class="secondary" type="button" id="registerBtn">注册并登录</button></div><button type="button" id="logoutBtn" hidden>退出登录</button></form></div></div>
+
+    <script>
+        let sessionId = "{{ session_id }}";
+        const archiveOwnerId = localStorage.getItem('askamaArchiveOwnerId') || sessionId;
+        localStorage.setItem('askamaArchiveOwnerId', archiveOwnerId);
+        let currentQuestion = null;
+        let recordedFinal = false;
+        let dialogue = [];
+        // An out-of-scope reply is a polite end to this conversation.  The
+        // next message must be written into a fresh session, not appended to
+        // an unrelated consultation or its future report.
+        let freshSessionOnNextMessage = false;
+        let authenticatedUser = null;
+
+        const ui = {
+            zh: {title:'AskaMa · 问问阿嬷', brand:'AskaMa · 问问阿嬷', subtitle:'先问问阿嬷：要不要去医院、去哪里、在家怎么照顾自己', urgent:'紧急就医995', history:'☰ 问诊记录', disclaimer:'阿嬷只能帮你掂量轻重，疾病诊断得听医生的呀。', newChat:'＋ 新对话', disclaimerBtn:'免责声明', welcome:'我在这里，有什么困扰或是不舒服，都可以安心说说。月经、出血、下腹疼痛、分泌物变化，或其他女性健康方面的疑问，都不用不好意思。阿嬷会帮你掂量轻重，告诉你需不需要就医，以及这时候怎样照顾自己。', placeholder:'说说你的情况...', send:'发送', chat:'问阿嬷', profile:'健康档案', me:'我的', healthVault:'MY HEALTH VAULT', healthTitle:'健康档案', healthDesc:'记录周期信息，方便你下次和医生沟通。', cycle:'我的周期信息', save:'保存我的基本信息', myEyebrow:'MY AskaMa', myDesc:'管理你的账号、健康资料和使用说明。', privacy:'隐私说明', privacyDesc:'资料的本地存储、使用范围与安全提醒', about:'关于 AskaMa', aboutDesc:'Tencent Cloud AI Hackathon 2026 参赛原型', sos:'紧急情况：立即拨打 995', sideTitle:'问诊记录', sideDesc:'阿嬷陪你聊过的事情', sideNew:'＋ 开始新对话', empty:'尚无问诊记录。完成一次问诊后，摘要会显示在这里。', expand:'展开对话记录', collapse:'收起对话记录', report:'查看对话报告', account:'账号设置', login:'登录或注册', accountInfo:'管理登录方式与资料绑定', loginInfo:'登录后可管理资料与问诊记录', signedIn:'已登录', guest:'访客模式', noLogin:'还没有登录', bound:'你的健康档案和问诊记录已绑定到这个账号。', unbound:'登录后，健康档案和问诊记录会绑定到你的账号。'},
+            en: {title:'AskaMa · Ask Grandma', brand:'AskaMa · Ask Grandma', subtitle:'Ask Grandma whether to seek care, where to go, and how to care for yourself', urgent:'Emergency 995', history:'☰ History', disclaimer:'Grandma can help weigh urgency, but diagnosis belongs to a doctor.', newChat:'＋ New chat', disclaimerBtn:'Disclaimer', welcome:'I am here for you. Tell Grandma about any discomfort or concern. I can help you assess urgency, decide whether to seek care, and understand how to care for yourself.', placeholder:'Tell Grandma what is troubling you…', send:'Send', chat:'Ask Grandma', profile:'Health profile', me:'Me', healthVault:'MY HEALTH VAULT', healthTitle:'Health profile', healthDesc:'Keep cycle information ready for your next conversation with a doctor.', cycle:'My cycle information', save:'Save health profile', myEyebrow:'MY AskaMa', myDesc:'Manage your account, health profile and app information.', privacy:'Privacy', privacyDesc:'Local data storage, scope of use and safety guidance', about:'About AskaMa', aboutDesc:'Tencent Cloud AI Hackathon 2026 prototype', sos:'Emergency: call 995 now', sideTitle:'Consultation history', sideDesc:'Your previous conversations with Grandma', sideNew:'＋ Start new chat', empty:'No consultation records yet. Completed consultations will appear here.', expand:'View conversation', collapse:'Hide conversation', report:'View report', account:'Account settings', login:'Sign in or register', accountInfo:'Manage sign-in and data linking', loginInfo:'Sign in to manage your profile and consultation records', signedIn:'Signed in', guest:'Guest mode', noLogin:'Not signed in', bound:'Your health profile and consultation records are linked to this account.', unbound:'Sign in to link your health profile and consultation records.'}
+        };
+        const currentLanguage = () => document.getElementById('langSelect').value;
+        const t = key => ui[currentLanguage()][key] || ui.zh[key] || key;
+        const text = (selector, value) => { const el = document.querySelector(selector); if (el) el.textContent = value; };
+        function applyLanguage(lang) {
+            document.getElementById('langSelect').value = lang;
+            document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+            document.title = t('title'); text('.brand h1', t('brand')); text('.brand .subtitle', t('subtitle')); text('.urgent-top', t('urgent')); text('#historyToggle', t('history')); text('#disclaimerNote', t('disclaimer')); text('#newChatBtn', t('newChat')); text('#openDisclaimer', t('disclaimerBtn')); text('#sidebarNewChatBtn', t('sideNew')); text('.history-sidebar-head h2', t('sideTitle')); text('.history-sidebar-head p', t('sideDesc'));
+            const welcome = document.getElementById('welcomeMessage'); if (welcome) welcome.textContent = t('welcome');
+            document.getElementById('messageInput').placeholder = t('placeholder'); text('#sendBtn', t('send'));
+            document.querySelector('[data-page="chat"] span:last-child').textContent = t('chat'); document.querySelector('[data-page="records"] span:last-child').textContent = t('profile'); document.querySelector('[data-page="me"] span:last-child').textContent = t('me');
+            text('#recordsPage .eyebrow', t('healthVault')); text('#recordsPage h2', t('healthTitle')); text('#recordsPage .subpage-title p', t('healthDesc')); text('#recordsPage .card h3', t('cycle')); text('.save-btn', t('save'));
+            text('#mePage .eyebrow', t('myEyebrow')); text('#mePage h2', t('me')); text('#mePage .subpage-title p', t('myDesc')); text('[data-modal="privacyModal"] b', t('privacy')); text('[data-modal="privacyModal"] small', t('privacyDesc')); text('[data-modal="aboutModal"] b', t('about')); text('[data-modal="aboutModal"] small', t('aboutDesc')); text('.sos', t('sos'));
+            ['称呼（可选）','上次月经开始日期','平时周期天数','经期长度天数','周期是否规律','是否放置节育环','最近是否服用抗凝药','最近是否服用避孕药'].forEach((label, index) => { const english=['Name (optional)','Date last period started','Usual cycle length (days)','Period length (days)','Are cycles regular?','Using an IUD?','Recently used anticoagulants?','Recently used contraceptives?'][index]; const el = document.querySelectorAll('#profileForm label')[index]; if (el) el.textContent = lang === 'en' ? english : label; });
+            const choiceSets = lang === 'en' ? [['Not specified','Regular','Irregular','Not sure'],['Not specified','Yes','No','Not sure'],['Not specified','Yes','No','Not sure'],['Not specified','Yes','No','Not sure']] : [['不填写','规律','不规律','不确定'],['不填写','是','否','不确定'],['不填写','是','否','不确定'],['不填写','是','否','不确定']];
+            document.querySelectorAll('#profileForm select').forEach((select, selectIndex) => Array.from(select.options).forEach((option, optionIndex) => { option.textContent = choiceSets[selectIndex][optionIndex]; }));
+            const modalCopy = lang === 'en' ? {
+                disclaimer:['Disclaimer','Tencent Cloud AI Hackathon 2026 prototype. This product has not undergone rigorous medical review and is for demonstration only.','I understand'],
+                privacy:['Privacy','Health profile details and consultation summaries are stored locally only when you choose to save them. Please do not enter real names, addresses, phone numbers or other sensitive identifying information.','Close'],
+                about:['About AskaMa','Tencent Cloud AI Hackathon 2026 prototype. This product has not undergone rigorous medical review and is for demonstration only.','Close']
+            } : {
+                disclaimer:['免责声明','Tencent Cloud AI Hackathon 2026 参赛原型。未经严谨医学审核，仅供演示参考','我已了解'],
+                privacy:['隐私说明','本页面仅在你主动点击保存时，才将周期信息与问诊摘要保存在本机的演示数据中。请不要输入真实姓名、地址、电话或其他敏感身份信息。','关闭'],
+                about:['关于 AskaMa','Tencent Cloud AI Hackathon 2026 参赛原型。未经严谨医学审核，仅供演示参考','关闭']
+            };
+            Object.entries(modalCopy).forEach(([key, copy]) => { const modal = document.getElementById(`${key}Modal`); if (!modal) return; modal.querySelector('h2').textContent = copy[0]; modal.querySelector('p').textContent = copy[1]; modal.querySelector('[data-close]').textContent = copy[2]; });
+            document.querySelectorAll('.language-toggle button').forEach(item => item.classList.toggle('active', item.dataset.lang === lang));
+            if (authenticatedUser !== null) updateAccountCopy(); loadRecords();
+        }
+        document.getElementById('langSelect').value = 'zh';
+        document.querySelectorAll('.language-toggle button').forEach(button => button.addEventListener('click', () => applyLanguage(button.dataset.lang)));
+
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const btn = document.getElementById('sendBtn');
+            const text = input.value.trim();
+            if (!text) return;
+
+            if (freshSessionOnNextMessage) {
+                btn.disabled = true;
+                const started = await startNewChat(false);
+                if (!started) { btn.disabled = false; return; }
+                freshSessionOnNextMessage = false;
+            }
+
+            // Show user message
+            addMessage(text, 'user');
+            input.value = '';
+            btn.disabled = true;
+
+            // Show typing indicator
+            showTyping();
+
+            try {
+                const formData = new FormData();
+                formData.append('message', text);
+                formData.append('session_id', sessionId);
+                formData.append('is_answer', currentQuestion ? 'true' : 'false');
+                if (currentQuestion && currentQuestion.answerValue !== undefined) {
+                    formData.append('answer_value', text);
+                    const parsed = parseInt(text);
+                    if (!isNaN(parsed)) {
+                        formData.append('answer_value_int', parsed);
+                    }
+                    formData.set('message', '');
+                }
+                formData.append('language', document.getElementById('langSelect').value);
+
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await res.json();
+
+                hideTyping();
+                currentQuestion = null;
+
+                const response = data.response;
+                if (response.response_type === 'question') {
+                    currentQuestion = {
+                        questionId: response.question_id,
+                        slot: response.slot,
+                    };
+                    addQuestionCard(response.text, response.options);
+                } else {
+                    if (response.level) {
+                        if (response.level === 'EMERGENCY_NOW') {
+                            const record = await saveConsultation(response, data.session_state);
+                            showEmergencyScreen(response, record, data.session_state);
+                            return;
+                        }
+                        const record = await saveConsultation(response, data.session_state);
+                        showStandardResult(response, record);
+                        return;
+                    } else {
+                        if (response.response_type === 'out_of_scope') {
+                            freshSessionOnNextMessage = true;
+                        }
+                        addMessage(response.text, 'bot');
+                    }
+                }
+            } catch (err) {
+                hideTyping();
+                addMessage('抱歉，出了点问题。请重试。', 'bot');
+                console.error(err);
+            }
+
+            btn.disabled = false;
+            input.focus();
+        }
+
+        function selectOption(value, label) {
+            // Show user selection
+            addMessage(label, 'user');
+
+            // Send answer
+            sendAnswer(value);
+        }
+
+        async function sendAnswer(value) {
+            showTyping();
+            try {
+                const formData = new FormData();
+                formData.append('message', '');
+                formData.append('session_id', sessionId);
+                formData.append('is_answer', 'true');
+                formData.append('answer_value', value);
+                const parsed = parseInt(value);
+                if (!isNaN(parsed)) {
+                    formData.append('answer_value_int', parsed);
+                }
+                formData.append('language', document.getElementById('langSelect').value);
+
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await res.json();
+                hideTyping();
+                currentQuestion = null;
+
+                const response = data.response;
+                if (response.response_type === 'question') {
+                    currentQuestion = {
+                        questionId: response.question_id,
+                        slot: response.slot,
+                    };
+                    addQuestionCard(response.text, response.options);
+                } else {
+                    if (response.level) {
+                        if (response.level === 'EMERGENCY_NOW') {
+                            const record = await saveConsultation(response, data.session_state);
+                            showEmergencyScreen(response, record, data.session_state);
+                            return;
+                        }
+                        const record = await saveConsultation(response, data.session_state);
+                        showStandardResult(response, record);
+                        return;
+                    } else {
+                        if (response.response_type === 'out_of_scope') {
+                            freshSessionOnNextMessage = true;
+                        }
+                        addMessage(response.text, 'bot');
+                    }
+                }
+            } catch (err) {
+                hideTyping();
+                addMessage('抱歉，出了点问题。请重试。', 'bot');
+                console.error(err);
+            }
+        }
+
+        function addMessage(text, type, saveToDialogue = true) {
+            const container = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            div.innerHTML = text;
+            container.appendChild(div);
+            if (saveToDialogue) {
+                const readable = div.textContent.trim();
+                if (readable) dialogue.push({role: type === 'user' ? '我' : '阿嬷', text: readable});
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function addQuestionCard(questionText, options) {
+            const container = document.getElementById('chatContainer');
+            const card = document.createElement('div');
+            card.className = 'question-card';
+
+            const qText = document.createElement('div');
+            qText.className = 'q-text';
+            qText.innerHTML = '👵 ' + questionText;
+            card.appendChild(qText);
+            dialogue.push({role: '阿嬷', text: questionText.replace(/<[^>]*>/g, '')});
+
+            if (currentQuestion?.slot === 'pain_location') {
+                const zones = [
+                    ['左上腹', 'whole_abdomen'], ['上腹', 'whole_abdomen'], ['右上腹', 'whole_abdomen'],
+                    ['左侧腹', 'whole_abdomen'], ['肚脐周围', 'whole_abdomen'], ['右侧腹', 'whole_abdomen'],
+                    ['左下腹', 'lower_abdomen_one_side'], ['下腹正中', 'lower_abdomen_middle'], ['右下腹', 'lower_abdomen_one_side'],
+                ];
+                const grid = document.createElement('div');
+                grid.className = 'location-grid';
+                zones.forEach(([label, value]) => {
+                    const button = document.createElement('button'); button.type = 'button'; button.textContent = label;
+                    button.onclick = () => selectOption(value, label); grid.appendChild(button);
+                });
+                card.appendChild(grid); container.appendChild(card); container.scrollTop = container.scrollHeight; return;
+            }
+
+            const optContainer = document.createElement('div');
+            optContainer.className = 'question-options';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'question-option';
+                btn.innerHTML = opt.label;
+                btn.onclick = () => selectOption(opt.value, opt.label);
+                optContainer.appendChild(btn);
+            });
+
+            card.appendChild(optContainer);
+            container.appendChild(card);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping() {
+            const container = document.getElementById('chatContainer');
+            const div = document.createElement('div');
+            div.className = 'typing-indicator';
+            div.id = 'typing';
+            div.innerHTML = '<span></span><span></span><span></span>';
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function hideTyping() {
+            const el = document.getElementById('typing');
+            if (el) el.remove();
+        }
+
+        function mapSearchUrl(query) {
+            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+        }
+
+        function reportAdvice(response) {
+            const adviceByLevel = {
+                EMERGENCY_NOW: '分诊建议：请立即前往急诊；如无法安全前往，请拨打 995。',
+                SEE_DOCTOR_24_48H: '分诊建议：建议在 24–48 小时内到妇科或医院门诊评估；如症状加重，请立即去急诊。',
+                BOOK_SOON: '分诊建议：建议近期预约 GP 或 Polyclinic；如症状加重，请提前就医。',
+                SELF_CARE: '分诊建议：可先居家观察并按护理指引休息；如出现新的危险信号，请及时就医。',
+            };
+            return adviceByLevel[response.level] || response.text || response.level;
+        }
+
+        async function saveConsultation(response, state) {
+            if (recordedFinal || !response.level) return null;
+            recordedFinal = true;
+            const finalAdvice = reportAdvice(response);
+            dialogue.push({role: '阿嬷', text: finalAdvice});
+            const firstUserMessage = dialogue.find(item => item.role === '我')?.text || state?.active_module || '女性健康问题';
+            try {
+                const saved = await fetch('/api/records', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({
+                    session_id: archiveOwnerId, consultation_session_id: sessionId,
+                    module: state?.active_module || '未说明', complaint: firstUserMessage, level: response.level,
+                    summary: finalAdvice, dialogue, language: document.getElementById('langSelect').value
+                })});
+                const data = await saved.json();
+                loadRecords();
+                return data.record || null;
+            } catch (error) { console.warn('无法保存问诊记录', error); return null; }
+        }
+
+        function showEmergencyScreen(response, record, state) {
+            const reasonData = response.events?.find(event => event.type === 'l1_evaluated')?.data?.triggered_rule_details || [];
+            const reasons = reasonData.map(rule => rule.note?.zh || rule.rule_id).filter(Boolean);
+            const slots = state?.slots || {};
+            const value = key => slots[key]?.value;
+            const symptoms = [];
+            if (value('pain_present') === true || value('pain_present') === 'true') symptoms.push('下腹很痛');
+            if (value('pain_sudden_onset') === true || value('pain_sudden_onset') === 'true') symptoms.push('疼痛是突然发生的');
+            if (value('dizziness_or_fainting') === 'fainted') symptoms.push('已经晕倒');
+            if (value('dizziness_or_fainting') === 'nearly_fainted') symptoms.push('一直头晕，快要晕倒');
+            if (value('heart_racing_or_short_of_breath') === true || value('heart_racing_or_short_of_breath') === 'true') symptoms.push('呼吸不顺或心跳很快');
+            if (value('soak_through_interval') === 'hourly_or_more_often') symptoms.push('出血量很大，每小时就浸透');
+            if (value('bleeding_through_clothes_or_bedding') === true || value('bleeding_through_clothes_or_bedding') === 'true') symptoms.push('出血已经浸透衣物或床单');
+            const symptomLine = symptoms.length ? symptoms.join('，') : (reasons[0] || '出现了需要紧急处理的症状');
+            const care = [
+                '让患者待在安全的地方，尽量躺着休息，不要自行走动或开车。',
+                '不要喂患者水、食物或任何药物，也不要勉强挪动患者。',
+                '留一个人在旁边陪着患者，留意患者是否清醒、呼吸有没有变化。',
+                '别挂电话，照着 995 接线员的指示做；准备好开门或到电梯口接救护人员。',
+            ];
+            if (symptoms.some(item => item.includes('出血'))) care.splice(2, 0, '外出血时可用干净的卫生巾或毛巾垫着，留意出血量；不要往身体里面放任何东西。');
+            const container = document.getElementById('chatContainer');
+            const card = document.createElement('article');
+            card.className = 'emergency-screen';
+            card.innerHTML = `<section class="emergency-head"><span class="emergency-tag">紧急</span><h2>请立即去急诊</h2><a class="call995" href="tel:995" aria-label="拨打 995 急诊电话">📞 请立即去急诊</a></section><section class="emergency-section"><h3>通话范例</h3><p>感觉很难受时不要自行前往医院，阿嬷担心你。先不要慌，阿嬷在这里陪你打 995 急诊电话，通话时一定要交代清楚细节。</p><div class="call-script"><span class="call-script-kicker">可以照着说</span><p class="call-script-main">你好！这里有人紧急急症。${symptomLine}，请尽快派救护车过来！</p><div class="call-script-field"><strong>地址</strong><span>xxxx（一定要讲清楚具体的组屋／街道、楼层单元号！）</span></div><div class="call-script-field"><strong>号码</strong><span>xxxxx（很重要，方便医护后续联络）</span></div></div></section><section class="emergency-section"><h3>救护车到达前</h3><ul>${care.map(item => `<li>${item}</li>`).join('')}</ul></section><a class="map-action" href="${mapSearchUrl('emergency department near me')}" target="_blank" rel="noopener">🗺 在 Google Maps 找附近急诊</a>`;
+            container.replaceChildren(card);
+            document.body.classList.add('result-view');
+            document.querySelector('.input-area').style.display = 'none';
+            container.scrollTop = 0;
+        }
+
+        function showStandardResult(response, record) {
+            const container = document.getElementById('chatContainer');
+            const card = document.createElement('article');
+            const isSelfCare = response.level === 'SELF_CARE';
+            card.className = `result-screen ${isSelfCare ? 'selfcare' : ''}`;
+            if (isSelfCare) {
+                const actions = [
+                    '找个舒服的地方慢慢躺下，先别硬撑。',
+                    '喝几口温水，让身体放松一点，注意保暖。',
+                    '今天把行程放慢，留意不舒服有没有加重。',
+                ];
+                card.innerHTML = `<section class="result-head"><span class="emergency-tag" style="border-color:#4a6b2e;color:#4a6b2e">居家观察</span><h2>阿嬷叮嘱你好好照顾自己</h2></section><section class="result-copy">别紧张，这种情况不少女生都会遇到，阿嬷暂时没看到危险信号。你可以先在家好好休息观察，有不适再来和阿嬷讲呀。</section><ul class="care-list">${actions.map(item => `<li>阿嬷建议你先：${item}</li>`).join('')}</ul><section class="watch-box"><b>⚠️ 需要警惕的信号：</b><br>如果出现疼到受不了、晕倒或快晕倒、呼吸不顺、出血突然变得很多，马上去急诊。<br><br>不要自行服用任何药物，症状没有好转记得按时去看医生。</section>`;
+            } else {
+                const plan = response.level === 'SEE_DOCTOR_24_48H' ? {
+                    className: 'soon-care', tagClass: 'soon-tag', tag: '尽快就医',
+                    title: '建议在 24–48 小时内就医',
+                    intro: '阿嬷暂时没看到需要立即拨打 995 的信号，但这个情况不适合继续拖着。请尽快安排医疗评估。',
+                    where: '妇科门诊或医院门诊；可用下方地图按你所在位置查看。',
+                    mapQuery: 'hospital outpatient clinic near me',
+                    mapLabel: '🗺 在 Google Maps 找附近医院／妇科门诊',
+                    actions: ['尽量在 24–48 小时内预约就医。', '把症状开始时间、变化和对话摘要带给医生。', '若症状突然加重、晕倒、呼吸不顺或出血明显增多，请立即去急诊。'],
+                } : {
+                    className: 'book-care', tagClass: 'book-tag', tag: '近期预约',
+                    title: '建议择期看 GP 或 Polyclinic',
+                    intro: '目前不需要急诊处理，但建议近期让医生评估一下，帮你把情况弄清楚。',
+                    where: '可预约附近的 GP 或 Polyclinic；可用下方地图按你所在位置查看。',
+                    mapQuery: 'GP clinic or polyclinic near me',
+                    mapLabel: '🗺 在 Google Maps 找附近 GP／Polyclinic',
+                    actions: ['近期预约一次门诊，不需要自行硬撑。', '记录症状出现的时间、频率和变化。', '如果症状加重或出现新的不适，请提前就医。'],
+                };
+                const summaryHref = record ? `/summary/${record.id}` : '#';
+                card.classList.add(plan.className);
+                card.innerHTML = `<section class="result-head"><span class="emergency-tag ${plan.tagClass}">${plan.tag}</span><h2>${plan.title}</h2></section><section class="result-copy">${plan.intro}</section><section class="care-plan"><div class="care-plan-section"><h3>去哪里</h3><p>${plan.where}</p></div><div class="care-plan-section"><h3>现在怎么做</h3><ul>${plan.actions.map(item => `<li>${item}</li>`).join('')}</ul></div></section><a class="map-action" href="${mapSearchUrl(plan.mapQuery)}" target="_blank" rel="noopener">${plan.mapLabel}</a><a class="summary-action" href="${summaryHref}">📄 查看诊前信息与对话摘要</a>`;
+            }
+            container.replaceChildren(card);
+            document.body.classList.add('result-view');
+            document.querySelector('.input-area').style.display = 'none';
+            container.scrollTop = 0;
+        }
+
+        function showPage(name) {
+            const chat = document.getElementById('chatContainer');
+            const input = document.querySelector('.input-area');
+            const records = document.getElementById('recordsPage');
+            const me = document.getElementById('mePage');
+            const isChat = name === 'chat';
+            document.body.classList.toggle('subpage', !isChat);
+            chat.style.display = isChat ? '' : 'none'; input.style.display = isChat ? '' : 'none';
+            records.classList.toggle('active', name === 'records'); me.classList.toggle('active', name === 'me');
+            document.querySelectorAll('.tabbar button').forEach(button => button.classList.toggle('active', button.dataset.page === name));
+            if (name === 'records') loadProfile();
+            if (name === 'me') loadProfile();
+            window.scrollTo(0, 0);
+        }
+
+        async function loadProfile() {
+            const response = await fetch(`/api/profile/${archiveOwnerId}`);
+            const {profile = {}} = await response.json();
+            Object.entries(profile).forEach(([key, value]) => { const field = document.getElementById(key); if (field) field.value = value; });
+            const welcome = document.getElementById('welcomeMessage');
+            if (welcome && profile.nickname) welcome.innerHTML = `${profile.nickname}，又来找阿嬷啦。这次是哪里不舒服？慢慢跟我说说。`;
+        }
+
+        async function loadRecords() {
+            const response = await fetch(`/api/records/${archiveOwnerId}`);
+            const {records = []} = await response.json();
+            const list = document.getElementById('recordList');
+            if (!records.length) { list.className = 'empty'; list.textContent = t('empty'); return; }
+            list.className = '';
+            list.replaceChildren(...records.map(record => {
+                const item = document.createElement('article'); item.className = 'record';
+                const title = document.createElement('div'); title.className = 'record-title';
+                const subject = record.complaint || record.module || (currentLanguage() === 'en' ? 'this consultation' : '本次情况');
+                title.textContent = currentLanguage() === 'en' ? `Consultation: ${subject}` : `关于${subject}的咨询`;
+                const row = document.createElement('div'); row.className = 'record-row';
+                const expand = document.createElement('button'); expand.type = 'button'; expand.textContent = t('expand');
+                const report = document.createElement('a'); report.href = `/summary/${record.id}`; report.textContent = t('report');
+                const dialogueCard = document.createElement('div'); dialogueCard.className = 'record-dialogue';
+                const turns = Array.isArray(record.dialogue) && record.dialogue.length ? record.dialogue : [{role: '阿嬷', text: record.summary || '未保存对话内容'}];
+                turns.forEach(turn => { const line = document.createElement('p'); const who = document.createElement('b'); who.textContent = `${turn.role || '对话'}：`; line.append(who, document.createTextNode(turn.text || '')); dialogueCard.appendChild(line); });
+                expand.addEventListener('click', () => { dialogueCard.classList.toggle('open'); expand.textContent = dialogueCard.classList.contains('open') ? t('collapse') : t('expand'); });
+                row.append(title, expand, report); item.append(row, dialogueCard); return item;
+            }));
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            const profile = Object.fromEntries(new FormData(event.currentTarget).entries());
+            const response = await fetch(`/api/profile/${archiveOwnerId}`, {method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(profile)});
+            document.getElementById('profileStatus').textContent = response.ok ? (currentLanguage() === 'en' ? 'Saved to your local health profile.' : '已保存到本地健康档案。') : (currentLanguage() === 'en' ? 'Could not save. Please try again.' : '保存失败，请重试。');
+            loadProfile();
+        });
+        document.querySelectorAll('.tabbar button').forEach(button => button.addEventListener('click', () => showPage(button.dataset.page)));
+        const profileLink = document.getElementById('profileLink');
+        if (profileLink) profileLink.addEventListener('click', event => { event.preventDefault(); showPage('me'); });
+        document.getElementById('openDisclaimer').addEventListener('click', () => document.getElementById('disclaimerModal').classList.add('open'));
+        document.getElementById('newChatBtn').addEventListener('click', startNewChat);
+        document.getElementById('sidebarNewChatBtn').addEventListener('click', () => { toggleHistory(false); startNewChat(); });
+        document.getElementById('historyToggle').addEventListener('click', () => toggleHistory(true));
+        document.getElementById('closeHistory').addEventListener('click', () => toggleHistory(false));
+        document.getElementById('sidebarScrim').addEventListener('click', () => toggleHistory(false));
+        document.getElementById('authEntry').addEventListener('click', openAuthModal);
+        document.getElementById('loginBtn').addEventListener('click', () => submitAuth('login'));
+        document.getElementById('registerBtn').addEventListener('click', () => submitAuth('register'));
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.querySelectorAll('[data-modal]').forEach(button => button.addEventListener('click', () => document.getElementById(button.dataset.modal).classList.add('open')));
+        document.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => button.closest('.modal').classList.remove('open')));
+        function toggleHistory(open) {
+            document.getElementById('historySidebar').classList.toggle('open', open);
+            document.getElementById('sidebarScrim').classList.toggle('open', open);
+        }
+
+        Promise.all([loadProfile(), loadRecords(), loadAuthStatus()]).catch(() => {});
+
+        function updateAccountCopy() {
+            document.getElementById('accountTitle').textContent = authenticatedUser ? t('account') : t('login');
+            document.getElementById('accountInfo').textContent = authenticatedUser ? t('accountInfo') : t('loginInfo');
+            document.getElementById('accountBadge').textContent = authenticatedUser ? t('signedIn') : t('guest');
+            document.getElementById('accountName').textContent = authenticatedUser ? authenticatedUser.username : t('noLogin');
+            document.getElementById('accountDescription').textContent = authenticatedUser ? t('bound') : t('unbound');
+        }
+
+        async function loadAuthStatus() {
+            const response = await fetch('/api/auth/me');
+            const data = await response.json();
+            authenticatedUser = data.user || null;
+            updateAccountCopy();
+        }
+
+        function openAuthModal() {
+            const loggedIn = Boolean(authenticatedUser);
+            document.getElementById('authModalTitle').textContent = loggedIn ? '账号信息' : '登录 / 注册';
+            document.getElementById('authIntro').textContent = loggedIn ? `当前已登录为「${authenticatedUser.username}」。你的健康档案和问诊记录已绑定到这个账号。` : '登录后，这台设备已有的健康档案和问诊记录会绑定到你的账号。';
+            document.getElementById('authUsername').hidden = loggedIn;
+            document.getElementById('authPassword').hidden = loggedIn;
+            document.getElementById('authActions').hidden = loggedIn;
+            document.getElementById('logoutBtn').hidden = !loggedIn;
+            document.getElementById('authStatus').textContent = '';
+            document.getElementById('authModal').classList.add('open');
+        }
+
+        async function submitAuth(action) {
+            const username = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value;
+            const status = document.getElementById('authStatus');
+            status.textContent = '正在处理…';
+            try {
+                const response = await fetch(`/api/auth/${action}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username, password, guest_owner_id: archiveOwnerId})});
+                const data = await response.json();
+                if (!response.ok) { status.textContent = data.error || '操作没有完成，请重试。'; return; }
+                authenticatedUser = data.user;
+                await loadAuthStatus(); await loadProfile(); await loadRecords();
+                document.getElementById('authModal').classList.remove('open');
+            } catch (error) { status.textContent = '网络出了点问题，请重试。'; }
+        }
+
+        async function logout() {
+            await fetch('/api/auth/logout', {method: 'POST'});
+            authenticatedUser = null;
+            await loadAuthStatus();
+            document.getElementById('authModal').classList.remove('open');
+            loadProfile(); loadRecords();
+        }
+
+        async function startNewChat(focusInput = true) {
+            const language = document.getElementById('langSelect').value;
+            const formData = new FormData(); formData.append('language', language);
+            try {
+                const response = await fetch('/api/sessions/new', {method: 'POST', body: formData});
+                const data = await response.json();
+                sessionId = data.session_id;
+                currentQuestion = null; recordedFinal = false; dialogue = []; freshSessionOnNextMessage = false;
+                history.replaceState({}, '', `/?sid=${encodeURIComponent(sessionId)}`);
+                const chat = document.getElementById('chatContainer');
+                document.body.classList.remove('result-view');
+                chat.replaceChildren();
+                addMessage(t('welcome'), 'bot', false);
+                document.querySelector('.input-area').style.display = '';
+                if (focusInput) document.getElementById('messageInput').focus();
+                return true;
+            } catch (error) {
+                addMessage('新的对话暂时开不了，请再试一次。', 'bot', false);
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>

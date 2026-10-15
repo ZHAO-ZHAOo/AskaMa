@@ -1,0 +1,33 @@
+# 故意不合法：level 写成不存在的值
+
+meta:
+  id: decision_table_invalid
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+module: heavy_bleeding
+
+rows:
+  - row_id: DT_EXAMPLE_INVALID
+    when:
+      {slot: flow_compared_to_usual, op: eq, value: much_more}
+    level: GO_TO_HOSPITAL  # 不存在的 level id
+    rationale:
+      en: Format example only
+      zh: 仅格式示例
+    needs_clinician_review: true
+    sources: []
+
+default_row:
+  level: SELF_CARE
+  rationale:
+    en: Format example only
+    zh: 仅格式示例
+
+conflict_resolution: highest_severity_wins
+
+uncertainty_policy:
+  mode: escalate_one_level

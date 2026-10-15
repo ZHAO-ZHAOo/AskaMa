@@ -1,0 +1,25 @@
+meta:
+  id: redflag_fixture
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+rules:
+  - rule_id: RF_FIXTURE_EXAMPLE
+    scope: [global]
+    condition:
+      all_of:
+        - {slot: fever_status, op: eq, value: measured_fever}
+        - {slot: pain_location, op: contains_any, value: [lower_abdomen_middle]}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: treat_as_false
+    user_note:
+      en: "[Fixture only – not clinical content]"
+    rationale:
+      en: "[Fixture only – not clinical content]"
+    sources:
+      - title: "[Fixture source]"
+        url: "https://example.invalid/source"
+    needs_clinician_review: true
+    status: draft_unreviewed

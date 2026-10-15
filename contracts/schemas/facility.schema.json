@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/facility.schema.json",
+  "title": "Facility schema",
+  "description": "Schema for the healthcare facility data table used by the L4 care-recommendation layer. Geographic coordinates can be provided by a map service, but service-specific attributes (gynaecology availability, walk-in capability, fee tier, subsidy and referral requirements, minor acceptance) must be maintained in this table. Facility names are official English proper nouns and are NOT translated. Facility data must be verified against official sources before use.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "facilities"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/meta" },
+    "facilities": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/facility" }
+    }
+  },
+  "$defs": {
+    "facility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "facility_id",
+        "name",
+        "type",
+        "lat",
+        "lng",
+        "address",
+        "postal_code",
+        "has_gynaecology",
+        "walk_in_available",
+        "appointment_required",
+        "fee_tier",
+        "subsidy_requires_referral",
+        "accepts_minors",
+        "needs_clinician_review",
+        "status"
+      ],
+      "properties": {
+        "facility_id": {
+          "type": "string",
+          "pattern": "^FAC_[A-Z0-9_]+$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Official English name (proper noun, not translated)."
+        },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "type": {
+          "enum": ["a_e", "urgent_og", "polyclinic", "chas_gp", "private_gp", "private_gynae", "soc"]
+        },
+        "lat": {
+          "type": "number",
+          "minimum": 1.1,
+          "maximum": 1.5,
+          "description": "Latitude within Singapore's approximate bounds."
+        },
+        "lng": {
+          "type": "number",
+          "minimum": 103.6,
+          "maximum": 104.1,
+          "description": "Longitude within Singapore's approximate bounds."
+        },
+        "address": {
+          "type": "string",
+          "minLength": 1
+        },
+        "postal_code": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$",
+          "description": "Singapore 6-digit postal code."
+        },
+        "has_gynaecology": {
+          "type": "boolean",
+          "description": "Whether the facility has a gynaecology department or service."
+        },
+        "walk_in_available": {
+          "type": "boolean",
+          "description": "Whether walk-in (no appointment needed) is possible."
+        },
+        "appointment_required": {
+          "type": "boolean",
+          "description": "Whether an appointment is required for routine visits."
+        },
+        "fee_tier": {
+          "enum": ["free", "low", "moderate", "high"],
+          "description": "Cost tier for the typical visit path at this facility type."
+        },
+        "subsidy_requires_referral": {
+          "type": "boolean",
+          "description": "Whether public subsidies require a referral from polyclinic, public hospital A&E, or CHAS GP."
+        },
+        "accepts_minors": {
+          "type": "boolean",
+          "description": "Whether the facility accepts minors (under 18). Specific requirements (guardian accompaniment etc.) are tracked in open_questions."
+        },
+        "operating_hours": {
+          "type": "string",
+          "description": "Free-text operating hours summary (official English source)."
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone number."
+        },
+        "website": {
+          "type": "string",
+          "format": "uri"
+        },
+        "languages": {
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/language_code" },
+          "description": "Languages spoken at the facility."
+        },
+        "notes": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title"],
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "publisher": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "accessed": { "type": "string", "format": "date" }
+            }
+          }
+        },
+        "needs_clinician_review": {
+          "type": "boolean"
+        },
+        "status": {
+          "enum": ["draft_unreviewed", "clinician_reviewed", "approved"]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "status": { "enum": ["clinician_reviewed", "approved"] }
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "sources": {
+                "type": "array",
+                "minItems": 1
+              },
+              "needs_clinician_review": { "const": false }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,119 @@
+# AI Grandma demo 追问树 – late_or_missed_period
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: question_tree_late_or_missed_period
+  version: 0.4.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+      url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+module: late_or_missed_period
+
+required_slots:
+  - days_since_last_period_start
+  - usual_cycle_length_days
+
+questions:
+  - question_id: Q_LM_DAYS_SINCE
+    slot: days_since_last_period_start
+    text:
+      en: "About how many days since your last period started?"
+      zh: "上次月经开始到现在大概多少天了？"
+    answer_options:
+      - {value: "20", label: {en: "About 20 days", zh: "大概20天"}}
+      - {value: "28", label: {en: "About 28 days", zh: "大概28天"}}
+      - {value: "35", label: {en: "About 35 days", zh: "大概35天"}}
+      - {value: "45", label: {en: "About 45 days", zh: "大概45天"}}
+      - {value: "60", label: {en: "About 60 days", zh: "大概60天"}}
+      - {value: "90", label: {en: "Over 90 days", zh: "超过90天"}}
+    priority: 1
+
+  - question_id: Q_LM_USUAL_CYCLE
+    slot: usual_cycle_length_days
+    text:
+      en: "What's your usual cycle length in days?"
+      zh: "你平常的月经周期大概多少天？"
+    answer_options:
+      - {value: "21", label: {en: "About 21 days", zh: "大概21天"}}
+      - {value: "28", label: {en: "About 28 days", zh: "大概28天"}}
+      - {value: "30", label: {en: "About 30 days", zh: "大概30天"}}
+      - {value: "35", label: {en: "About 35 days", zh: "大概35天"}}
+      - {value: "45", label: {en: "About 45 days", zh: "大概45天"}}
+    priority: 2
+
+  - question_id: Q_LM_PREGNANCY
+    slot: pregnancy_status
+    text:
+      en: "Is there a possibility you might be pregnant?"
+      zh: "有没有怀孕的可能？"
+    answer_options:
+      - {value: "confirmed_pregnant", label: {en: "I'm confirmed pregnant", zh: "已确认怀孕"}}
+      - {value: "possibly_pregnant", label: {en: "Possibly", zh: "可能怀孕"}}
+      - {value: "not_pregnant", label: {en: "No", zh: "没有怀孕"}}
+    priority: 3
+
+  - question_id: Q_LM_STOPPED
+    slot: periods_stopped_over_12_months
+    text:
+      en: "Have your periods stopped for a long time?"
+      zh: "月经已经停了很长时间了吗？"
+    answer_options:
+      - {value: "true", label: {en: "Yes, for a long time", zh: "是的，很久了"}}
+      - {value: "false", label: {en: "No, this is just a delay", zh: "没有，只是推迟了"}}
+    priority: 4
+
+  - question_id: Q_LM_DIZZY
+    slot: dizziness_or_fainting
+    text:
+      en: "Have you felt dizzy, lightheaded, or fainted?"
+      zh: "有没有头晕、眼前发黑，或者晕倒过？"
+    answer_options:
+      - {value: "none", label: {en: "No", zh: "没有"}}
+      - {value: "lightheaded", label: {en: "A bit lightheaded", zh: "有点头晕"}}
+      - {value: "nearly_fainted", label: {en: "Nearly fainted", zh: "差点晕倒"}}
+      - {value: "fainted", label: {en: "I fainted", zh: "晕倒过"}}
+    priority: 5
+
+  - question_id: Q_LM_FEVER
+    slot: fever_status
+    text:
+      en: "Do you have a fever, or have you taken your temperature?"
+      zh: "你发烧了吗，或者量过体温吗？"
+    answer_options:
+      - {value: "no_fever", label: {en: "No fever", zh: "没有发烧"}}
+      - {value: "feels_feverish_not_measured", label: {en: "Feel feverish but haven't measured", zh: "感觉发热但没量体温"}}
+      - {value: "measured_fever", label: {en: "Measured fever", zh: "量过，确实发烧"}}
+    priority: 6
+    reask_if_unclear:
+      en: "Could you confirm whether you have measured your temperature?"
+      zh: "能确认一下你有没有量过体温吗？"
+
+  - question_id: Q_LM_HEART
+    slot: heart_racing_or_short_of_breath
+    text:
+      en: "Do you feel your heart racing, or are you short of breath?"
+      zh: "有没有心跳加速，或者觉得气短？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 7
+
+  - question_id: Q_LM_VOMIT
+    slot: vomiting_or_cannot_keep_fluids_down
+    text:
+      en: "Have you been vomiting, or unable to keep fluids down?"
+      zh: "有没有呕吐，或者喝不进水？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 8
+
+stopping:
+  on_max_reached: grade_with_uncertainty
+  on_all_required_answered: grade
+
+max_questions: 8

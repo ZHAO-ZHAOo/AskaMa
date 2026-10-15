@@ -1,0 +1,27 @@
+# 故意不合法：lat 超出新加坡范围（1.1–1.5）
+
+meta:
+  id: facility_invalid
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+facilities:
+  - facility_id: FAC_EXAMPLE_INVALID
+    name: Example Invalid Facility
+    type: polyclinic
+    lat: 5.0  # 超出新加坡纬度范围 (1.1–1.5)
+    lng: 103.8
+    address: 300 Example Street, Singapore
+    postal_code: "111111"
+    has_gynaecology: false
+    walk_in_available: true
+    appointment_required: false
+    fee_tier: low
+    subsidy_requires_referral: false
+    accepts_minors: true
+    sources: []
+    needs_clinician_review: true
+    status: draft_unreviewed

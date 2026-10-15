@@ -1,0 +1,35 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY and contains NO real user data.
+
+session_id: "abc123def456ghi789"
+outcome_link_key: "olk_abc123def456ghi789"
+ui_language: en
+detected_input_languages: [en]
+started_at: "2026-10-08T12:00:00Z"
+turn_count: 2
+active_modules: [heavy_bleeding]
+slots:
+  age_band:
+    slot_id: age_band
+    status: answered
+    value: "18_24"
+    confidence: 0.95
+    source_turn: 0
+  flow_heaviness:
+    slot_id: flow_heaviness
+    status: answered
+    value: heavier_than_usual
+    confidence: 0.9
+    source_turn: 1
+  clot_size:
+    slot_id: clot_size
+    status: unknown
+asked_question_ids: ["Q_FLOW_COMPARED"]
+candidate_levels: [SELF_CARE, BOOK_SOON, SEE_DOCTOR_24_48H]
+user_profile_ref: "up_ref_abc123"
+stage: l2
+versions:
+  redflag_rules: "0.1.0"
+  question_tree: "0.1.0"
+  decision_table: "0.1.0"
+  contracts_bundle: "0.1.0"

@@ -1,0 +1,30 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: l4_ranked payload contains "lat" and "lng" (precise coordinates are prohibited in logs).
+
+event_id: "evt_bad_003"
+session_id: "abc123def456ghi789"
+turn_id: 3
+timestamp: "2026-10-08T12:06:00Z"
+event_type: l4_ranked
+ui_language: en
+versions:
+  facility_table: "0.1.0"
+  contracts_bundle: "0.1.0"
+outcome_link_key: "olk_abc123def456ghi789"
+payload:
+  level: SEE_DOCTOR_24_48H
+  emergency_mode: false
+  weights_source: questionnaire
+  preferences_clipped: true
+  lat: 1.3  # PROHIBITED — precise coordinates must not be in logs
+  lng: 103.8  # PROHIBITED
+  ranked:
+    - rank: 1
+      facility_id: "FAC_EXAMPLE_POLYCLINIC"
+      total_score: 0.85
+      feature_scores:
+        travel_time:
+          raw: 15
+          score: 0.8
+          weight: 0.5

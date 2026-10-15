@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/interfaces/grading_result.schema.json",
+  "title": "Grading result schema",
+  "description": "Schema for the GradingResult object produced by the L2 grading layer. L2 uses the question tree and decision table for the active module to narrow candidate levels and produce a final level. The level_trajectory records the candidate levels at each turn for audit. When information is uncertain, escalation is applied (escalated_for_uncertainty=true). status=in_progress means more questions are needed; status=final means a level has been determined.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "turn_id",
+    "module",
+    "status",
+    "level",
+    "next_question_id",
+    "matched_row_ids",
+    "level_trajectory",
+    "stop_reason",
+    "escalated_for_uncertainty",
+    "uncertain_slots",
+    "questions_asked_count",
+    "tables_version",
+    "question_tree_version"
+  ],
+  "properties": {
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "turn_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "module": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/module_id" },
+    "status": {
+      "enum": ["in_progress", "final"]
+    },
+    "level": {
+      "oneOf": [
+        { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id" },
+        { "type": "null" }
+      ]
+    },
+    "next_question_id": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ]
+    },
+    "matched_row_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "level_trajectory": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["turn", "candidates"],
+        "properties": {
+          "turn": { "type": "integer", "minimum": 0 },
+          "candidates": {
+            "type": "array",
+            "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id" }
+          }
+        }
+      }
+    },
+    "stop_reason": {
+      "oneOf": [
+        {
+          "enum": ["all_required_answered", "max_questions_reached", "redflag_triggered", "out_of_scope", "user_ended"]
+        },
+        { "type": "null" }
+      ]
+    },
+    "escalated_for_uncertainty": { "type": "boolean" },
+    "uncertain_slots": {
+      "type": "array",
+      "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/slot_id" }
+    },
+    "questions_asked_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "tables_version": { "type": "string" },
+    "question_tree_version": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "status": { "const": "final" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id"
+          },
+          "stop_reason": {
+            "enum": ["all_required_answered", "max_questions_reached", "redflag_triggered", "out_of_scope", "user_ended"]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "status": { "const": "in_progress" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "next_question_id": { "type": "string" }
+        }
+      }
+    }
+  ]
+}

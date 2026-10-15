@@ -1,0 +1,12 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: level is SELF_CARE but includes_escalation_criteria is false.
+
+session_id: "abc123def456ghi789"
+turn_id: 3
+module: heavy_bleeding
+level: SELF_CARE
+card_ids: ["SC_EXAMPLE_RELIEF"]
+includes_escalation_criteria: false  # PROHIBITED — should fail if/then constraint
+fallback_used: false
+selfcare_kb_version: "0.1.0"

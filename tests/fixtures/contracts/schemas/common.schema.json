@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/common.schema.json",
+  "title": "Common definitions for AI Grandma configuration files",
+  "description": "Reusable $defs shared by all rule-type schemas. These definitions encode shared concepts: meta information, i18n text (multilingual with English as source and fallback), language codes, slot/level/module ids, condition expressions with three-valued (Kleene) logic, etc.",
+  "type": "object",
+  "$defs": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "status", "sources", "reviewer", "last_verified"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "status": { "enum": ["draft_unreviewed", "clinician_reviewed", "approved"] },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title"],
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "publisher": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "accessed": { "type": "string", "format": "date" }
+            }
+          }
+        },
+        "reviewer": { "type": ["string", "null"] },
+        "last_verified": { "type": ["string", "null"], "format": "date" }
+      }
+    },
+
+    "i18n_text": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["en"],
+      "description": "Multilingual text object. English (en) is the source text and is required. Other languages (zh, ms, ta) are optional translations. When a translation is missing, the system falls back to English. Non-English medical text must be reviewed by a native speaker or clinician before it can be considered reliable.",
+      "properties": {
+        "en": { "type": "string", "minLength": 1 },
+        "zh": { "type": "string", "minLength": 1 },
+        "ms": { "type": "string", "minLength": 1 },
+        "ta": { "type": "string", "minLength": 1 }
+      }
+    },
+
+    "language_code": {
+      "enum": ["en", "zh", "ms", "ta"],
+      "description": "Supported language codes: en (English, default), zh (Simplified Chinese), ms (Malay), ta (Tamil)."
+    },
+
+    "slot_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+
+    "level_id": {
+      "enum": ["EMERGENCY_NOW", "SEE_DOCTOR_24_48H", "BOOK_SOON", "SELF_CARE"]
+    },
+
+    "module_id": {
+      "enum": [
+        "heavy_bleeding",
+        "severe_period_pain",
+        "late_or_missed_period",
+        "irregular_or_intermenstrual_bleeding"
+      ]
+    },
+
+    "redflag_exit_type": {
+      "enum": ["CALL_AMBULANCE", "GO_URGENT_OG_OR_AE"]
+    },
+
+    "versions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "redflag_rules": { "type": "string" },
+        "question_tree": { "type": "string" },
+        "decision_table": { "type": "string" },
+        "selfcare_kb": { "type": "string" },
+        "facility_table": { "type": "string" },
+        "weight_presets": { "type": "string" },
+        "questionnaire": { "type": "string" },
+        "prompt": { "type": "string" },
+        "model_id": { "type": "string" },
+        "contracts_bundle": { "type": "string" }
+      },
+      "description": "Version numbers for all configuration bundles used in a session. All fields are optional because different events involve different bundles. Recorded in every event log entry for audit and shadow-mode replay."
+    },
+
+    "slot_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slot_id", "status"],
+      "properties": {
+        "slot_id": { "$ref": "#/$defs/slot_id" },
+        "status": {
+          "enum": ["answered", "unknown", "declined", "not_asked"]
+        },
+        "value": {
+          "description": "The extracted value. Required when status is 'answered'. The type must match the slot definition in slots.yaml (checked by the downstream validation script)."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "source_turn": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "description": "A single extracted slot with its status and value. When status is 'answered', value must be present. The value type must conform to the slot's type in slots.yaml (cross-file check by validation script)."
+    },
+
+    "session_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{16,64}$",
+      "description": "Randomly generated session identifier. MUST NOT be derived from any personal information."
+    },
+
+    "outcome_link_key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]{16,64}$",
+      "description": "Anonymous key for linking a session to a follow-up outcome record. MUST NOT be derived from any personal information."
+    },
+
+    "duration_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit"],
+      "properties": {
+        "value": { "type": "number" },
+        "unit": { "enum": ["hours", "days", "weeks"] }
+      }
+    },
+
+    "condition": {
+      "$comment": "Three-valued (Kleene) logic condition expression.",
+      "description": "A recursive condition expression evaluated under three-valued logic. Each predicate produces true / false / unknown. When the referenced slot's status is unknown, declined, or not_asked, the predicate result is unknown — UNLESS the operator itself is is_unknown, is_answered, or is_declined (which always produce true/false). all_of / any_of / not combine results using Kleene logic: unknown AND false = false; unknown AND true = unknown; unknown OR true = true; unknown OR false = unknown; NOT unknown = unknown. Each rule file declares how it handles unknown results (e.g. on_unknown field in redflag rules, uncertainty_policy in decision tables).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["all_of"],
+          "properties": {
+            "all_of": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["any_of"],
+          "properties": {
+            "any_of": {
+              "type": "array",
+              "minItems": 1,
+              "items": { "$ref": "#" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["not"],
+          "properties": {
+            "not": { "$ref": "#" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["slot", "op", "value"],
+          "properties": {
+            "slot": { "$ref": "#/$defs/slot_id" },
+            "op": { "enum": ["eq", "ne", "in", "not_in", "contains_any"] },
+            "value": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "number" },
+                { "type": "boolean" },
+                { "type": "array", "items": { "type": ["string", "number", "boolean"] } }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["slot", "op", "value"],
+          "properties": {
+            "slot": { "$ref": "#/$defs/slot_id" },
+            "op": { "enum": ["gt", "gte", "lt", "lte"] },
+            "value": {
+              "oneOf": [
+                { "type": "number" },
+                { "$ref": "#/$defs/duration_value" }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["slot", "op"],
+          "properties": {
+            "slot": { "$ref": "#/$defs/slot_id" },
+            "op": { "enum": ["is_unknown", "is_answered", "is_declined"] }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,20 @@
+meta:
+  id: modules
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+modules:
+  - id: heavy_bleeding
+    name: {en: Heavy bleeding, zh: 经量过多}
+    scope: {en: Covers heavy bleeding, zh: 涵盖经量过多}
+  - id: severe_period_pain
+    name: {en: Severe period pain, zh: 严重痛经}
+    scope: {en: Covers severe pain, zh: 涵盖严重痛经}
+  - id: late_or_missed_period
+    name: {en: Late or missed period, zh: 月经推迟}
+    scope: {en: Covers late periods, zh: 涵盖月经推迟}
+  - id: irregular_or_intermenstrual_bleeding
+    name: {en: Irregular bleeding, zh: 不规则出血}
+    scope: {en: Covers irregular bleeding, zh: 涵盖不规则出血}

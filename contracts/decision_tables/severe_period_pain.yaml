@@ -1,0 +1,128 @@
+# AI Grandma demo 决策表 – severe_period_pain
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: decision_table_severe_period_pain
+  version: 0.4.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+      url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+module: severe_period_pain
+
+rows:
+  - row_id: DT_SP_001
+    when:
+      all_of:
+        - {slot: pain_severity_0_10, op: gte, value: 7}
+        - {slot: pain_interferes_with_activities, op: eq, value: cannot_do_usual_things}
+    level: SEE_DOCTOR_24_48H
+    priority: 10
+    rationale:
+      en: "Severe pain preventing daily activities warrants prompt medical review."
+      zh: "严重疼痛导致无法进行日常活动，应尽快就诊。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+
+  - row_id: DT_SP_002
+    when:
+      all_of:
+        - {slot: pain_severity_0_10, op: gte, value: 7}
+        - {slot: pain_compared_to_usual, op: eq, value: new_kind_of_pain}
+    level: SEE_DOCTOR_24_48H
+    priority: 9
+    rationale:
+      en: "Severe and new type of pain needs prompt evaluation."
+      zh: "严重且新类型的疼痛需要尽快评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+
+  - row_id: DT_SP_003
+    when:
+      all_of:
+        - {slot: pain_severity_0_10, op: gte, value: 6}
+        - {slot: pain_interferes_with_activities, op: in, value: [quite_a_lot, cannot_do_usual_things]}
+    level: BOOK_SOON
+    priority: 7
+    rationale:
+      en: "Significant pain interfering with activities should be assessed soon."
+      zh: "明显疼痛影响活动，应尽快看医生。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+
+  - row_id: DT_SP_004
+    when:
+      all_of:
+        - {slot: pain_severity_0_10, op: lt, value: 6}
+        - {slot: pain_compared_to_usual, op: in, value: [same_as_usual]}
+    level: SELF_CARE
+    priority: 1
+    rationale:
+      en: "Mild to moderate pain similar to usual – suitable for home self-care."
+      zh: "轻中度疼痛与平常相近——适合居家自我照护。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+
+  - row_id: DT_SP_005
+    when:
+      all_of:
+        - {slot: pain_severity_0_10, op: gte, value: 7}
+    level: BOOK_SOON
+    priority: 8
+    rationale:
+      en: "Severe pain rated 7 or above should always be assessed by a doctor, regardless of activity impact."
+      zh: "疼痛达到 7 分及以上，无论是否影响活动都建议尽快就医（保底升级）。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+
+  - row_id: DT_SP_006
+    when:
+      all_of:
+        - {slot: pain_timing_relative_to_period, op: in, value: [before_period, after_period, not_related_to_period]}
+    level: BOOK_SOON
+    priority: 6
+    rationale:
+      en: "Pain outside the menstrual period may indicate endometriosis or other conditions worth evaluating."
+      zh: "疼痛发生在非经期（经前/经后/与经期无关）可能提示子宫内膜异位症等，建议尽快评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+
+  - row_id: DT_SP_007
+    when:
+      all_of:
+        - {slot: pain_location, op: eq, value: lower_abdomen_one_side}
+    level: BOOK_SOON
+    priority: 5
+    rationale:
+      en: "One-sided pelvic pain may indicate ovarian-related conditions worth evaluating."
+      zh: "单侧盆腔疼痛可能提示卵巢相关问题，建议尽快评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+
+default_row:
+  level: BOOK_SOON
+  rationale:
+    en: "Unable to clearly assess – default to booking an appointment."
+    zh: "无法明确评估——默认建议预约就诊。"
+
+conflict_resolution: highest_severity_wins
+
+uncertainty_policy:
+  mode: escalate_one_level

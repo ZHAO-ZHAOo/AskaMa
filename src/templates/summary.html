@@ -1,0 +1,155 @@
+<!doctype html>
+{% set tx = s.tx %}
+<html lang="{{ 'zh' if s.lang == 'zh' else 'en' }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ tx.title }} · AskaMa</title>
+<style>
+:root{
+  /* Design tokens — same warm palette as the main page; change colours here only. */
+  --ink:#3e2a21;--ink-2:#62483b;--ink-3:#7c5f51;--line:#e6d5c4;--row-line:#f1e6da;
+  --soft:#fbf1e6;--brand:#a2452f;--primary:#b5523b;--on-primary:#fffaf4;
+  --emg:#b3261e;--emg-soft:#fdecea;
+  --desk:#efe4d8;--paper:#ffffff;--toolbar:#4a3328;--toolbar-ink:#fffaf4;
+  --toolbar-chip:rgba(255,250,244,.14);--toolbar-chip-line:rgba(255,250,244,.3);--paper-shadow:rgba(91,58,40,.16);
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Noto Sans SC","Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--desk);color:var(--ink)}
+.toolbar{position:sticky;top:0;z-index:2;display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;padding:12px 16px;background:var(--toolbar);color:var(--toolbar-ink);font-size:14px}
+.toolbar a,.toolbar button{font:inherit;color:var(--toolbar-ink);background:var(--toolbar-chip);border:1px solid var(--toolbar-chip-line);border-radius:999px;padding:7px 16px;text-decoration:none;cursor:pointer}
+.toolbar button.primary{background:var(--primary);border-color:var(--primary);color:var(--on-primary);font-weight:600}
+.page{width:210mm;max-width:calc(100% - 24px);min-height:297mm;margin:16px auto;background:var(--paper);box-shadow:0 2px 18px var(--paper-shadow);border-radius:6px;padding:14mm 14mm 12mm;font-size:10.5pt;line-height:1.45;display:flex;flex-direction:column}
+@media (max-width:600px){.page{padding:16px;min-height:auto;font-size:13px}}
+h1{font-size:15pt;margin:0}
+.head{display:flex;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:6px;margin-bottom:6px;flex-wrap:wrap}
+.meta{font-size:9pt;color:var(--ink-2);text-align:right}
+.nodx{font-size:9pt;font-weight:700;color:var(--ink);background:var(--soft);border-left:3px solid var(--ink);padding:4px 8px;margin:0 0 8px}
+.emg{border:2px solid var(--emg);background:var(--emg-soft);border-radius:6px;padding:8px 10px;margin-bottom:8px}
+.emg h2{color:var(--emg);margin:0 0 4px;font-size:11pt}
+.emg p{margin:0 0 6px;font-weight:600}
+h2{font-size:10.5pt;margin:10px 0 4px;padding:3px 6px;background:var(--soft);border-left:3px solid var(--brand)}
+h3{font-size:9.5pt;margin:6px 0 2px;color:var(--ink-2)}
+table{width:100%;border-collapse:collapse}
+td{padding:2px 6px 2px 0;vertical-align:top;border-bottom:1px solid var(--row-line)}
+td.k{width:38%;color:var(--ink-2)}
+td.v{font-weight:600;width:16%}
+td.p{font-size:8.5pt;color:var(--ink-3)}
+.q{font-style:italic;color:var(--ink)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.cols td.k{width:44%}.cols td.v{width:14%}
+@media (max-width:600px){.cols{grid-template-columns:1fr}}
+.none{color:var(--ink-3);font-size:9.5pt}
+.words{margin:2px 0 0;padding-left:16px}
+.words li{margin:1px 0}
+.small{font-size:9pt;color:var(--ink-2)}
+ul.esc{margin:2px 0;padding-left:16px}
+.foot{margin-top:auto;padding-top:8px;border-top:1px solid var(--line);display:flex;gap:12px;align-items:flex-start;font-size:8.5pt;color:var(--ink-2)}
+.qr{width:22mm;height:22mm;flex:none;border:1px dashed var(--ink-3);display:grid;place-items:center;text-align:center;font-size:7pt;color:var(--ink-3);padding:2px}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:8.5pt}
+@page{size:A4;margin:0}
+@media print{html,body{background:var(--paper)}.toolbar{display:none}.page{margin:0;box-shadow:none;border-radius:0;width:210mm;min-height:297mm;max-width:none}}
+.legacy-report{display:none}
+.compact-report{max-width:760px;margin:0 auto;padding:26px 18px 44px}
+.report-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;padding:4px 2px 18px;border-bottom:1px solid var(--line)}
+.report-brand{display:flex;gap:10px;align-items:center;color:#ad5b4c;font-size:13px;font-weight:800;letter-spacing:.08em}.report-brand i{width:10px;height:10px;border-radius:50%;background:#f18b79;box-shadow:0 0 0 5px #ffe7db}.report-top h1{margin:8px 0 4px;font-size:27px;letter-spacing:.01em}.report-top p{margin:0;color:var(--ink-2);font-size:14px}.report-meta{padding-top:10px;text-align:right;color:var(--ink-3);font-size:12px;line-height:1.7;white-space:nowrap}
+.notice{margin:16px 0;padding:11px 13px;border-radius:12px;background:#fff5e7;color:#725342;font-size:13px;line-height:1.55}
+.triage-card{position:relative;margin:14px 0 16px;padding:20px 20px 18px;border:1px solid #f2d3bd;border-radius:20px;background:linear-gradient(135deg,#fffaf4,#fff1e8);overflow:hidden}.triage-card:after{content:"";position:absolute;right:-22px;top:-30px;width:120px;height:120px;border-radius:50%;background:#ffe0d4;opacity:.7}.triage-card.emergency{border-color:#edb5ae;background:linear-gradient(135deg,#fff7f5,#ffe9e6)}.triage-card.care{border-color:#dce4b5;background:linear-gradient(135deg,#fffffa,#f5f8e8)}
+.eyebrow{position:relative;z-index:1;display:inline-block;padding:4px 9px;border-radius:999px;background:#f7d7ce;color:#9c4a3d;font-weight:800;font-size:12px}.triage-card.care .eyebrow{background:#e6edc5;color:#65723a}.triage-card h2{position:relative;z-index:1;margin:11px 0 5px;font-size:24px}.triage-card p{position:relative;z-index:1;margin:0;max-width:560px;color:var(--ink-2);line-height:1.6}
+.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.section{background:var(--paper);border:1px solid var(--line);border-radius:17px;overflow:hidden}.section.wide{grid-column:1/-1}.section h2{margin:0;padding:12px 16px;font-size:16px;background:#fff7ef;border-bottom:1px solid #f5e5d7}.content{padding:15px 16px;line-height:1.65}.complaint{font-size:18px;font-weight:700}.advice{white-space:pre-line;margin:0;color:var(--ink-2)}
+.fact-list{margin:0;padding:0}.fact-list div{display:grid;grid-template-columns:minmax(130px,36%) 1fr;gap:12px;padding:11px 0;border-bottom:1px dashed #ecdccf}.fact-list div:first-child{padding-top:0}.fact-list div:last-child{border-bottom:0;padding-bottom:0}.fact-list dt{color:#765b51;font-weight:750}.fact-list dd{margin:0;color:#382a26;font-weight:650}.empty{color:var(--ink-3);margin:0}.prompt-list{margin:0;padding-left:18px;color:var(--ink-2)}.prompt-list li{margin:5px 0}
+.full-record{margin-top:14px;border:1px solid var(--line);border-radius:15px;background:#fffdf9;overflow:hidden}.full-record summary{padding:14px 16px;cursor:pointer;font-weight:750;list-style:none}.full-record summary::-webkit-details-marker{display:none}.full-record summary:after{content:"⌄";float:right;color:#ad5b4c}.full-record[open] summary{border-bottom:1px solid var(--line)}.full-record[open] summary:after{content:"⌃"}.turns{padding:0 16px 14px}.turn{margin:10px 0 0;padding:10px 12px;border-radius:11px;background:#fff7ef;line-height:1.6}.turn b{color:#a45141}.report-actions{display:flex;justify-content:center;margin-top:18px}.print-button{border:1px solid #e8a291;border-radius:999px;padding:10px 18px;background:#fffdf8;color:#a45141;font:inherit;font-weight:700;cursor:pointer}
+@media(max-width:600px){.compact-report{padding:18px 14px 34px}.report-top{display:block}.report-top h1{font-size:24px}.report-meta{text-align:left;padding-top:9px;white-space:normal}.report-grid{grid-template-columns:1fr}.section.wide{grid-column:auto}.triage-card h2{font-size:21px}.fact-list div{grid-template-columns:1fr;gap:3px}}
+@media print{.compact-report{max-width:none;padding:10mm 12mm}.report-actions{display:none}.full-record{display:none}.report-top{padding-bottom:10px}}
+</style>
+</head>
+<body>
+<main class="compact-report">
+  <header class="report-top">
+    <div><div class="report-brand"><i></i> ASKaMa · 问问阿嬷</div><h1>就诊前信息摘要</h1><p>请在就医时向医生出示或转述这份摘要。</p></div>
+    <div class="report-meta">生成时间：{{ s.generated }}<br>记录编号：{{ s.session_id }}</div>
+  </header>
+  <p class="notice">本页根据本次对话整理，仅用于帮助医患沟通，不构成诊断或医疗建议。</p>
+
+  <section class="triage-card {{ s.triage.tone }}">
+    <span class="eyebrow">{{ s.triage.tag }}</span>
+    <h2>{{ s.triage.title }}</h2>
+    <p>{{ s.triage.note }}</p>
+  </section>
+
+  <div class="report-grid">
+    <section class="section wide"><h2>本次主诉</h2><div class="content complaint">{{ s.complaint }}</div></section>
+    <section class="section wide"><h2>分诊沟通建议</h2><div class="content advice">{{ s.advice }}</div></section>
+    <section class="section wide"><h2>本次已确认信息</h2><div class="content">{% if s.confirmed_facts %}<dl class="fact-list">{% for fact in s.confirmed_facts %}<div><dt>{{ fact.label }}</dt><dd>{{ fact.value }}</dd></div>{% endfor %}</dl>{% else %}<p class="empty">除主诉外，本次未保存更多可整理的信息。</p>{% endif %}</div></section>
+    <section class="section"><h2>就医时可补充</h2><div class="content"><ul class="prompt-list"><li>症状何时开始、是否持续或加重</li><li>月经、出血或分泌物的变化（如适用）</li><li>近期用药、避孕、性生活或怀孕可能（按实际情况说明）</li></ul></div></section>
+    <section class="section"><h2>使用说明</h2><div class="content">请以实际症状和医生的现场评估为准。如症状突然加重、感到非常不适或无法安全前往医院，请及时求助。</div></section>
+  </div>
+
+  <details class="full-record"><summary>查看完整对话记录</summary><div class="turns">{% if s.details %}{% for turn in s.details %}<p class="turn"><b>{{ turn.role }}：</b>{{ turn.text }}</p>{% endfor %}{% else %}<p class="empty">本次未保存更多对话细节。</p>{% endif %}</div></details>
+  <div class="report-actions"><button class="print-button" onclick="window.print()">打印或保存为 PDF</button></div>
+</main>
+<div class="legacy-report">
+<div class="toolbar">
+  <button class="primary" onclick="window.print()">🖨 {{ '打印 / 保存为 PDF' if s.lang == 'zh' else 'Print / Save as PDF' }}</button>
+  <a href="?lang=en">English (for doctor)</a><a href="?lang=zh">中文（给自己）</a>
+</div>
+<div class="page">
+  <div class="head">
+    <h1>{{ tx.title }}</h1>
+    <div class="meta">{{ tx.generated }}: {{ s.generated }}<br>{{ tx.session }}: <span class="code">{{ s.session_id }}</span></div>
+  </div>
+  <p class="nodx">{{ tx.no_dx }}</p>
+
+  {% macro rows(items) -%}
+  {% if items %}<table>{% for r in items %}
+    <tr><td class="k">{{ r.label }}</td><td class="v">{{ r.value }}</td>
+    <td class="p">{% if r.prov %}{{ r.prov }}{% if r.turn %} · {{ r.turn }}{% endif %}{% endif %}{% if r.quote %} · <span class="q">“{{ r.quote }}”</span>{% endif %}</td></tr>
+  {% endfor %}</table>{% else %}<div class="none">{{ tx.none }}</div>{% endif %}
+  {%- endmacro %}
+
+  {% if s.emergency_box %}
+  <div class="emg">
+    <h2>⚠ {{ tx.emergency }} · {{ s.generated }}</h2>
+    <p>{{ s.emergency_box.instruction }}</p>
+    {{ rows(s.emergency_box.rows) }}
+  </div>
+  {% endif %}
+
+  <h2>{{ tx.S }}</h2>
+  <table><tr><td class="k">{{ tx.complaint }}</td><td class="v">{{ s.situation.complaint }}</td><td class="p"></td></tr></table>
+  {{ rows(s.situation.rows) if s.situation.rows else '' }}
+  {% if s.situation.own_words %}
+  <h3>{{ tx.own_words }}</h3>
+  <ul class="words">{% for w in s.situation.own_words %}<li><span class="q">“{{ w.text }}”</span> <span class="small">· {{ w.turn }}</span></li>{% endfor %}</ul>
+  {% endif %}
+
+  <h2>{{ tx.B }}</h2>
+  {{ rows(s.background) }}
+
+  <h2>{{ tx.A }}</h2>
+  <div class="cols">
+    <div><h3>{{ tx.present }}</h3>{{ rows(s.present) }}</div>
+    <div><h3>{{ tx.denied }}</h3>{{ rows(s.denied) }}</div>
+  </div>
+
+  <h2>{{ tx.R }}</h2>
+  <h3>{{ tx.uncertain }}</h3>
+  {{ rows(s.uncertain) }}
+  <h3>{{ tx.not_asked }}</h3>
+  <div class="small">{{ s.not_asked | join(' · ') if s.not_asked else tx.none }}</div>
+
+  <h2>{{ tx.guidance }}</h2>
+  <table><tr><td class="k">{{ tx.level }}</td><td class="v">{{ s.guidance.level }}</td><td class="p"></td></tr></table>
+  <p style="margin:4px 0">{{ s.guidance.core }}</p>
+  {% if s.guidance.escalation %}<h3>{{ tx.escalation }}</h3><ul class="esc">{% for e in s.guidance.escalation %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+  <div class="small">Rules: {% for r in s.rule_ids %}<span class="code">{{ r.id }}</span> {% else %}—{% endfor %}
+    · Config: {% for k, v in s.config_versions.items() %}<span class="code">{{ k }} {{ v }}</span> {% endfor %}</div>
+
+  <div class="foot">
+    <div class="qr">{{ tx.qr }}</div>
+    <div>{{ s.footer }}<br>AskaMa · {{ 'draft_unreviewed' }}</div>
+  </div>
+</div>
+</div>
+</body>
+</html>

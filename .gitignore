@@ -1,0 +1,15 @@
+.env
+.env.*
+!.env.example
+*.key
+__pycache__/
+.pytest_cache/
+.venv/
+node_modules/
+.DS_Store
+logs/
+# Runtime health profiles and consultation records stay on the local device.
+data/
+*.sqlite
+src/templates/chat.html.before-ask1012-ui
+*.zip

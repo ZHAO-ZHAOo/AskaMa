@@ -1,0 +1,406 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/events.schema.json",
+  "title": "Event log schema",
+  "description": "Schema for a single event log entry. Events are recorded for every significant action in a session for audit, optimization, and shadow-mode replay. PRIVACY: The log MUST NOT contain raw user text, precise location coordinates, names, contact information, the FinalResponse.text field, or specific questionnaire answers. Location may only be recorded at area level. All timestamps are UTC. Each event has a type-specific payload defined by oneOf below. Cross-file references (slot ids, rule ids, question ids, facility ids) are validated by the downstream validation script.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["event_id", "session_id", "turn_id", "timestamp", "event_type", "ui_language", "versions", "outcome_link_key", "payload"],
+  "properties": {
+    "event_id": { "type": "string", "minLength": 1 },
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "turn_id": { "type": "integer", "minimum": 0 },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "event_type": {
+      "enum": ["user_message_received","intake_extracted","l1_evaluated","l2_question_asked","l2_question_answered","l2_decision","l3_selfcare_rendered","l4_candidates_filtered","l4_ranked","l4_user_action","preference_clipped","settings_changed","consent_changed","language_switched","output_validation","feedback_given","error","session_end","outcome_recorded"]
+    },
+    "ui_language": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/language_code" },
+    "versions": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/versions" },
+    "outcome_link_key": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/outcome_link_key" },
+    "payload": {}
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "event_type": { "const": "user_message_received" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["input_language", "char_count", "text_redacted", "redaction_applied"],
+          "properties": {
+            "input_language": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/language_code" },
+            "char_count": { "type": "integer", "minimum": 0 },
+            "text_redacted": { "type": "string" },
+            "redaction_applied": { "const": true }
+          },
+          "description": "MUST NOT store raw user text — only the redacted version is stored."
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "intake_extracted" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["slots", "needs_clarification", "out_of_scope"],
+          "properties": {
+            "slots": { "type": "array", "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/slot_value" } },
+            "needs_clarification": { "type": "boolean" },
+            "out_of_scope": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "l1_evaluated" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["evaluated_rule_ids", "triggered_rule_ids", "near_miss_rule_ids", "exit_type"],
+          "properties": {
+            "evaluated_rule_ids": { "type": "array", "items": { "type": "string" } },
+            "triggered_rule_ids": { "type": "array", "items": { "type": "string" } },
+            "near_miss_rule_ids": { "type": "array", "items": { "type": "string" } },
+            "exit_type": {
+              "oneOf": [
+                { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/redflag_exit_type" },
+                { "type": "null" }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "l2_question_asked" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["question_id", "module", "slot"],
+          "properties": {
+            "question_id": { "type": "string" },
+            "module": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/module_id" },
+            "slot": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/slot_id" }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "l2_question_answered" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["question_id", "slot_value", "answer_unclear", "reasked"],
+          "properties": {
+            "question_id": { "type": "string" },
+            "slot_value": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/slot_value" },
+            "answer_unclear": { "type": "boolean" },
+            "reasked": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "l2_decision" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["module", "status", "level", "matched_row_ids", "level_trajectory", "stop_reason", "escalated_for_uncertainty", "questions_asked_count"],
+          "properties": {
+            "module": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/module_id" },
+            "status": { "enum": ["in_progress", "final"] },
+            "level": {
+              "oneOf": [
+                { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id" },
+                { "type": "null" }
+              ]
+            },
+            "matched_row_ids": { "type": "array", "items": { "type": "string" } },
+            "level_trajectory": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false,
+                "required": ["turn", "candidates"],
+                "properties": {
+                  "turn": { "type": "integer", "minimum": 0 },
+                  "candidates": { "type": "array", "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id" } }
+                }
+              }
+            },
+            "stop_reason": {
+              "oneOf": [
+                { "enum": ["all_required_answered", "max_questions_reached", "redflag_triggered", "out_of_scope", "user_ended"] },
+                { "type": "null" }
+              ]
+            },
+            "escalated_for_uncertainty": { "type": "boolean" },
+            "questions_asked_count": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "l3_selfcare_rendered" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["module", "level", "card_ids", "includes_escalation_criteria", "fallback_used"],
+          "properties": {
+            "module": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/module_id" },
+            "level": { "enum": ["SELF_CARE", "BOOK_SOON", "SEE_DOCTOR_24_48H"] },
+            "card_ids": { "type": "array", "items": { "type": "string" } },
+            "includes_escalation_criteria": { "type": "boolean" },
+            "fallback_used": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "l4_candidates_filtered" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["level", "candidates_before_filter", "excluded"],
+          "properties": {
+            "level": { "enum": ["SEE_DOCTOR_24_48H", "BOOK_SOON", "EMERGENCY_NOW"] },
+            "candidates_before_filter": { "type": "integer", "minimum": 0 },
+            "excluded": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false,
+                "required": ["facility_id", "reasons"],
+                "properties": {
+                  "facility_id": { "type": "string" },
+                  "reasons": { "type": "array", "items": { "enum": ["not_open", "no_gynae", "too_far", "not_accepting_adolescents", "other"] } }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "l4_ranked" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["level", "emergency_mode", "weights_source", "preferences_clipped", "ranked"],
+          "properties": {
+            "level": { "enum": ["SEE_DOCTOR_24_48H", "BOOK_SOON", "EMERGENCY_NOW"] },
+            "emergency_mode": { "type": "boolean" },
+            "weights_source": { "enum": ["default", "preset", "questionnaire"] },
+            "preferences_clipped": { "type": "boolean" },
+            "ranked": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false,
+                "required": ["rank", "facility_id", "total_score", "feature_scores"],
+                "properties": {
+                  "rank": { "type": "integer", "minimum": 1 },
+                  "facility_id": { "type": "string" },
+                  "total_score": { "type": "number", "minimum": 0, "maximum": 1 },
+                  "feature_scores": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "object", "additionalProperties": false,
+                      "required": ["raw", "score", "weight"],
+                      "properties": {
+                        "raw": {},
+                        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+                        "weight": { "type": "number", "minimum": 0, "maximum": 1 }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "l4_user_action" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["action", "facility_id"],
+          "properties": {
+            "action": { "enum": ["view_map", "click_navigate", "click_call", "click_website", "expand_details", "change_sort"] },
+            "facility_id": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "null" }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "preference_clipped" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["level", "feature", "requested_weight", "applied_weight"],
+          "properties": {
+            "level": { "enum": ["SEE_DOCTOR_24_48H", "BOOK_SOON"] },
+            "feature": { "type": "string" },
+            "requested_weight": { "type": "number", "minimum": 0, "maximum": 1 },
+            "applied_weight": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "settings_changed" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["mode", "preset_id", "questionnaire_version", "clipped"],
+          "properties": {
+            "mode": { "enum": ["preset", "questionnaire", "default"] },
+            "preset_id": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "null" }
+              ]
+            },
+            "questionnaire_version": {
+              "oneOf": [
+                { "type": "string" },
+                { "type": "null" }
+              ]
+            },
+            "clipped": { "type": "boolean" }
+          },
+          "description": "Does NOT record specific questionnaire answers — only the mode and whether clipping occurred."
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "consent_changed" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["consent_key", "new_value", "consent_text_version"],
+          "properties": {
+            "consent_key": { "enum": ["followup_contact", "research_use", "visit_history"] },
+            "new_value": { "type": "boolean" },
+            "consent_text_version": { "type": "string" }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "language_switched" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["from_language", "to_language"],
+          "properties": {
+            "from_language": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/language_code" },
+            "to_language": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/language_code" }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "output_validation" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["passed", "checks"],
+          "properties": {
+            "passed": { "type": "boolean" },
+            "checks": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false,
+                "required": ["name", "passed"],
+                "properties": {
+                  "name": { "enum": ["no_diagnostic_wording", "level_consistent_with_grading", "no_drug_or_dosage", "disclaimer_present", "language_matches"] },
+                  "passed": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "feedback_given" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["target", "rating"],
+          "properties": {
+            "target": { "enum": ["level", "selfcare", "recommendation", "overall"] },
+            "rating": { "enum": ["helpful", "not_helpful"] },
+            "comment_redacted": { "type": "string" }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "error" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["stage", "error_code", "recoverable"],
+          "properties": {
+            "stage": { "enum": ["intake", "l1", "l2", "l3", "l4", "output"] },
+            "error_code": { "type": "string" },
+            "recoverable": { "type": "boolean" }
+          },
+          "description": "MUST NOT contain user data from the stack trace."
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "session_end" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["reason", "last_stage", "final_level"],
+          "properties": {
+            "reason": { "enum": ["completed", "user_left", "timeout", "error"] },
+            "last_stage": { "enum": ["intake", "l1", "l2", "l3", "l4", "done"] },
+            "final_level": {
+              "oneOf": [
+                { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id" },
+                { "type": "null" }
+              ]
+            }
+          }
+        }
+      }
+    },
+    {
+      "properties": {
+        "event_type": { "const": "outcome_recorded" },
+        "payload": {
+          "type": "object", "additionalProperties": false,
+          "required": ["went_to_care", "facility_type", "advised_level_by_provider", "symptom_change", "source", "recorded_at"],
+          "properties": {
+            "went_to_care": { "enum": ["yes", "no", "not_yet", "unknown"] },
+            "facility_type": {
+              "oneOf": [
+                { "enum": ["a_e", "urgent_og", "polyclinic", "chas_gp", "private_gp", "private_gynae", "soc"] },
+                { "type": "null" }
+              ]
+            },
+            "advised_level_by_provider": {
+              "oneOf": [
+                { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id" },
+                { "enum": ["unknown"] }
+              ]
+            },
+            "symptom_change": { "enum": ["better", "same", "worse", "unknown"] },
+            "source": { "const": "user_followup" },
+            "recorded_at": { "type": "string", "format": "date-time" }
+          },
+          "description": "Only possible when user consented to followup_contact. Linked only via outcome_link_key — contains no identity information."
+        }
+      }
+    }
+  ]
+}

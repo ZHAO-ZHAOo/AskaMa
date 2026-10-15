@@ -1,0 +1,115 @@
+# AI Grandma demo 追问树 – irregular_or_intermenstrual_bleeding
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: question_tree_irregular_bleeding
+  version: 0.4.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+      url: "https://cks.nice.org.uk/topics/menorrhagia/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+module: irregular_or_intermenstrual_bleeding
+
+required_slots:
+  - bleeding_between_periods
+  - cycle_regularity
+
+questions:
+  - question_id: Q_IB_BETWEEN
+    slot: bleeding_between_periods
+    text:
+      en: "Do you experience bleeding between your periods?"
+      zh: "你有没有在两次月经之间出血？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 1
+
+  - question_id: Q_IB_REGULARITY
+    slot: cycle_regularity
+    text:
+      en: "How regular is your menstrual cycle?"
+      zh: "你的月经周期规律吗？"
+    answer_options:
+      - {value: "regular", label: {en: "Regular", zh: "规律"}}
+      - {value: "somewhat_irregular", label: {en: "Somewhat irregular", zh: "基本规律但偶尔不准"}}
+      - {value: "very_irregular", label: {en: "Very irregular", zh: "很不规律"}}
+      - {value: "no_established_pattern", label: {en: "No established pattern", zh: "没有固定规律"}}
+    priority: 2
+
+  - question_id: Q_IB_DISCHARGE
+    slot: unusual_discharge_or_odor
+    text:
+      en: "Have you noticed any unusual discharge or odour?"
+      zh: "有没有注意到异常分泌物或异味？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 3
+
+  - question_id: Q_IB_DURATION
+    slot: current_bleeding_days_so_far
+    text:
+      en: "How many days has this bleeding lasted so far?"
+      zh: "这次出血到目前为止持续了几天？"
+    answer_options:
+      - {value: "1", label: {en: "1 day", zh: "1天"}}
+      - {value: "3", label: {en: "About 3 days", zh: "大概3天"}}
+      - {value: "7", label: {en: "About a week", zh: "大概一周"}}
+      - {value: "14", label: {en: "Over 2 weeks", zh: "超过两周"}}
+    priority: 4
+
+  - question_id: Q_IB_DIZZY
+    slot: dizziness_or_fainting
+    text:
+      en: "Have you felt dizzy, lightheaded, or fainted?"
+      zh: "有没有头晕、眼前发黑，或者晕倒过？"
+    answer_options:
+      - {value: "none", label: {en: "No", zh: "没有"}}
+      - {value: "lightheaded", label: {en: "A bit lightheaded", zh: "有点头晕"}}
+      - {value: "nearly_fainted", label: {en: "Nearly fainted", zh: "差点晕倒"}}
+      - {value: "fainted", label: {en: "I fainted", zh: "晕倒过"}}
+    priority: 5
+
+  - question_id: Q_IB_FEVER
+    slot: fever_status
+    text:
+      en: "Do you have a fever, or have you taken your temperature?"
+      zh: "你发烧了吗，或者量过体温吗？"
+    answer_options:
+      - {value: "no_fever", label: {en: "No fever", zh: "没有发烧"}}
+      - {value: "feels_feverish_not_measured", label: {en: "Feel feverish but haven't measured", zh: "感觉发热但没量体温"}}
+      - {value: "measured_fever", label: {en: "Measured fever", zh: "量过，确实发烧"}}
+    priority: 6
+    reask_if_unclear:
+      en: "Could you confirm whether you have measured your temperature?"
+      zh: "能确认一下你有没有量过体温吗？"
+
+  - question_id: Q_IB_HEART
+    slot: heart_racing_or_short_of_breath
+    text:
+      en: "Do you feel your heart racing, or are you short of breath?"
+      zh: "有没有心跳加速，或者觉得气短？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 7
+
+  - question_id: Q_IB_VOMIT
+    slot: vomiting_or_cannot_keep_fluids_down
+    text:
+      en: "Have you been vomiting, or unable to keep fluids down?"
+      zh: "有没有呕吐，或者喝不进水？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 8
+
+stopping:
+  on_max_reached: grade_with_uncertainty
+  on_all_required_answered: grade
+
+max_questions: 8

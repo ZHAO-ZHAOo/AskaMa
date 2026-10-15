@@ -1,0 +1,17 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: needs_clarification.needed is true but "reason" is missing.
+
+session_id: "abc123def456ghi789"
+turn_id: 1
+extracted_slots:
+  - slot_id: age_band
+    status: unknown
+needs_clarification:
+  needed: true
+  # reason is missing — should fail if/then constraint
+  slots: [age_band]
+detected_language: en
+mixed_language: false
+out_of_scope:
+  flag: false

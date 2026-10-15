@@ -1,0 +1,18 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: status is final but level is null.
+
+session_id: "abc123def456ghi789"
+turn_id: 3
+module: heavy_bleeding
+status: final
+level: null  # PROHIBITED — should fail if/then constraint (final requires non-null level)
+next_question_id: null
+matched_row_ids: []
+level_trajectory: []
+stop_reason: null
+escalated_for_uncertainty: false
+uncertain_slots: []
+questions_asked_count: 3
+tables_version: "0.1.0"
+question_tree_version: "0.1.0"

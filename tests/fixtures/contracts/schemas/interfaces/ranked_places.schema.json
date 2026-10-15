@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/interfaces/ranked_places.schema.json",
+  "title": "Ranked places schema",
+  "description": "Schema for the RankedPlaces object — the output of the L4 care-recommendation layer. L4 first applies hard filters (department capability, operating status, distance range, minor acceptance), then ranks candidates by weighted feature scores. When emergency_mode is true, weights_used is null and ranked is sorted by travel time only (description constraint, enforced by implementation). feature_scores MUST be included for every ranked facility to enable explainability in the response. Hard filters and red-flag rules are NEVER affected by weights.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "turn_id",
+    "level",
+    "emergency_mode",
+    "weights_used",
+    "weights_source",
+    "preferences_clipped",
+    "candidates_before_filter",
+    "excluded",
+    "ranked",
+    "facility_table_version",
+    "weight_preset_version"
+  ],
+  "properties": {
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "turn_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "level": {
+      "enum": ["SEE_DOCTOR_24_48H", "BOOK_SOON", "EMERGENCY_NOW"]
+    },
+    "emergency_mode": { "type": "boolean" },
+    "weights_used": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "weights_source": {
+      "enum": ["default", "preset", "questionnaire"]
+    },
+    "preferences_clipped": { "type": "boolean" },
+    "candidates_before_filter": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "excluded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["facility_id", "reasons"],
+        "properties": {
+          "facility_id": { "type": "string" },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "enum": ["not_open", "no_gynae", "too_far", "not_accepting_adolescents", "other"]
+            }
+          }
+        }
+      }
+    },
+    "ranked": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/ranked_entry" }
+    },
+    "facility_table_version": { "type": "string" },
+    "weight_preset_version": { "type": "string" }
+  },
+  "$defs": {
+    "ranked_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rank",
+        "facility_id",
+        "total_score",
+        "feature_scores",
+        "travel_minutes",
+        "travel_mode",
+        "open_now",
+        "data_last_verified"
+      ],
+      "properties": {
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "facility_id": {
+          "type": "string",
+          "pattern": "^FAC_[A-Z0-9_]+$"
+        },
+        "total_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "feature_scores": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["raw", "score", "weight"],
+            "properties": {
+              "raw": {
+                "description": "The raw value of the feature before normalization (e.g. minutes, dollars). Type may vary."
+              },
+              "score": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        "travel_minutes": {
+          "oneOf": [
+            { "type": "number", "minimum": 0 },
+            { "type": "null" }
+          ]
+        },
+        "travel_mode": {
+          "enum": ["walking", "public_transport", "driving", "ride_hailing", "unknown"]
+        },
+        "open_now": { "type": "boolean" },
+        "pathway_note": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/i18n_text" },
+        "data_last_verified": {
+          "type": "string",
+          "format": "date"
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "emergency_mode": { "const": true }
+        },
+        "required": ["emergency_mode"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "weights_used": { "type": "null" }
+        }
+      }
+    }
+  ]
+}

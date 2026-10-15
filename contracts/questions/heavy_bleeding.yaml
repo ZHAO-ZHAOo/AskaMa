@@ -1,0 +1,129 @@
+# AI Grandma demo 追问树 – heavy_bleeding
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: question_tree_heavy_bleeding
+  version: 0.4.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+      url: "https://cks.nice.org.uk/topics/menorrhagia/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+module: heavy_bleeding
+
+required_slots:
+  - flow_compared_to_usual
+  - soak_through_interval
+
+questions:
+  - question_id: Q_HB_FLOW_COMPARE
+    slot: flow_compared_to_usual
+    text:
+      en: "How does your bleeding compare to your usual period?"
+      zh: "你的出血量和平时比怎么样？"
+    answer_options:
+      - {value: "much_less", label: {en: "Much less than usual", zh: "比平常少很多"}}
+      - {value: "a_bit_less", label: {en: "A bit less than usual", zh: "比平常少一点"}}
+      - {value: "same", label: {en: "About the same as usual", zh: "和平常差不多"}}
+      - {value: "a_bit_more", label: {en: "A bit more than usual", zh: "比平常多一点"}}
+      - {value: "much_more", label: {en: "Much more than usual", zh: "比平常多很多"}}
+    priority: 1
+
+  - question_id: Q_HB_SOAK_INTERVAL
+    slot: soak_through_interval
+    text:
+      en: "How often do you need to change your sanitary products because they're soaked through?"
+      zh: "卫生用品被浸透需要更换的频率是多久？"
+    answer_options:
+      - {value: "hourly_or_more_often", label: {en: "Every hour or more often", zh: "每小时或更频繁"}}
+      - {value: "every_2_to_3_hours", label: {en: "Every 2 to 3 hours", zh: "每2到3小时"}}
+      - {value: "a_few_times_a_day", label: {en: "A few times a day", zh: "一天几次"}}
+      - {value: "less_often", label: {en: "Less often", zh: "更少频率"}}
+    priority: 2
+
+  - question_id: Q_HB_CLOTS
+    slot: clots_present
+    text:
+      en: "Have you noticed any blood clots?"
+      zh: "有没有注意到血块？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 3
+
+  - question_id: Q_HB_CLOT_SIZE
+    slot: clot_size
+    text:
+      en: "How large are the clots?"
+      zh: "血块有多大？"
+    precondition:
+      {slot: clots_present, op: eq, value: true}
+    answer_options:
+      - {value: "small", label: {en: "Small", zh: "小"}}
+      - {value: "medium", label: {en: "Medium", zh: "中"}}
+      - {value: "large", label: {en: "Large", zh: "大"}}
+    priority: 4
+
+  - question_id: Q_HB_CLOTHES
+    slot: bleeding_through_clothes_or_bedding
+    text:
+      en: "Has the bleeding soaked through to your clothes or bedding?"
+      zh: "出血有没有渗透到衣物或床上用品？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 5
+
+  - question_id: Q_HB_DIZZY
+    slot: dizziness_or_fainting
+    text:
+      en: "Have you felt dizzy, lightheaded, or fainted?"
+      zh: "有没有头晕、眼前发黑，或者晕倒过？"
+    answer_options:
+      - {value: "none", label: {en: "No", zh: "没有"}}
+      - {value: "lightheaded", label: {en: "A bit lightheaded", zh: "有点头晕"}}
+      - {value: "nearly_fainted", label: {en: "Nearly fainted", zh: "差点晕倒"}}
+      - {value: "fainted", label: {en: "I fainted", zh: "晕倒过"}}
+    priority: 6
+
+  - question_id: Q_HB_FEVER
+    slot: fever_status
+    text:
+      en: "Do you have a fever, or have you taken your temperature?"
+      zh: "你发烧了吗，或者量过体温吗？"
+    answer_options:
+      - {value: "no_fever", label: {en: "No fever", zh: "没有发烧"}}
+      - {value: "feels_feverish_not_measured", label: {en: "Feel feverish but haven't measured", zh: "感觉发热但没量体温"}}
+      - {value: "measured_fever", label: {en: "Measured fever", zh: "量过，确实发烧"}}
+    priority: 7
+    reask_if_unclear:
+      en: "Could you confirm whether you have measured your temperature?"
+      zh: "能确认一下你有没有量过体温吗？"
+
+  - question_id: Q_HB_HEART
+    slot: heart_racing_or_short_of_breath
+    text:
+      en: "Do you feel your heart racing, or are you short of breath?"
+      zh: "有没有心跳加速，或者觉得气短？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 8
+
+  - question_id: Q_HB_VOMIT
+    slot: vomiting_or_cannot_keep_fluids_down
+    text:
+      en: "Have you been vomiting, or unable to keep fluids down?"
+      zh: "有没有呕吐，或者喝不进水？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 9
+
+stopping:
+  on_max_reached: grade_with_uncertainty
+  on_all_required_answered: grade
+
+max_questions: 9

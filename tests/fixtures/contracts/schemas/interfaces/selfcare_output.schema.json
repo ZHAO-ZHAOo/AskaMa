@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/interfaces/selfcare_output.schema.json",
+  "title": "Self-care output schema",
+  "description": "Schema for the SelfCareOutput object produced by the L3.1 self-care layer. Cards are selected by module x level. When the level is SELF_CARE, at least one escalation_criteria card MUST be included (enforced by if/then). fallback_used indicates that no matching cards were found and a generic fallback was used.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "turn_id",
+    "module",
+    "level",
+    "card_ids",
+    "includes_escalation_criteria",
+    "fallback_used",
+    "selfcare_kb_version"
+  ],
+  "properties": {
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "turn_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "module": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/module_id" },
+    "level": {
+      "enum": ["SELF_CARE", "BOOK_SOON", "SEE_DOCTOR_24_48H"]
+    },
+    "card_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "includes_escalation_criteria": { "type": "boolean" },
+    "fallback_used": { "type": "boolean" },
+    "selfcare_kb_version": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "level": { "const": "SELF_CARE" }
+        },
+        "required": ["level"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "includes_escalation_criteria": { "const": true }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+meta:
+  id: weight_presets_fixture
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+features:
+  - id: travel_time
+    name:
+      en: "[Fixture]"
+    description:
+      en: "[Fixture]"
+    higher_is_better: false
+    scoring_note: "[Fixture]"
+  - id: cost
+    name:
+      en: "[Fixture]"
+    description:
+      en: "[Fixture]"
+    higher_is_better: false
+    scoring_note: "[Fixture]"
+
+ranking_levels:
+  - SEE_DOCTOR_24_48H
+  - BOOK_SOON
+
+default_weights_by_level:
+  SEE_DOCTOR_24_48H:
+    travel_time: 0.6
+    cost: 0.4
+  BOOK_SOON:
+    travel_time: 0.4
+    cost: 0.6
+
+presets:
+  - preset_id: nearest
+    name:
+      en: "[Fixture]"
+    description:
+      en: "[Fixture]"
+    weights_by_level:
+      SEE_DOCTOR_24_48H:
+        travel_time: 0.8
+        cost: 0.2
+      BOOK_SOON:
+        travel_time: 0.7
+        cost: 0.3
+  - preset_id: budget_friendly
+    name:
+      en: "[Fixture]"
+    description:
+      en: "[Fixture]"
+    weights_by_level:
+      SEE_DOCTOR_24_48H:
+        travel_time: 0.3
+        cost: 0.7
+      BOOK_SOON:
+        travel_time: 0.2
+        cost: 0.8
+
+bounds_by_level:
+  SEE_DOCTOR_24_48H:
+    travel_time:
+      min: 0.3
+      max: 1.0
+    cost:
+      min: 0.0
+      max: 0.7
+  BOOK_SOON:
+    travel_time:
+      min: 0.1
+      max: 1.0
+    cost:
+      min: 0.0
+      max: 0.9
+
+emergency_ranking:
+  mode: travel_time_only
+  note:
+    en: "[Fixture]"

@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/questionnaire_mapping.schema.json",
+  "title": "Questionnaire mapping schema",
+  "description": "Schema for the settings-page weight questionnaire. The questionnaire is completed in the SETTINGS PAGE, not during a conversation. Each option's effects modify the starting weights to produce a personalized weight profile. The combination block defines the computation flow: start from default_weights or a base preset, apply effects in question order, clip to bounds_by_level, renormalize to sum 1, then store the result in user_profile.weight_profile.computed_weights. Specific question text and option labels are CONTENT to be authored in a later step (C4). References to feature ids and preset_ids are validated by the downstream validation script (cross-file check against weight_presets).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "questionnaire_version", "questions", "combination"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/meta" },
+    "questionnaire_version": { "type": "string" },
+    "questions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/question" }
+    },
+    "combination": { "$ref": "#/$defs/combination" }
+  },
+  "$defs": {
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "text", "multi_select", "required", "options"],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "pattern": "^PQ_[A-Z0-9_]+$"
+        },
+        "text": { "$ref": "common.schema.json#/$defs/i18n_text" },
+        "multi_select": { "type": "boolean" },
+        "required": { "type": "boolean" },
+        "options": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/option" }
+        }
+      }
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["option_id", "label", "effects"],
+      "properties": {
+        "option_id": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "label": { "$ref": "common.schema.json#/$defs/i18n_text" },
+        "effects": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/effect" }
+        }
+      }
+    },
+    "effect": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "preset_id"],
+          "properties": {
+            "type": { "const": "set_base_preset" },
+            "preset_id": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "feature", "value"],
+          "properties": {
+            "type": { "const": "add_delta" },
+            "feature": { "type": "string" },
+            "value": { "type": "number" },
+            "levels": {
+              "type": "array",
+              "items": {
+                "enum": ["SEE_DOCTOR_24_48H", "BOOK_SOON"]
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "feature", "factor"],
+          "properties": {
+            "type": { "const": "multiply" },
+            "feature": { "type": "string" },
+            "factor": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "levels": {
+              "type": "array",
+              "items": {
+                "enum": ["SEE_DOCTOR_24_48H", "BOOK_SOON"]
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "field", "value"],
+          "properties": {
+            "type": { "const": "set_profile_field" },
+            "field": {
+              "enum": ["travel_mode", "residency_status", "has_chas", "insurance_add"]
+            },
+            "value": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "combination": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_from",
+        "apply_order",
+        "clip_to_bounds",
+        "renormalize_to_sum_one",
+        "on_unanswered"
+      ],
+      "properties": {
+        "start_from": {
+          "enum": ["default_weights", "base_preset"]
+        },
+        "apply_order": {
+          "enum": ["question_order"]
+        },
+        "clip_to_bounds": { "const": true },
+        "renormalize_to_sum_one": { "const": true },
+        "on_unanswered": {
+          "enum": ["use_default"]
+        }
+      },
+      "description": "Computation flow: (1) Start from default_weights_by_level or a base preset. (2) Apply each selected option's effects in question order. (3) Clip resulting weights to bounds_by_level. (4) Renormalize so weights sum to 1 for each level. (5) Store the result in user_profile.weight_profile.computed_weights."
+    }
+  }
+}

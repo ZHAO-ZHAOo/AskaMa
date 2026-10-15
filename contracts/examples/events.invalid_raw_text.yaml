@@ -1,0 +1,19 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: user_message_received payload contains "raw_text" which is not allowed.
+
+event_id: "evt_bad_002"
+session_id: "abc123def456ghi789"
+turn_id: 0
+timestamp: "2026-10-08T12:00:00Z"
+event_type: user_message_received
+ui_language: en
+versions:
+  contracts_bundle: "0.1.0"
+outcome_link_key: "olk_abc123def456ghi789"
+payload:
+  input_language: en
+  char_count: 50
+  text_redacted: "[redacted]"
+  redaction_applied: true
+  raw_text: "[PROHIBITED — should not be here]"

@@ -1,0 +1,54 @@
+meta:
+  id: levels
+  version: 0.2.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+levels:
+  - id: EMERGENCY_NOW
+    name:
+      zh: 立即就医
+      en: Emergency now
+    meaning:
+      zh: 需要立即就医，由红旗规则命中触发。同时提供最近的24小时妇科急症/A&E信息和急救电话指引。
+      en: Seek emergency care immediately, triggered by a red-flag rule match. Accompanied by the nearest 24-hour O&G emergency / A&E information and emergency hotline guidance.
+    severity_rank: 4
+  - id: SEE_DOCTOR_24_48H
+    name:
+      zh: 24–48小时内就医
+      en: See doctor within 24–48h
+    meaning:
+      zh: 建议24至48小时内就医。应在追问和决策表支持下确定去处类型，而非由用户自行判断。
+      en: Advise seeing a doctor within 24 to 48 hours. Care setting type is determined by the triage flow, not by the user.
+    severity_rank: 3
+  - id: BOOK_SOON
+    name:
+      zh: 近期预约门诊
+      en: Book soon
+    meaning:
+      zh: 建议近期预约门诊（约1–2周内）。适用于不需紧急处理但应由医生评估的情况。
+      en: Advise booking an outpatient appointment soon (about 1–2 weeks). For situations that are not urgent but should be assessed by a doctor.
+    severity_rank: 2
+  - id: SELF_CARE
+    name:
+      zh: 居家观察与自我照护
+      en: Self-care
+    meaning:
+      zh: 可居家观察与自我照护，必须同时给出"出现什么情况就升级就医"的明确指引。
+      en: Suitable for home observation and self-care. Must always be accompanied by clear guidance on when to escalate care.
+    severity_rank: 1
+escalation_rule:
+  description:
+    zh: 信息不确定时，级别向上升一级。
+    en: When information is uncertain, escalate the level by one step.
+  order: [SELF_CARE, BOOK_SOON, SEE_DOCTOR_24_48H, EMERGENCY_NOW]
+redflag_exit_types:
+  - id: CALL_AMBULANCE
+    description:
+      zh: 建议立即拨打急救电话。
+      en: Advise calling the emergency hotline immediately.
+  - id: GO_URGENT_OG_OR_AE
+    description:
+      zh: 建议立即前往24小时妇科急症中心或公立医院急诊。
+      en: Advise going immediately to a 24-hour O&G emergency centre or a public hospital A&E.

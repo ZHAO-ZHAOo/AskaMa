@@ -1,0 +1,39 @@
+# 仅格式示例，非真实问卷内容
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: an effect is missing the "type" field.
+
+meta:
+  id: questionnaire_mapping_invalid_example
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+questionnaire_version: "0.1.0"
+
+questions:
+  - question_id: PQ_BROKEN
+    text:
+      en: "[Format example only]"
+    multi_select: false
+    required: true
+    options:
+      - option_id: option_a
+        label:
+          en: "[Format example only]"
+        effects:
+          # Missing "type" — none of the oneOf branches will match
+          - feature: travel_time
+            value: 0.1
+      - option_id: option_b
+        label:
+          en: "[Format example only]"
+        effects: []
+
+combination:
+  start_from: default_weights
+  apply_order: question_order
+  clip_to_bounds: true
+  renormalize_to_sum_one: true
+  on_unanswered: use_default

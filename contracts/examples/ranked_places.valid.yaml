@@ -1,0 +1,64 @@
+# 仅格式示例，非真实机构数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+session_id: "abc123def456ghi789"
+turn_id: 3
+level: SEE_DOCTOR_24_48H
+emergency_mode: false
+weights_used:
+  travel_time: 0.5
+  cost: 0.3
+  accessibility: 0.2
+weights_source: questionnaire
+preferences_clipped: true
+candidates_before_filter: 5
+excluded:
+  - facility_id: "FAC_EXAMPLE_CLOSED"
+    reasons: [not_open]
+  - facility_id: "FAC_EXAMPLE_NO_GYNAE"
+    reasons: [no_gynae]
+ranked:
+  - rank: 1
+    facility_id: "FAC_EXAMPLE_POLYCLINIC"
+    total_score: 0.85
+    feature_scores:
+      travel_time:
+        raw: 15
+        score: 0.8
+        weight: 0.5
+      cost:
+        raw: 25
+        score: 0.9
+        weight: 0.3
+      accessibility:
+        raw: true
+        score: 0.8
+        weight: 0.2
+    travel_minutes: 15
+    travel_mode: public_transport
+    open_now: true
+    pathway_note:
+      en: "[Format example only]"
+    data_last_verified: "2026-01-01"
+  - rank: 2
+    facility_id: "FAC_EXAMPLE_URGENT_OG"
+    total_score: 0.72
+    feature_scores:
+      travel_time:
+        raw: 30
+        score: 0.5
+        weight: 0.5
+      cost:
+        raw: 80
+        score: 0.6
+        weight: 0.3
+      accessibility:
+        raw: true
+        score: 0.9
+        weight: 0.2
+    travel_minutes: 30
+    travel_mode: public_transport
+    open_now: true
+    data_last_verified: "2026-01-01"
+facility_table_version: "0.1.0"
+weight_preset_version: "0.1.0"

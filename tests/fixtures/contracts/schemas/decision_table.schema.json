@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/decision_table.schema.json",
+  "title": "Decision table schema",
+  "description": "Schema for per-module decision tables used by the L2 grading layer. Each row maps a condition to a triage level. When condition evaluation results are unknown, the uncertainty_policy governs escalation (see levels.yaml escalation rule). SELF_CARE results must always be accompanied by escalation guidance content; that constraint is enforced by the L3.1 self-care card layer in a later step. Actual clinical content (which conditions map to which levels) is authored separately and must be reviewed by a clinician.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "module", "rows", "default_row", "conflict_resolution", "uncertainty_policy"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/meta" },
+    "module": { "$ref": "common.schema.json#/$defs/module_id" },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/row" }
+    },
+    "default_row": { "$ref": "#/$defs/default_row" },
+    "conflict_resolution": {
+      "enum": ["highest_severity_wins", "first_match_by_priority"],
+      "default": "highest_severity_wins"
+    },
+    "uncertainty_policy": { "$ref": "#/$defs/uncertainty_policy" }
+  },
+  "$defs": {
+    "row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["row_id", "when", "level", "rationale", "needs_clinician_review", "sources"],
+      "properties": {
+        "row_id": {
+          "type": "string",
+          "pattern": "^DT_[A-Z0-9_]+$"
+        },
+        "when": { "$ref": "common.schema.json#/$defs/condition" },
+        "level": { "$ref": "common.schema.json#/$defs/level_id" },
+        "rationale": { "$ref": "common.schema.json#/$defs/i18n_text" },
+        "needs_clinician_review": { "type": "boolean" },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title"],
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "publisher": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "accessed": { "type": "string", "format": "date" }
+            }
+          }
+        },
+        "priority": { "type": "integer" }
+      }
+    },
+
+    "default_row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["level", "rationale"],
+      "properties": {
+        "level": { "$ref": "common.schema.json#/$defs/level_id" },
+        "rationale": { "$ref": "common.schema.json#/$defs/i18n_text" }
+      }
+    },
+
+    "uncertainty_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "enum": ["escalate_one_level", "none"] },
+        "escalation_cap": { "$ref": "common.schema.json#/$defs/level_id" }
+      },
+      "description": "When a row's condition evaluates to unknown: if mode is escalate_one_level, escalate the level by one step per levels.yaml escalation rule order, not exceeding escalation_cap. The value of escalation_cap is a clinical decision to be determined by a clinician; it is recorded as an open question in docs/open_questions.md."
+    }
+  },
+
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "conflict_resolution": { "const": "first_match_by_priority" }
+        },
+        "required": ["conflict_resolution"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "rows": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["priority"]
+            }
+          }
+        }
+      }
+    }
+  ]
+}

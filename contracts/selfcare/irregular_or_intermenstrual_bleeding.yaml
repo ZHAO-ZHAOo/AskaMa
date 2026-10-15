@@ -1,0 +1,76 @@
+# AI Grandma demo 自护卡片 – irregular_or_intermenstrual_bleeding
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: selfcare_irregular_bleeding
+  version: 0.3.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+      url: "https://cks.nice.org.uk/topics/menorrhagia/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+cards:
+  - card_id: SC_IB_RELIEF
+    module: irregular_or_intermenstrual_bleeding
+    applicable_levels: [SELF_CARE]
+    card_type: relief_measure
+    title:
+      en: "Things you can do"
+      zh: "你可以做的事"
+    body:
+      en: "Keep a record of your bleeding pattern – dates, how heavy, and any spotting between periods. Stay hydrated and rest as needed. This will also help a doctor if you visit one."
+      zh: "记录你的出血模式——日期、量的大小、经间期点滴出血等。保持水分，需要时休息。这些记录对就医也有帮助。"
+    priority: 1
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - card_id: SC_IB_REASSURANCE
+    module: irregular_or_intermenstrual_bleeding
+    applicable_levels: [SELF_CARE]
+    card_type: reassurance
+    title:
+      en: "Some irregularity is common"
+      zh: "偶尔不规律很常见"
+    body:
+      en: "Cycles can be slightly irregular from time to time. Stress, travel, and weight changes can all affect timing. Occasional minor changes are usually nothing to worry about."
+      zh: "周期偶尔有点不规律很正常。压力、旅行、体重变化都可能影响时间。偶尔的轻微变化通常不必担心。"
+    priority: 2
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - card_id: SC_IB_ESCALATION
+    module: irregular_or_intermenstrual_bleeding
+    applicable_levels: [SELF_CARE, BOOK_SOON]
+    card_type: escalation_criteria
+    title:
+      en: "See a doctor if"
+      zh: "出现以下情况请就医"
+    body:
+      en: "Please see a doctor if: you bleed between periods regularly; there's unusual discharge or odour; the bleeding lasts more than 2 weeks; or the cycle is consistently very irregular."
+      zh: "请就医，如果：经常在经间期出血；有异常分泌物或异味；出血持续超过两周；或周期持续非常不规律。"
+    priority: 10
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed

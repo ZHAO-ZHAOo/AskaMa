@@ -1,0 +1,19 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+event_id: "evt_005"
+session_id: "abc123def456ghi789"
+turn_id: 3
+timestamp: "2026-10-15T10:00:00Z"
+event_type: outcome_recorded
+ui_language: en
+versions:
+  contracts_bundle: "0.1.0"
+outcome_link_key: "olk_abc123def456ghi789"
+payload:
+  went_to_care: "yes"
+  facility_type: polyclinic
+  advised_level_by_provider: SELF_CARE
+  symptom_change: better
+  source: user_followup
+  recorded_at: "2026-10-15T10:00:00Z"

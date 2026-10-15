@@ -1,0 +1,49 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY and contains NO real user data.
+
+schema_version: "0.1.0"
+residency_status: citizen
+has_chas: "yes"
+chas_note: "[Format example only]"
+insurance: [none]
+ui_language: en
+travel_mode: public_transport
+home_area: "[Format example area]"
+use_current_location: true
+weight_profile:
+  mode: questionnaire
+  questionnaire_version: "0.1.0"
+  questionnaire_answers:
+    PQ_TRAVEL_MODE: public_transport
+    PQ_PRIORITY: nearest
+  computed_weights:
+    SEE_DOCTOR_24_48H:
+      travel_time: 0.5
+      cost: 0.2
+      path_friction: 0.1
+      accessibility: 0.1
+      condition_fit: 0.05
+      language_match: 0.03
+      familiarity: 0.02
+    BOOK_SOON:
+      travel_time: 0.3
+      cost: 0.3
+      path_friction: 0.1
+      accessibility: 0.1
+      condition_fit: 0.1
+      language_match: 0.05
+      familiarity: 0.05
+  weight_preset_version: "0.1.0"
+  updated_at: "2026-10-08T12:00:00Z"
+visit_history:
+  - facility_id: FAC_EXAMPLE_POLYCLINIC
+    visited_month: "2026-08"
+consent:
+  service: true
+  followup_contact: false
+  research_use: false
+  visit_history: true
+  consent_text_version: "0.1.0"
+  consented_at: "2026-10-08T12:00:00Z"
+created_at: "2026-10-08T12:00:00Z"
+updated_at: "2026-10-08T12:00:00Z"

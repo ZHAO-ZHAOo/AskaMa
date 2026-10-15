@@ -1,0 +1,75 @@
+# 仅格式示例，非真实权重数值
+# This file is for FORMAT DEMONSTRATION ONLY.
+# All text fields say "[Format example only]". All numeric values are arbitrary
+# placeholders and do NOT imply any real medical or product judgment.
+
+meta:
+  id: weight_presets_example
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+features:
+  - id: travel_time
+    name:
+      en: "[Format example only]"
+    description:
+      en: "[Format example only]"
+    higher_is_better: false
+    scoring_note: "[Format example only — how travel_time is converted to 0–1]"
+  - id: cost
+    name:
+      en: "[Format example only]"
+    description:
+      en: "[Format example only]"
+    higher_is_better: false
+    scoring_note: "[Format example only — how cost is converted to 0–1]"
+
+ranking_levels:
+  - SEE_DOCTOR_24_48H
+  - BOOK_SOON
+
+default_weights_by_level:
+  SEE_DOCTOR_24_48H:
+    travel_time: 0.6
+    cost: 0.4
+  BOOK_SOON:
+    travel_time: 0.4
+    cost: 0.6
+
+presets:
+  - preset_id: nearest
+    name:
+      en: "[Format example only]"
+    description:
+      en: "[Format example only]"
+    weights_by_level:
+      SEE_DOCTOR_24_48H:
+        travel_time: 0.8
+        cost: 0.2
+      BOOK_SOON:
+        travel_time: 0.7
+        cost: 0.3
+
+bounds_by_level:
+  SEE_DOCTOR_24_48H:
+    travel_time:
+      min: 0.5
+      max: 1.0
+    cost:
+      min: 0.0
+      max: 0.5
+  BOOK_SOON:
+    travel_time:
+      min: 0.2
+      max: 1.0
+    cost:
+      min: 0.0
+      max: 0.8
+
+emergency_ranking:
+  mode: travel_time_only
+  note:
+    en: "[Format example only]"

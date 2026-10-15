@@ -1,0 +1,18 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+event_id: "evt_002"
+session_id: "abc123def456ghi789"
+turn_id: 0
+timestamp: "2026-10-08T12:00:01Z"
+event_type: l1_evaluated
+ui_language: en
+versions:
+  redflag_rules: "0.1.0"
+  contracts_bundle: "0.1.0"
+outcome_link_key: "olk_abc123def456ghi789"
+payload:
+  evaluated_rule_ids: ["RF_EXAMPLE_001", "RF_EXAMPLE_002"]
+  triggered_rule_ids: []
+  near_miss_rule_ids: ["RF_EXAMPLE_001"]
+  exit_type: null

@@ -1,0 +1,33 @@
+# 仅格式示例，非临床内容
+# This file is for FORMAT DEMONSTRATION ONLY and contains NO clinical content.
+
+meta:
+  id: redflag_rules
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+rules:
+  - rule_id: RF_EXAMPLE_ONLY
+    scope: [global]
+    condition:
+      all_of:
+        - {slot: fever_status, op: eq, value: measured_fever}
+        - {slot: pain_location, op: contains_any, value: [lower_abdomen_middle]}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [fever_status, temperature_c]
+    near_miss_condition:
+      {slot: fever_status, op: eq, value: feels_feverish_not_measured}
+    user_note:
+      en: Format example only, not clinical content
+      zh: 仅格式示例，非临床内容
+    rationale:
+      en: Format example only, not clinical content
+      zh: 仅格式示例，非临床内容
+    sources: []
+    needs_clinician_review: true
+    status: draft_unreviewed
+    notes: 仅格式示例，非临床内容

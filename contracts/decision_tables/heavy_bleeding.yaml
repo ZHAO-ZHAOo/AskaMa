@@ -1,0 +1,99 @@
+# AI Grandma demo 决策表 – heavy_bleeding
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: decision_table_heavy_bleeding
+  version: 0.4.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+      url: "https://cks.nice.org.uk/topics/menorrhagia/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+module: heavy_bleeding
+
+rows:
+  - row_id: DT_HB_001
+    when:
+      all_of:
+        - {slot: flow_compared_to_usual, op: eq, value: much_more}
+        - {slot: soak_through_interval, op: in, value: [hourly_or_more_often, every_2_to_3_hours]}
+    level: SEE_DOCTOR_24_48H
+    priority: 10
+    rationale:
+      en: "Much heavier than usual with frequent soaking warrants prompt medical review."
+      zh: "出血量明显多于平常且浸透频繁，应尽快就诊。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+  - row_id: DT_HB_002
+    when:
+      all_of:
+        - {slot: flow_compared_to_usual, op: eq, value: much_more}
+        - {slot: soak_through_interval, op: in, value: [a_few_times_a_day, less_often]}
+    level: BOOK_SOON
+    priority: 8
+    rationale:
+      en: "Much heavier than usual but less frequent soaking – should be assessed by a doctor soon."
+      zh: "出血量明显增多但浸透不频繁——应尽快看医生评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+  - row_id: DT_HB_003
+    when:
+      any_of:
+        - {slot: flow_compared_to_usual, op: eq, value: same}
+        - {slot: flow_compared_to_usual, op: eq, value: a_bit_more}
+    level: SELF_CARE
+    priority: 1
+    rationale:
+      en: "Flow similar to or slightly more than usual – suitable for home observation."
+      zh: "出血量与平常相近或略多——适合居家观察。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+  - row_id: DT_HB_004
+    when:
+      {slot: flow_compared_to_usual, op: eq, value: a_bit_less}
+    level: SELF_CARE
+    priority: 2
+    rationale:
+      en: "Less than usual – suitable for home observation."
+      zh: "出血量少于平常——适合居家观察。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+  - row_id: DT_HB_005
+    when:
+      all_of:
+        - {slot: clots_present, op: eq, value: true}
+        - {slot: clot_size, op: in, value: [small, medium]}
+    level: BOOK_SOON
+    priority: 6
+    rationale:
+      en: "Passing blood clots (small or medium) with heavy bleeding should be assessed by a doctor soon."
+      zh: "经量多并伴有小/中等血块，应尽快看医生评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+
+default_row:
+  level: BOOK_SOON
+  rationale:
+    en: "Unable to clearly assess – default to booking an appointment."
+    zh: "无法明确评估——默认建议预约就诊。"
+
+conflict_resolution: highest_severity_wins
+
+uncertainty_policy:
+  mode: escalate_one_level

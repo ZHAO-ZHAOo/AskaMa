@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/interfaces/session_state.schema.json",
+  "title": "Session state schema",
+  "description": "Schema for the SessionState object that flows through the entire pipeline. SessionState is the shared mutable state passed between layers (Intake, L1, L2, L3, L4, Persona). It MUST NOT contain raw user text, precise location coordinates, names, or contact information. Location is area-level only. user_profile_ref stores a reference (id or key) to the profile, not the profile content itself, to minimize data in transit.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "outcome_link_key",
+    "ui_language",
+    "detected_input_languages",
+    "started_at",
+    "turn_count",
+    "active_modules",
+    "slots",
+    "asked_question_ids",
+    "candidate_levels",
+    "user_profile_ref",
+    "stage"
+  ],
+  "properties": {
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "outcome_link_key": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/outcome_link_key" },
+    "ui_language": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/language_code" },
+    "detected_input_languages": {
+      "type": "array",
+      "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/language_code" },
+      "description": "Languages detected in the user's input (may include multiple if mixed-language)."
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "turn_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "active_modules": {
+      "type": "array",
+      "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/module_id" }
+    },
+    "slots": {
+      "type": "object",
+      "description": "Keys are slot ids; values are slot_value objects. Slot ids must exist in slots.yaml (checked by validation script).",
+      "additionalProperties": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/slot_value" }
+    },
+    "asked_question_ids": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Question ids that have been asked so far in this session. Must match the pattern in question_tree schema."
+    },
+    "candidate_levels": {
+      "type": "array",
+      "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id" },
+      "description": "Current candidate levels under consideration (narrows as more questions are answered)."
+    },
+    "user_profile_ref": {
+      "type": "string",
+      "description": "Reference to the user profile (e.g. a key or id). Does NOT embed the profile content to minimize data in transit."
+    },
+    "stage": {
+      "enum": ["intake", "l1", "l2", "l3", "l4", "done"],
+      "description": "Current pipeline stage."
+    },
+    "versions": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/versions" }
+  }
+}

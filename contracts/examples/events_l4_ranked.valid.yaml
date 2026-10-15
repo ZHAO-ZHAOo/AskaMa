@@ -1,0 +1,44 @@
+# 仅格式示例，非真实机构数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+event_id: "evt_004"
+session_id: "abc123def456ghi789"
+turn_id: 3
+timestamp: "2026-10-08T12:06:00Z"
+event_type: l4_ranked
+ui_language: en
+versions:
+  facility_table: "0.1.0"
+  weight_presets: "0.1.0"
+  contracts_bundle: "0.1.0"
+outcome_link_key: "olk_abc123def456ghi789"
+payload:
+  level: SEE_DOCTOR_24_48H
+  emergency_mode: false
+  weights_source: questionnaire
+  preferences_clipped: true
+  ranked:
+    - rank: 1
+      facility_id: "FAC_EXAMPLE_POLYCLINIC"
+      total_score: 0.85
+      feature_scores:
+        travel_time:
+          raw: 15
+          score: 0.8
+          weight: 0.5
+        cost:
+          raw: 25
+          score: 0.9
+          weight: 0.3
+    - rank: 2
+      facility_id: "FAC_EXAMPLE_URGENT_OG"
+      total_score: 0.72
+      feature_scores:
+        travel_time:
+          raw: 30
+          score: 0.5
+          weight: 0.5
+        cost:
+          raw: 80
+          score: 0.6
+          weight: 0.3

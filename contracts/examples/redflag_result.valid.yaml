@@ -1,0 +1,13 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+session_id: "abc123def456ghi789"
+turn_id: 1
+evaluated_rule_ids: ["RF_EXAMPLE_001", "RF_EXAMPLE_002"]
+triggered: false
+triggered_rules: []
+exit_type: null
+near_misses:
+  - rule_id: "RF_EXAMPLE_001"
+followup_needed: []
+rules_version: "0.1.0"

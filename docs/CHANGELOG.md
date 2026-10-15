@@ -1,0 +1,33 @@
+# 变更日志
+
+- 0.0.1 创建项目结构与背景文件
+- 0.0.2 项目搬迁至 ~/Projects/ai-grandma 并初始化 git
+- 0.0.3 新增 levels.yaml、modules.yaml、01_levels_and_modules.md
+- 0.0.4 新增槽位字典 v0.1.0（47 个槽位，全部 draft_unreviewed）与槽位变更请求流程
+- 0.0.4.1 记录目标人群与年龄的产品决策、新增槽位提案 menarche_stage
+- 0.0.5 新增 common、redflag_rules、question_tree、decision_table 的 JSON Schema 及示例
+- 0.0.6 记录语言决策（默认英文，可切换 zh / ms / ta），levels.yaml 与 modules.yaml 迁移为 i18n_text 多语言结构（v0.2.0）
+- 0.0.5.1 共享 schema 的多语言文本改为 i18n_text（en 必填，zh/ms/ta 可选）；新增 language_code；示例同步更新
+- 0.0.4.3 slots.yaml 升至 0.2.0，文本字段迁移为多语言对象，补充英文示例说法；槽位提案模板同步更新
+- 0.0.7 新增 selfcare_card 和 facility 的 JSON Schema 及示例；schema README 补充 format 检查说明
+- 0.0.8 新增校验脚本（tools/validate_contracts.py）、lint 词表（tools/lint_denylist.yaml）、测试（tests/）、约定文档（docs/02_conventions.md）；创建内容目录（rules/questions/decision_tables/selfcare/facilities）；00_project_context.md 新增"MVP 范围与安全措施"一节；README 新增"如何校验"一节；open_questions 新增 Q-033~Q-036 及 schema 缺陷记录
+- 0.0.5.3 新增 user_profile、weight_presets、questionnaire_mapping 的 JSON Schema 及示例；schemas/README 补充三个 schema 的说明和跨字段约束清单；examples/README 补充新示例说明；open_questions 新增 Q-037~Q-041
+- 0.0.7 新增接口与事件日志 schema（interfaces/ 下 9 个接口 schema + events.schema.json）、common.schema.json 新增 versions/slot_value/session_id/outcome_link_key 定义、docs/04_data_flow.md 数据流说明、schemas/README 补充接口和事件日志说明及约束清单、examples/README 补充新示例说明；open_questions 新增 Q-042~Q-046
+- 0.1.0-step0 Step 0 完成：校验补强（权重预设语义检查：权重总和 = 1 ± 0.001、特征 id 定义、bounds 覆盖、preset_id 唯一、ranking_levels 不含 EMERGENCY_NOW/SELF_CARE；问卷映射语义检查：question_id/option_id 唯一、feature/preset_id 引用一致性、set_profile_field 枚举值、multi_select 冲突 WARNING、版本一致性 WARNING；机构补充：urgent_og/a_e 建议 walk_in_available=true；示例豁免"从未产生级别"WARNING）、新增内容目录（weights/、questionnaire/）、技术栈提案（docs/03_tech_stack_proposal.md）、内容阶段计划（docs/05_content_phase_plan.md）、README 更新、open_questions 新增 Q-047~Q-052 及尚未解决问题总览分类、02_conventions.md 补充新目录和新检查说明；tests 新增 11 个测试用例（权重预设 6 个 + 问卷 4 个 + 机构 1 个）
+- 0.1.1 疼痛槽位统一与抽取修复（v2 设计稿对齐）：
+  - 槽位名统一：pain_intensity_0_10 → pain_severity_0_10（contracts/slots.yaml、contracts/decision_tables/severe_period_pain.yaml、contracts/rules/redflag_rules.yaml、contracts/questions/severe_period_pain.yaml、tests/、src/llm/intake.py、docs/content/cases_*）——以 v2 设计稿 pain_severity_0_10 为准，消除双套命名
+  - 抽取修复：keyword 兜底路径原用 `str(score) in text` 匹配疼痛分数，"10分"因 `'0' in "10分"` 被抽成 0 分，导致数值红旗永不触发；改为正则显式匹配 "N分 / N/10 / N score"（SP-001 病例由 UNKNOWN 修复为 EMERGENCY_NOW）
+  - contracts/slots.yaml 疼痛槽位补 review_note（阈值待临床确认）、needs_clinician_review: true
+  - 病例文档：cases_heavy_bleeding.md HB-006 标题修复（→ BOOK_SOON，消除 run_eval 解析成 UNKNOWN 的文档 bug）
+  - 验证：tests 46/46 通过；run_eval 合成病例准确率 59.1% → 68.2%（SP 模块 6/6 全对）
+- 0.1.2 槽位体系全面修复（死槽位接回 + 反向死槽位补问 + 引擎分级漏洞，仅改 ai-grandma 3 运行契约）：
+  - 死槽位接回（收集未用 → 参与分级）：usual_cycle_length_days → DT_LM_006（周期 ≤20 / ≥36 天 → BOOK_SOON）；clots_present + clot_size → DT_HB_005（小/中等血块 → BOOK_SOON）；pain_severity_0_10 → DT_SP_005 保底（≥7 → BOOK_SOON）；pain_timing_relative_to_period → DT_SP_006（非经期痛 → BOOK_SOON）；pain_location → DT_SP_007（单侧下腹痛 → BOOK_SOON）
+  - 反向死槽位修复（分级引用未收集）：fever_status / dizziness_or_fainting / heart_racing_or_short_of_breath / vomiting_or_cannot_keep_fluids_down 此前仅被红旗引用、问题树不收集 → 4 个问题树全部补问（severe_period_pain 5→10 问、heavy_bleeding 5→9 问、irregular 4→8 问、late_or_missed 4→8 问），红旗追问实际生效
+  - 引擎修复（src/engine/l2_grading.py）：select_next_question 原在 required_slots 答完即停，补问的非 required 红旗槽位永远不会被问到 → 改为 required 答完继续按 priority 追问、跳过已抽取/已答槽位
+  - 引擎修复（src/orchestrator.py）：用户回答"不确定/不知道"类 → 槽位标 unknown，使决策表 uncertainty escalate（安全向升级）生效，不再因枚举不匹配被当作 False 低估
+  - 决策表漏洞修复：DT_IB_002 误绑 bleeding_between_periods=true（经期延长落空）→ 仅按 current_bleeding_days_so_far ≥14；DT_IB_004 仅认 no_established_pattern（very_irregular 落空）→ 覆盖 [very_irregular, no_established_pattern]；DT_LM_004 边界 <35 → ≤35（推迟 7 天 = 35 天应落 SELF_CARE）
+  - intake 修复（src/llm/intake.py）：模块识别加特异性权重（经间/推迟/停经权重 2，通用"出血/痛"权重 1）+ 补充经间关键词（月经之间/之间出血/点滴/经期延长/还没停），修复 IB 病例被误路由到 heavy_bleeding；"发烧38度"类明确数值不再被抽成 feels_feverish_not_measured
+  - 评估基建修复（src/eval/run_eval.py）：追问回答由"位置顺序匹配"改为按 slot 名匹配，消除 intake 抽取与答案顺序冲突造成的错位
+  - 决策表 rows 移除 schema 禁止的 note 字段（5 处）；病例文档 4 个重写为 slot 名答案全覆盖，期望对齐新规则（HB-006 不确定浸透 → 升级一级、LM-001 停经+可能怀孕 → 24-48H 无急诊依据、IB-003 经间点滴 → 保守 BOOK_SOON）
+  - 已知缺口（如实标注）：temperature_c 仍为"红旗 followup 引用但问题树未收集"——它是发烧后的条件性自由数值追问（float），followup 追问机制未在 orchestrator 落地，目前依赖 intake 抽取；异位妊娠红旗（停经+腹痛+可能怀孕→急诊）未纳入 MVP 运行契约，待临床确认
+  - 验证：tests 46/46 通过；run_eval 合成病例 22/22 全对（准确率 100%，under 0 / over 0，基线 59.1% → 68.2% → 100%）

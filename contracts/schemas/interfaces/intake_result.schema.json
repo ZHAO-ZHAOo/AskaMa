@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/interfaces/intake_result.schema.json",
+  "title": "Intake result schema",
+  "description": "Schema for the IntakeResult object produced by the Intake layer (LLM-based slot extraction). Slot ids and their values are language-independent: regardless of which supported language the user speaks, Intake extracts the same set of slots. The LLM only extracts information and detects language; it does NOT decide the triage level. needs_clarification signals that the extracted information is insufficient or contradictory and further follow-up is needed.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "turn_id",
+    "extracted_slots",
+    "needs_clarification",
+    "detected_language",
+    "mixed_language",
+    "out_of_scope"
+  ],
+  "properties": {
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "turn_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "extracted_slots": {
+      "type": "array",
+      "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/slot_value" }
+    },
+    "needs_clarification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["needed"],
+      "properties": {
+        "needed": { "type": "boolean" },
+        "reason": {
+          "enum": ["ambiguous", "low_confidence", "contradictory"]
+        },
+        "slots": {
+          "type": "array",
+          "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/slot_id" }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "needed": { "const": true }
+            },
+            "required": ["needed"]
+          },
+          "then": {
+            "type": "object",
+            "required": ["reason"]
+          }
+        }
+      ]
+    },
+    "detected_language": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/language_code" },
+    "mixed_language": { "type": "boolean" },
+    "out_of_scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flag"],
+      "properties": {
+        "flag": { "type": "boolean" },
+        "category": {
+          "enum": ["other_health_topic", "not_health", "unsafe_request", "unclear"]
+        }
+      }
+    }
+  }
+}

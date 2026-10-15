@@ -1,0 +1,22 @@
+# 故意不合法：用户可见文本缺少 en（i18n_text 的 en 必填）
+
+meta:
+  id: redflag_rules_invalid_missing_en
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+rules:
+  - rule_id: RF_EXAMPLE_MISSING_EN
+    scope: [global]
+    condition:
+      {slot: fever_status, op: eq, value: measured_fever}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: treat_as_false
+    # rationale 缺少 en，应该校验失败
+    rationale:
+      zh: 仅格式示例
+    needs_clinician_review: true
+    status: draft_unreviewed

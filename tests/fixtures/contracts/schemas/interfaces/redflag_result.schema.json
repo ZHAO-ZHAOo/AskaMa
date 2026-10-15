@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/interfaces/redflag_result.schema.json",
+  "title": "Red-flag result schema",
+  "description": "Schema for the RedFlagResult object produced by the L1 red-flag layer. L1 evaluates all red-flag rules on every turn. When multiple rules trigger, the exit_type is the more urgent one (CALL_AMBULANCE takes priority over GO_URGENT_OG_OR_AE). Near-misses (rules close to triggering but not triggered) are recorded for future optimization. Red-flag rules never enter automatic optimization — they can only be modified manually by a clinician.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "turn_id",
+    "evaluated_rule_ids",
+    "triggered",
+    "triggered_rules",
+    "exit_type",
+    "near_misses",
+    "followup_needed",
+    "rules_version"
+  ],
+  "properties": {
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "turn_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "evaluated_rule_ids": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "triggered": { "type": "boolean" },
+    "triggered_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "exit_type"],
+        "properties": {
+          "rule_id": { "type": "string" },
+          "exit_type": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/redflag_exit_type" }
+        }
+      }
+    },
+    "exit_type": {
+      "oneOf": [
+        { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/redflag_exit_type" },
+        { "type": "null" }
+      ]
+    },
+    "near_misses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id"],
+        "properties": {
+          "rule_id": { "type": "string" }
+        }
+      }
+    },
+    "followup_needed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["rule_id", "slots"],
+        "properties": {
+          "rule_id": { "type": "string" },
+          "slots": {
+            "type": "array",
+            "items": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/slot_id" }
+          }
+        }
+      }
+    },
+    "rules_version": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "triggered": { "const": true }
+        },
+        "required": ["triggered"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "exit_type": {
+            "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/redflag_exit_type"
+          },
+          "triggered_rules": {
+            "type": "array",
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ]
+}

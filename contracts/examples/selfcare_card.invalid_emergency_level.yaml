@@ -1,0 +1,29 @@
+# 故意不合法：applicable_levels 包含 EMERGENCY_NOW（自护卡片不适用于急症级别）
+
+meta:
+  id: selfcare_card_invalid_emergency
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+cards:
+  - card_id: SC_EXAMPLE_EMERGENCY
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE, EMERGENCY_NOW]  # EMERGENCY_NOW 不应出现在自护卡片的 applicable_levels 中
+    card_type: relief_measure
+    title:
+      en: "[Format example only – not clinical content]"
+      zh: 【格式示例，非临床内容】
+    body:
+      en: "[Format example only – not clinical content]"
+      zh: 【格式示例，非临床内容】
+    priority: 1
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources: []
+    needs_clinician_review: true
+    status: draft_unreviewed

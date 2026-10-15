@@ -1,0 +1,21 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: contains "home_address" which is not an allowed field.
+
+session_id: "abc123def456ghi789"
+turn_id: 3
+level: BOOK_SOON
+module: heavy_bleeding
+weights:
+  travel_time: 0.6
+  cost: 0.4
+weights_source: default
+weight_preset_version: "0.1.0"
+profile_fields:
+  residency_status: citizen
+  travel_mode: walking
+location:
+  planning_area: "[Format example area]"
+  source: user_entered_area
+age_band: "18_24"
+home_address: "[PROHIBITED — should not be here]"

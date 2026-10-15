@@ -1,0 +1,22 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+session_id: "abc123def456ghi789"
+turn_id: 1
+extracted_slots:
+  - slot_id: age_band
+    status: answered
+    value: "18_24"
+    confidence: 0.95
+    source_turn: 0
+  - slot_id: flow_heaviness
+    status: answered
+    value: heavier_than_usual
+    confidence: 0.9
+    source_turn: 1
+needs_clarification:
+  needed: false
+detected_language: en
+mixed_language: false
+out_of_scope:
+  flag: false

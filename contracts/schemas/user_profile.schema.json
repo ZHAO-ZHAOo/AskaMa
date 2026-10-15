@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/user_profile.schema.json",
+  "title": "User profile schema",
+  "description": "Schema for a single user profile object (NOT a meta-wrapped config file). The profile stores information needed by the L4 care-recommendation layer to rank facilities. PRIVACY: This profile MUST NOT store age, date of birth, name, contact information, or precise location. Age band is collected per-session via the 'age_band' slot, not stored in the profile. home_area is area-level only (planning region name) — precise addresses, postal codes, and coordinates are prohibited. visit_history is recorded only when consent.visit_history is true. All four consent fields are independent; all except 'service' default to false.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "residency_status",
+    "has_chas",
+    "insurance",
+    "ui_language",
+    "travel_mode",
+    "use_current_location",
+    "weight_profile",
+    "consent",
+    "created_at",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": { "type": "string" },
+    "residency_status": {
+      "enum": ["citizen", "pr", "other", "unknown"]
+    },
+    "has_chas": {
+      "enum": ["yes", "no", "unknown"]
+    },
+    "chas_note": {
+      "type": "string",
+      "description": "Optional free-text note about CHAS status. The schema does NOT hardcode CHAS sub-categories (Blue/Orange/Green) to avoid staleness as policies change."
+    },
+    "insurance": {
+      "type": "array",
+      "items": {
+        "enum": ["private", "student", "employer", "other", "none", "unknown"]
+      }
+    },
+    "ui_language": {
+      "$ref": "common.schema.json#/$defs/language_code",
+      "default": "en"
+    },
+    "travel_mode": {
+      "enum": ["walking", "public_transport", "driving", "ride_hailing", "unknown"]
+    },
+    "home_area": {
+      "type": "string",
+      "description": "Area-level location only (e.g. a Singapore planning region name). Storing precise addresses, postal codes, or coordinates is PROHIBITED."
+    },
+    "use_current_location": {
+      "type": "boolean",
+      "description": "Whether the session may use the current device location. Location is used only for the current calculation and is NOT persisted."
+    },
+    "weight_profile": {
+      "$ref": "#/$defs/weight_profile"
+    },
+    "visit_history": {
+      "type": "array",
+      "description": "Past facility visits. Recorded ONLY when consent.visit_history is true.",
+      "items": { "$ref": "#/$defs/visit_entry" }
+    },
+    "consent": {
+      "$ref": "#/$defs/consent"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "weight_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "weight_preset_version",
+        "updated_at"
+      ],
+      "properties": {
+        "mode": {
+          "enum": ["default", "preset", "questionnaire"]
+        },
+        "preset_id": {
+          "type": "string"
+        },
+        "questionnaire_version": {
+          "type": "string"
+        },
+        "questionnaire_answers": {
+          "type": "object",
+          "description": "Keys are question ids; values are either a single option id (string) or an array of option ids (for multi-select questions).",
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "string" },
+              { "type": "array", "items": { "type": "string" } }
+            ]
+          }
+        },
+        "computed_weights": {
+          "type": "object",
+          "description": "Keys are level_ids where weights are used (SEE_DOCTOR_24_48H, BOOK_SOON). Values are objects mapping feature ids to numeric weights (0–1). The sum of weights for each level MUST be 1; feature ids MUST exist in the features array of weight_presets. These cross-field constraints are checked by the downstream validation script, not by JSON Schema.",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          }
+        },
+        "weight_preset_version": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "mode": { "const": "preset" }
+            },
+            "required": ["mode"]
+          },
+          "then": {
+            "type": "object",
+            "required": ["preset_id"]
+          }
+        },
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "mode": { "const": "questionnaire" }
+            },
+            "required": ["mode"]
+          },
+          "then": {
+            "type": "object",
+            "required": ["questionnaire_version", "questionnaire_answers"]
+          }
+        }
+      ]
+    },
+    "visit_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["facility_id", "visited_month"],
+      "properties": {
+        "facility_id": {
+          "type": "string",
+          "pattern": "^FAC_[A-Z0-9_]+$"
+        },
+        "visited_month": {
+          "type": "string",
+          "pattern": "^\\d{4}-(0[1-9]|1[0-2])$",
+          "description": "Year-month only (e.g. 2026-03). Day-level precision is NOT stored to protect privacy."
+        }
+      }
+    },
+    "consent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "service",
+        "followup_contact",
+        "research_use",
+        "visit_history",
+        "consent_text_version",
+        "consented_at"
+      ],
+      "properties": {
+        "service": {
+          "type": "boolean",
+          "description": "Consent to use data for the core triage service."
+        },
+        "followup_contact": {
+          "type": "boolean",
+          "description": "Consent to be contacted for follow-up."
+        },
+        "research_use": {
+          "type": "boolean",
+          "description": "Consent to use anonymised data for research."
+        },
+        "visit_history": {
+          "type": "boolean",
+          "description": "Consent to record facility visit history."
+        },
+        "consent_text_version": {
+          "type": "string"
+        },
+        "consented_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "All four consent flags are independent. service is required; the other three (followup_contact, research_use, visit_history) default to false."
+    }
+  }
+}

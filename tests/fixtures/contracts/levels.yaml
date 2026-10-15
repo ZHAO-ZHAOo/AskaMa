@@ -1,0 +1,32 @@
+meta:
+  id: levels
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+levels:
+  - id: EMERGENCY_NOW
+    name: {en: Emergency now, zh: 立即就医}
+    meaning: {en: Seek emergency care, zh: 立即就医}
+    severity_rank: 4
+  - id: SEE_DOCTOR_24_48H
+    name: {en: See doctor 24-48h, zh: 24-48小时内就医}
+    meaning: {en: See a doctor within 24-48h, zh: 24-48小时内就医}
+    severity_rank: 3
+  - id: BOOK_SOON
+    name: {en: Book soon, zh: 近期预约}
+    meaning: {en: Book an appointment soon, zh: 近期预约}
+    severity_rank: 2
+  - id: SELF_CARE
+    name: {en: Self-care, zh: 居家观察}
+    meaning: {en: Home self-care, zh: 居家观察}
+    severity_rank: 1
+escalation_rule:
+  description: {en: Escalate when uncertain, zh: 不确定时升级}
+  order: [SELF_CARE, BOOK_SOON, SEE_DOCTOR_24_48H, EMERGENCY_NOW]
+redflag_exit_types:
+  - id: CALL_AMBULANCE
+    description: {en: Call ambulance, zh: 拨打急救电话}
+  - id: GO_URGENT_OG_OR_AE
+    description: {en: Go to urgent O&G or A&E, zh: 前往急症}

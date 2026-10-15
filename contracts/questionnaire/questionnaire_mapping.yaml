@@ -1,0 +1,129 @@
+# AI Grandma demo 问卷映射 – 设置页
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: questionnaire_mapping
+  version: 0.3.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: "2026-10-01"
+
+questionnaire_version: "0.3.0"
+
+questions:
+  - question_id: PQ_PRIORITY
+    text:
+      en: "What matters most to you when choosing a clinic?"
+      zh: "选择就诊机构时，你最看重什么？"
+    multi_select: false
+    required: true
+    options:
+      - option_id: nearest
+        label:
+          en: "Closest to me"
+          zh: "离家最近"
+        effects:
+          - type: set_base_preset
+            preset_id: nearest
+      - option_id: budget
+        label:
+          en: "Affordable"
+          zh: "经济实惠"
+        effects:
+          - type: set_base_preset
+            preset_id: budget_friendly
+      - option_id: accessible
+        label:
+          en: "Easy to access and language"
+          zh: "方便就诊、语言通"
+        effects:
+          - type: set_base_preset
+            preset_id: accessibility_focused
+      - option_id: balanced
+        label:
+          en: "Balanced"
+          zh: "均衡考虑"
+        effects:
+          - type: set_base_preset
+            preset_id: balanced
+
+  - question_id: PQ_TRAVEL_MODE
+    text:
+      en: "How do you usually travel to the clinic?"
+      zh: "你通常怎么去诊所？"
+    multi_select: false
+    required: false
+    options:
+      - option_id: public_transport
+        label:
+          en: "Public transport"
+          zh: "公共交通"
+        effects:
+          - type: set_profile_field
+            field: travel_mode
+            value: public_transport
+          - type: multiply
+            feature: travel_time
+            factor: 1.2
+      - option_id: driving
+        label:
+          en: "Driving"
+          zh: "开车"
+        effects:
+          - type: set_profile_field
+            field: travel_mode
+            value: driving
+          - type: multiply
+            feature: travel_time
+            factor: 0.8
+      - option_id: walking
+        label:
+          en: "Walking"
+          zh: "步行"
+        effects:
+          - type: set_profile_field
+            field: travel_mode
+            value: walking
+          - type: multiply
+            feature: travel_time
+            factor: 1.5
+
+  - question_id: PQ_RESIDENCY
+    text:
+      en: "What is your residency status?"
+      zh: "你的居留身份是？"
+    multi_select: false
+    required: false
+    options:
+      - option_id: citizen
+        label:
+          en: "Singapore Citizen"
+          zh: "新加坡公民"
+        effects:
+          - type: set_profile_field
+            field: residency_status
+            value: citizen
+      - option_id: pr
+        label:
+          en: "Permanent Resident"
+          zh: "永久居民"
+        effects:
+          - type: set_profile_field
+            field: residency_status
+            value: pr
+      - option_id: student_pass
+        label:
+          en: "Student Pass / Other"
+          zh: "学生准证/其他"
+        effects:
+          - type: set_profile_field
+            field: residency_status
+            value: other
+
+combination:
+  start_from: default_weights
+  apply_order: question_order
+  clip_to_bounds: true
+  renormalize_to_sum_one: true
+  on_unanswered: use_default

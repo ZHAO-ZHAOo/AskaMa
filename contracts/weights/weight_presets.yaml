@@ -1,0 +1,205 @@
+# AI Grandma demo 权重预设
+# 原型，未经临床审核，不是医疗建议。
+# 权重数值为演示用途。
+
+meta:
+  id: weight_presets
+  version: 0.3.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: "2026-10-01"
+
+features:
+  - id: travel_time
+    name:
+      en: "Travel time"
+      zh: "路程时间"
+    description:
+      en: "Estimated travel time from user area to facility"
+      zh: "从用户区域到机构的估计路程时间"
+    higher_is_better: false
+    scoring_note: "Approximated by planning_area for demo; production uses OneMap API"
+
+  - id: cost
+    name:
+      en: "Cost"
+      zh: "费用"
+    description:
+      en: "Estimated cost of visit"
+      zh: "就诊估计费用"
+    higher_is_better: false
+    scoring_note: "Based on fee_tier: free=1.0, low=0.8, moderate=0.5, high=0.2"
+
+  - id: accessibility
+    name:
+      en: "Accessibility"
+      zh: "可及性"
+    description:
+      en: "Wheelchair access, language match, walk-in availability"
+      zh: "无障碍通道、语言匹配、是否可walk-in"
+    higher_is_better: true
+    scoring_note: "Composite score"
+
+  - id: condition_fit
+    name:
+      en: "Condition fit"
+      zh: "对症程度"
+    description:
+      en: "Whether the facility can handle gynaecological concerns"
+      zh: "机构是否能处理妇科问题"
+    higher_is_better: true
+    scoring_note: "has_gynaecology and type match"
+
+  - id: language_match
+    name:
+      en: "Language match"
+      zh: "语言匹配"
+    description:
+      en: "Whether facility offers user's preferred language"
+      zh: "机构是否提供用户首选语言"
+    higher_is_better: true
+    scoring_note: "Match between user language and facility languages"
+
+ranking_levels:
+  - SEE_DOCTOR_24_48H
+  - BOOK_SOON
+
+default_weights_by_level:
+  SEE_DOCTOR_24_48H:
+    travel_time: 0.35
+    cost: 0.15
+    accessibility: 0.15
+    condition_fit: 0.25
+    language_match: 0.10
+  BOOK_SOON:
+    travel_time: 0.25
+    cost: 0.25
+    accessibility: 0.15
+    condition_fit: 0.20
+    language_match: 0.15
+
+presets:
+  - preset_id: nearest
+    name:
+      en: "Nearest"
+      zh: "离家近"
+    description:
+      en: "Prioritises facilities closest to you"
+      zh: "优先推荐离家最近的机构"
+    weights_by_level:
+      SEE_DOCTOR_24_48H:
+        travel_time: 0.55
+        cost: 0.10
+        accessibility: 0.10
+        condition_fit: 0.20
+        language_match: 0.05
+      BOOK_SOON:
+        travel_time: 0.40
+        cost: 0.15
+        accessibility: 0.10
+        condition_fit: 0.20
+        language_match: 0.15
+
+  - preset_id: budget_friendly
+    name:
+      en: "Budget friendly"
+      zh: "经济实惠"
+    description:
+      en: "Prioritises lower-cost facilities"
+      zh: "优先推荐费用较低的机构"
+    weights_by_level:
+      SEE_DOCTOR_24_48H:
+        travel_time: 0.25
+        cost: 0.35
+        accessibility: 0.15
+        condition_fit: 0.15
+        language_match: 0.10
+      BOOK_SOON:
+        travel_time: 0.20
+        cost: 0.40
+        accessibility: 0.10
+        condition_fit: 0.15
+        language_match: 0.15
+
+  - preset_id: accessibility_focused
+    name:
+      en: "Accessibility focused"
+      zh: "可及性优先"
+    description:
+      en: "Prioritises walk-in and language-matched facilities"
+      zh: "优先推荐walk-in和语言匹配的机构"
+    weights_by_level:
+      SEE_DOCTOR_24_48H:
+        travel_time: 0.20
+        cost: 0.10
+        accessibility: 0.40
+        condition_fit: 0.15
+        language_match: 0.15
+      BOOK_SOON:
+        travel_time: 0.15
+        cost: 0.15
+        accessibility: 0.35
+        condition_fit: 0.15
+        language_match: 0.20
+
+  - preset_id: balanced
+    name:
+      en: "Balanced"
+      zh: "均衡"
+    description:
+      en: "Balances all factors equally"
+      zh: "均衡考虑所有因素"
+    weights_by_level:
+      SEE_DOCTOR_24_48H:
+        travel_time: 0.25
+        cost: 0.25
+        accessibility: 0.15
+        condition_fit: 0.20
+        language_match: 0.15
+      BOOK_SOON:
+        travel_time: 0.20
+        cost: 0.25
+        accessibility: 0.20
+        condition_fit: 0.20
+        language_match: 0.15
+
+bounds_by_level:
+  SEE_DOCTOR_24_48H:
+    travel_time:
+      min: 0.10
+      max: 0.80
+    cost:
+      min: 0.05
+      max: 0.60
+    accessibility:
+      min: 0.05
+      max: 0.60
+    condition_fit:
+      min: 0.05
+      max: 0.60
+    language_match:
+      min: 0.02
+      max: 0.40
+  BOOK_SOON:
+    travel_time:
+      min: 0.10
+      max: 0.80
+    cost:
+      min: 0.05
+      max: 0.60
+    accessibility:
+      min: 0.05
+      max: 0.60
+    condition_fit:
+      min: 0.05
+      max: 0.60
+    language_match:
+      min: 0.02
+      max: 0.40
+
+emergency_ranking:
+  mode: travel_time_only
+  note:
+    en: "For emergency exits, facilities are ranked by travel time only"
+    zh: "急症出口的机构排序仅按路程时间"

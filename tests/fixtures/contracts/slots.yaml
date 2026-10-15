@@ -1,0 +1,272 @@
+meta:
+  id: slots
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+special_values:
+- {id: unknown, meaning: {en: User does not know, zh: 不知道}}
+- {id: declined, meaning: {en: User declines, zh: 不愿回答}}
+slot_value_record:
+  description: Test fixture
+  fields: [slot_id, value, status, confidence, source_turn]
+  status_values: [answered, unknown, declined, not_asked]
+groups:
+- {id: context, name: {en: Context, zh: 基本情况}}
+- {id: bleeding, name: {en: Bleeding, zh: 出血}}
+- {id: pain, name: {en: Pain, zh: 疼痛}}
+type_notes:
+  duration: >-
+    duration: {value: number, unit: hours|days|weeks}
+slots:
+- id: age_band
+  group: context
+  type: enum
+  allowed_values:
+  - {id: under_12, label: {en: Under 12, zh: 12岁以下}}
+  - {id: "12_17", label: {en: 12-17, zh: 12-17岁}}
+  - {id: "18_24", label: {en: 18-24, zh: 18-24岁}}
+  - {id: "25_34", label: {en: 25-34, zh: 25-34岁}}
+  - {id: "35_44", label: {en: 35-44, zh: 35-44岁}}
+  - {id: "45_49", label: {en: 45-49, zh: 45-49岁}}
+  - {id: "50_plus", label: {en: 50 plus, zh: 50岁以上}}
+  multi: false
+  range: null
+  unit: null
+  description: {en: Age band, zh: 年龄段}
+  example_phrases:
+    en: [I'm in my early thirties]
+    zh: [三十出头]
+  module_tags: [global]
+  used_by: [l2_grading, l3_selfcare, l4_recommend]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: Test fixture
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: flow_compared_to_usual
+  group: bleeding
+  type: enum
+  allowed_values:
+  - {id: much_less, label: {en: Much less, zh: 少很多}}
+  - {id: a_bit_less, label: {en: A bit less, zh: 少一点}}
+  - {id: same, label: {en: About the same, zh: 差不多}}
+  - {id: a_bit_more, label: {en: A bit more, zh: 多一点}}
+  - {id: much_more, label: {en: Much more, zh: 多很多}}
+  multi: false
+  range: null
+  unit: null
+  description: {en: Flow compared to usual, zh: 出血量比较}
+  example_phrases:
+    en: [It's heavy this time]
+    zh: [这次特别多]
+  module_tags: [heavy_bleeding]
+  used_by: [l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: bleeding_through_clothes_or_bedding
+  group: bleeding
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description: {en: Bleeding through clothes, zh: 渗透衣物}
+  example_phrases:
+    en: [It got on my pants]
+    zh: [弄到裤子上了]
+  module_tags: [heavy_bleeding]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pain_severity_0_10
+  group: pain
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 0, max: 10}
+  unit: null
+  description: {en: Pain intensity 0-10, zh: 疼痛程度}
+  example_phrases:
+    en: [Maybe seven or eight]
+    zh: [七八分]
+  module_tags: [severe_period_pain]
+  used_by: [l1_redflag, l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pain_location
+  group: pain
+  type: enum
+  allowed_values:
+  - {id: lower_abdomen_middle, label: {en: Lower abdomen, zh: 下腹中部}}
+  - {id: lower_abdomen_one_side, label: {en: Lower abdomen one side, zh: 下腹一侧}}
+  - {id: whole_abdomen, label: {en: Whole abdomen, zh: 全腹}}
+  - {id: lower_back, label: {en: Lower back, zh: 腰背}}
+  - {id: other, label: {en: Other, zh: 其他}}
+  multi: true
+  range: null
+  unit: null
+  description: {en: Pain location, zh: 疼痛位置}
+  example_phrases:
+    en: [My lower belly hurts]
+    zh: [小肚子疼]
+  module_tags: [severe_period_pain]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: fever_status
+  group: pain
+  type: enum
+  allowed_values:
+  - {id: no_fever, label: {en: No fever, zh: 没有发烧}}
+  - {id: feels_feverish_not_measured, label: {en: Feels feverish, zh: 觉得发热}}
+  - {id: measured_fever, label: {en: Measured fever, zh: 量过发烧}}
+  multi: false
+  range: null
+  unit: null
+  description: {en: Fever status, zh: 发烧状态}
+  example_phrases:
+    en: [I think I have a fever]
+    zh: [好像有点发烧]
+  module_tags: [global]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: symptom_duration
+  group: pain
+  type: duration
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description: {en: Symptom duration, zh: 症状持续时间}
+  example_phrases:
+    en: [It's been three days]
+    zh: [三天了]
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: days_since_last_period_start
+  group: pain
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 0, max: null}
+  unit: days
+  description: {en: Days since last period, zh: 距上次月经天数}
+  example_phrases:
+    en: [About two weeks]
+    zh: [两周了]
+  module_tags: [late_or_missed_period]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: true
+  derivation_note: Computed from last_period_start_date
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: last_period_start_date
+  group: pain
+  type: date
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description: {en: Last period start date, zh: 上次月经开始日}
+  example_phrases:
+    en: [Two weeks ago]
+    zh: [两周前]
+  module_tags: [late_or_missed_period]
+  used_by: [l2_grading, logging]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: temperature_c
+  group: pain
+  type: float
+  allowed_values:
+  multi: false
+  range: {min: 30.0, max: 45.0}
+  unit: celsius
+  description: {en: Body temperature, zh: 体温}
+  example_phrases:
+    en: [38.5 degrees]
+    zh: [三十八度五]
+  module_tags: [global]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: period_currently_ongoing
+  group: pain
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description: {en: Period currently ongoing, zh: 正在来月经}
+  example_phrases:
+    en: [I'm on my period]
+    zh: [正来着]
+  module_tags: [heavy_bleeding, severe_period_pain]
+  used_by: [l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0

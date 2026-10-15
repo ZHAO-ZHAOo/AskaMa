@@ -1,0 +1,46 @@
+meta:
+  id: selfcare_fixture
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+cards:
+  - card_id: SC_FIXTURE_RELIEF
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE]
+    card_type: relief_measure
+    title:
+      en: "[Fixture only – not clinical content]"
+    body:
+      en: "[Fixture only – not clinical content] This is a test fixture card."
+    applies_when:
+      {slot: age_band, op: in, value: [18_24, 25_34]}
+    priority: 1
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "[Fixture source]"
+        url: "https://example.invalid/source"
+    needs_clinician_review: true
+    status: draft_unreviewed
+  - card_id: SC_FIXTURE_ESCALATION
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE]
+    card_type: escalation_criteria
+    title:
+      en: "[Fixture only – not clinical content]"
+    body:
+      en: "[Fixture only – not clinical content] Escalation criteria fixture."
+    priority: 10
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "[Fixture source]"
+        url: "https://example.invalid/source"
+    needs_clinician_review: true
+    status: draft_unreviewed

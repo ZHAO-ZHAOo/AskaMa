@@ -1,0 +1,49 @@
+# 仅格式示例，非临床内容
+# This file is for FORMAT DEMONSTRATION ONLY and contains NO clinical content.
+
+meta:
+  id: decision_table_example
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+module: heavy_bleeding
+
+rows:
+  - row_id: DT_EXAMPLE_1
+    when:
+      all_of:
+        - {slot: flow_compared_to_usual, op: eq, value: much_more}
+        - {slot: bleeding_through_clothes_or_bedding, op: eq, value: true}
+    level: SEE_DOCTOR_24_48H
+    rationale:
+      en: "[Format example only]"
+      zh: 【格式示例，非临床内容】
+    needs_clinician_review: true
+    sources: []
+
+  - row_id: DT_EXAMPLE_2
+    when:
+      any_of:
+        - {slot: flow_compared_to_usual, op: eq, value: same}
+        - {slot: flow_compared_to_usual, op: eq, value: a_bit_more}
+    level: SELF_CARE
+    rationale:
+      en: "[Format example only]"
+      zh: 【格式示例，非临床内容】
+    needs_clinician_review: true
+    sources: []
+
+default_row:
+  level: BOOK_SOON
+  rationale:
+    en: "[Format example only] Default row"
+    zh: 【格式示例，非临床内容】默认行
+
+conflict_resolution: highest_severity_wins
+
+uncertainty_policy:
+  mode: escalate_one_level
+  # escalation_cap 的取值待医生决定，此处暂不设定

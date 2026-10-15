@@ -1,0 +1,53 @@
+# 仅格式示例，非临床内容
+# This file is for FORMAT DEMONSTRATION ONLY and contains NO clinical content.
+
+meta:
+  id: selfcare_card_example
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+cards:
+  - card_id: SC_EXAMPLE_RELIEF
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE]
+    card_type: relief_measure
+    title:
+      en: "[Format example only – not clinical content]"
+      zh: 【格式示例，非临床内容】
+    body:
+      en: "[Format example only – not clinical content] This card demonstrates the relief_measure card type."
+      zh: 【格式示例，非临床内容】此卡片演示 relief_measure 类型。
+    applies_when:
+      {slot: age_band, op: in, value: [18_24, 25_34, 35_44, 45_49]}
+    priority: 1
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources: []
+    needs_clinician_review: true
+    status: draft_unreviewed
+    notes: 仅格式示例
+
+  - card_id: SC_EXAMPLE_ESCALATION
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE, BOOK_SOON]
+    card_type: escalation_criteria
+    title:
+      en: "[Format example only – not clinical content]"
+      zh: 【格式示例，非临床内容】
+    body:
+      en: "[Format example only – not clinical content] This card demonstrates the escalation_criteria card type."
+      zh: 【格式示例，非临床内容】此卡片演示 escalation_criteria 类型。
+    priority: 10
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources: []
+    needs_clinician_review: true
+    status: draft_unreviewed
+    notes: 仅格式示例

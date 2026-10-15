@@ -1,0 +1,76 @@
+# AI Grandma demo 自护卡片 – severe_period_pain
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: selfcare_severe_period_pain
+  version: 0.3.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+      url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+cards:
+  - card_id: SC_SP_RELIEF
+    module: severe_period_pain
+    applicable_levels: [SELF_CARE]
+    card_type: relief_measure
+    title:
+      en: "Things that may help at home"
+      zh: "在家可以尝试的缓解办法"
+    body:
+      en: "Rest in a comfortable position. A hot water bottle or warm compress on your lower tummy or lower back can be soothing. Gentle movement or stretching may help. Drink warm fluids and stay hydrated."
+      zh: "找一个舒服的姿势休息。在下腹部或腰部放一个热水袋或暖宝宝可能有所缓解。轻柔活动或拉伸也可能有帮助。喝点温水，保持水分。"
+    priority: 1
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - card_id: SC_SP_REASSURANCE
+    module: severe_period_pain
+    applicable_levels: [SELF_CARE]
+    card_type: reassurance
+    title:
+      en: "It's often manageable"
+      zh: "通常可以缓解"
+    body:
+      en: "Period pain that's similar to your usual pattern and responds to your usual self-care is very common. If your usual approach gives some relief, it's reasonable to keep an eye on things at home."
+      zh: "和你平常差不多的、用平时的方法能缓解的痛经很常见。如果平时的方法有一定效果，可以在家观察。"
+    priority: 2
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - card_id: SC_SP_ESCALATION
+    module: severe_period_pain
+    applicable_levels: [SELF_CARE, BOOK_SOON]
+    card_type: escalation_criteria
+    title:
+      en: "See a doctor if"
+      zh: "出现以下情况请就医"
+    body:
+      en: "Please see a doctor soon if: your pain gets worse; you can't do your usual activities; the pain is a new type you've never felt before; it comes on very suddenly; or you also feel dizzy, faint, or have a fever."
+      zh: "请尽快就医，如果：疼痛加重；无法进行日常活动；疼痛是以前没感受过的新类型；突然发作；或同时感到头晕、快要晕倒、发烧。"
+    priority: 10
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+    needs_clinician_review: true
+    status: draft_unreviewed

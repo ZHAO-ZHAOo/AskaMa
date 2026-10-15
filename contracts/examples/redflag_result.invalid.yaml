@@ -1,0 +1,15 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: triggered is true but exit_type is null.
+
+session_id: "abc123def456ghi789"
+turn_id: 1
+evaluated_rule_ids: ["RF_EXAMPLE_001"]
+triggered: true
+triggered_rules:
+  - rule_id: "RF_EXAMPLE_001"
+    exit_type: GO_URGENT_OG_OR_AE
+exit_type: null  # PROHIBITED — should fail if/then constraint
+near_misses: []
+followup_needed: []
+rules_version: "0.1.0"

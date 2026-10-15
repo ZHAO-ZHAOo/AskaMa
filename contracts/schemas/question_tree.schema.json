@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/question_tree.schema.json",
+  "title": "Question tree schema",
+  "description": "Schema for per-module question trees used by the L2 grading layer. Defines the follow-up questions to ask, their priority order, and stopping conditions. Actual clinical content (which questions, which slots, which conditions) is authored separately and must be reviewed by a clinician.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "meta",
+    "module",
+    "required_slots",
+    "questions",
+    "stopping",
+    "max_questions"
+  ],
+  "properties": {
+    "meta": {
+      "$ref": "common.schema.json#/$defs/meta"
+    },
+    "module": {
+      "$ref": "common.schema.json#/$defs/module_id"
+    },
+    "entry_condition": {
+      "$ref": "common.schema.json#/$defs/condition"
+    },
+    "required_slots": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "$ref": "common.schema.json#/$defs/slot_id"
+      }
+    },
+    "questions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/question"
+      }
+    },
+    "stopping": {
+      "$ref": "#/$defs/stopping"
+    },
+    "max_questions": {
+      "type": "integer",
+      "minimum": 1
+    }
+  },
+  "$defs": {
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question_id",
+        "slot",
+        "text",
+        "priority"
+      ],
+      "properties": {
+        "question_id": {
+          "type": "string",
+          "pattern": "^Q_[A-Z0-9_]+$"
+        },
+        "slot": {
+          "$ref": "common.schema.json#/$defs/slot_id"
+        },
+        "also_fills": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/slot_id"
+          }
+        },
+        "text": {
+          "$ref": "common.schema.json#/$defs/i18n_text"
+        },
+        "answer_options": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "label"
+            ],
+            "properties": {
+              "value": {
+                "type": "string"
+              },
+              "label": {
+                "$ref": "common.schema.json#/$defs/i18n_text"
+              }
+            }
+          }
+        },
+        "precondition": {
+          "$ref": "common.schema.json#/$defs/condition"
+        },
+        "priority": {
+          "type": "integer"
+        },
+        "reask_if_unclear": {
+          "$ref": "common.schema.json#/$defs/i18n_text"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "stopping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "on_max_reached",
+        "on_all_required_answered"
+      ],
+      "properties": {
+        "stop_when": {
+          "$ref": "common.schema.json#/$defs/condition"
+        },
+        "on_max_reached": {
+          "enum": [
+            "grade_with_uncertainty"
+          ]
+        },
+        "on_all_required_answered": {
+          "enum": [
+            "grade"
+          ]
+        }
+      }
+    }
+  }
+}

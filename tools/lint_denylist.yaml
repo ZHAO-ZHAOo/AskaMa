@@ -1,0 +1,87 @@
+# Lint denylist — content safety keyword lists for AI Grandma.
+# Maintained by the project lead; can be expanded at any time.
+# Used by tools/validate_contracts.py to scan user-visible text.
+
+# Dosage patterns (regex, case-insensitive). Any match → ERROR.
+dosage_patterns:
+  - '\b\d+(\.\d+)?\s?(mg|mcg|µg|g|ml|iu)\b'
+  - '\b\d+\s?(tablets?|pills?|capsules?)\b'
+  - '每天.{0,4}次'
+  - '每日.{0,4}次'
+  - '一次.{0,4}片'
+  - '一次.{0,4}粒'
+  - '服用.{0,4}\d'
+  - '剂量.{0,4}\d'
+  - '\d+\s?毫克'
+  - '\d+\s?毫升'
+  - 'take\s\d+'
+  - '\d+\s?drops'
+
+# Drug names (case-insensitive substring match). Any match → ERROR.
+# Generic names (English + Chinese) and common brand names.
+# At least 20 entries.
+drug_names:
+  # English generic names
+  - ibuprofen
+  - paracetamol
+  - acetaminophen
+  - aspirin
+  - naproxen
+  - diclofenac
+  - mefenamic acid
+  - tranexamic acid
+  - norethisterone
+  - medroxyprogesterone
+  - dydrogesterone
+  - combined oral contraceptive
+  - levonorgestrel
+  - drospirenone
+  - ethinyl estradiol
+  # English brand names
+  - panadol
+  - nurofen
+  - ponstan
+  - naprosyn
+  - voltaren
+  # Chinese generic names
+  - 布洛芬
+  - 对乙酰氨基酚
+  - 扑热息痛
+  - 阿司匹林
+  - 萘普生
+  - 双氯芬酸
+  - 甲芬那酸
+  - 氨甲环酸
+  - 炔诺酮
+  - 甲羟孕酮
+  - 屈螺酮
+  - 左炔诺孕酮
+
+# Diagnostic phrases (case-insensitive substring match). Any match → WARNING.
+# Requires human review because some phrases may be used legitimately
+# (e.g. "this is not caused by ...").
+diagnostic_phrases:
+  # English
+  - you have
+  - you may have
+  - you probably have
+  - this is caused by
+  - diagnosed with
+  - endometriosis
+  - pcos
+  - polycystic ovary
+  - fibroids
+  - ectopic
+  - miscarriage
+  - you are suffering from
+  - your condition is
+  # Chinese
+  - 你得了
+  - 你患有
+  - 可能是
+  - 诊断为
+  - 子宫内膜异位
+  - 多囊卵巢
+  - 子宫肌瘤
+  - 宫外孕
+  - 流产

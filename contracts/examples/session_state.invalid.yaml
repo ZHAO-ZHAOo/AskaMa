@@ -1,0 +1,18 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: contains "raw_text" which is not an allowed field.
+# Raw user text MUST NOT appear in SessionState.
+
+session_id: "abc123def456ghi789"
+outcome_link_key: "olk_abc123def456ghi789"
+ui_language: en
+detected_input_languages: [en]
+started_at: "2026-10-08T12:00:00Z"
+turn_count: 0
+active_modules: []
+slots: {}
+asked_question_ids: []
+candidate_levels: []
+user_profile_ref: "up_ref_abc123"
+stage: intake
+raw_text: "[PROHIBITED — should not be here]"

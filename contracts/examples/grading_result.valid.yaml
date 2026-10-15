@@ -1,0 +1,23 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+session_id: "abc123def456ghi789"
+turn_id: 3
+module: heavy_bleeding
+status: final
+level: SELF_CARE
+next_question_id: null
+matched_row_ids: ["DT_EXAMPLE_001"]
+level_trajectory:
+  - turn: 0
+    candidates: [SELF_CARE, BOOK_SOON, SEE_DOCTOR_24_48H, EMERGENCY_NOW]
+  - turn: 1
+    candidates: [SELF_CARE, BOOK_SOON]
+  - turn: 2
+    candidates: [SELF_CARE]
+stop_reason: all_required_answered
+escalated_for_uncertainty: false
+uncertain_slots: []
+questions_asked_count: 3
+tables_version: "0.1.0"
+question_tree_version: "0.1.0"

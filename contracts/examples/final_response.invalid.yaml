@@ -1,0 +1,27 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: response_type is emergency_exit but level is SELF_CARE.
+
+session_id: "abc123def456ghi789"
+turn_id: 2
+response_type: emergency_exit
+level: SELF_CARE  # PROHIBITED — emergency_exit requires level=EMERGENCY_NOW
+language: en
+text: "[Format example only]"
+disclaimer_included: true
+output_validation:
+  passed: false
+  checks:
+    - name: no_diagnostic_wording
+      passed: true
+    - name: level_consistent_with_grading
+      passed: false
+    - name: no_drug_or_dosage
+      passed: true
+    - name: disclaimer_present
+      passed: true
+    - name: language_matches
+      passed: true
+versions:
+  redflag_rules: "0.1.0"
+  contracts_bundle: "0.1.0"

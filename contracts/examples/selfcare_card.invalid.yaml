@@ -1,0 +1,30 @@
+# 故意不合法：content_attestation.contains_diagnostic_statement 被设为 true
+
+meta:
+  id: selfcare_card_invalid
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+cards:
+  - card_id: SC_EXAMPLE_INVALID
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE]
+    card_type: relief_measure
+    title:
+      en: "[Format example only – not clinical content]"
+      zh: 【格式示例，非临床内容】
+    body:
+      en: "[Format example only – not clinical content]"
+      zh: 【格式示例，非临床内容】
+    priority: 1
+    # contains_diagnostic_statement 应为 false，这里故意设为 true
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: true  # 应该校验失败
+    sources: []
+    needs_clinician_review: true
+    status: draft_unreviewed

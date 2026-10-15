@@ -1,0 +1,24 @@
+meta:
+  id: facility_fixture
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+facilities:
+  - facility_id: FAC_FIXTURE_URGENT
+    name: Fixture Urgent Centre
+    type: urgent_og
+    lat: 1.3
+    lng: 103.8
+    address: 100 Fixture Road, Singapore
+    postal_code: "123456"
+    has_gynaecology: true
+    walk_in_available: true
+    appointment_required: false
+    fee_tier: moderate
+    subsidy_requires_referral: false
+    accepts_minors: true
+    sources: []
+    needs_clinician_review: true
+    status: draft_unreviewed

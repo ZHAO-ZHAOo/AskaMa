@@ -1,0 +1,33 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+
+session_id: "abc123def456ghi789"
+turn_id: 3
+response_type: recommendation
+level: SEE_DOCTOR_24_48H
+language: en
+text: "[Format example only — this is the response text shown to the user]"
+disclaimer_included: true
+refs:
+  facility_ids: ["FAC_EXAMPLE_POLYCLINIC"]
+output_validation:
+  passed: true
+  checks:
+    - name: no_diagnostic_wording
+      passed: true
+    - name: level_consistent_with_grading
+      passed: true
+    - name: no_drug_or_dosage
+      passed: true
+    - name: disclaimer_present
+      passed: true
+    - name: language_matches
+      passed: true
+versions:
+  redflag_rules: "0.1.0"
+  question_tree: "0.1.0"
+  decision_table: "0.1.0"
+  selfcare_kb: "0.1.0"
+  facility_table: "0.1.0"
+  weight_presets: "0.1.0"
+  contracts_bundle: "0.1.0"

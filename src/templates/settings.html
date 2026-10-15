@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Grandma - 设置</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #e07a5f;
+            --primary-light: #f2cc8f;
+            --bg: #faf4ef;
+            --border: #e8e0d8;
+            --text: #3d405b;
+            --success: #81b29a;
+        }
+        body {
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 700px; margin: 0 auto; }
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        .header h1 { font-size: 1.25rem; }
+        .header a {
+            color: white;
+            text-decoration: none;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 24px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+        .question {
+            margin-bottom: 24px;
+        }
+        .question-text {
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .option {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 16px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        .option:hover { border-color: var(--primary); }
+        .option.selected {
+            border-color: var(--primary);
+            background: var(--primary-light);
+        }
+        .save-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 32px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: inherit;
+            display: block;
+            margin: 0 auto;
+        }
+        .save-btn:hover { background: #c9593f; }
+        .disclaimer {
+            background: #fff3cd;
+            color: #856404;
+            padding: 8px 16px;
+            font-size: 0.75rem;
+            text-align: center;
+            border-radius: 8px;
+            border: 1px solid #ffc107;
+            margin-bottom: 16px;
+        }
+        .info {
+            background: #e7f5ff;
+            color: #1971c2;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="disclaimer">
+            ⚠️ 这是原型，未经临床审核，不是医疗建议。
+        </div>
+        <div class="header">
+            <h1>⚙️ 设置</h1>
+            <a href="/?sid={{ session_id }}">← 返回对话</a>
+        </div>
+
+        <div class="info">
+            💡 这些设置会影响推荐医疗机构的排序权重。你的回答只保存在本地，不会上传。
+        </div>
+
+        <div class="card">
+            <h2>就医偏好问卷</h2>
+            <div id="questionsContainer"></div>
+            <button class="save-btn" onclick="saveSettings()">保存设置</button>
+        </div>
+    </div>
+
+    <script>
+        const questionnaire = {{ questionnaire | tojson }};
+        let answers = {};
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            if (!questionnaire || !questionnaire.questions) {
+                container.innerHTML = '<p>暂无问卷配置</p>';
+                return;
+            }
+
+            questionnaire.questions.forEach((q, idx) => {
+                const div = document.createElement('div');
+                div.className = 'question';
+
+                const text = document.createElement('div');
+                text.className = 'question-text';
+                text.innerHTML = `${idx + 1}. ${q.text.zh || q.text.en || ''}`;
+                div.appendChild(text);
+
+                const opts = document.createElement('div');
+                opts.className = 'options';
+
+                q.options.forEach(opt => {
+                    const btn = document.createElement('div');
+                    btn.className = 'option';
+                    btn.innerHTML = opt.label.zh || opt.label.en || '';
+                    btn.dataset.qid = q.question_id;
+                    btn.dataset.oid = opt.option_id;
+                    btn.onclick = () => {
+                        // Deselect siblings
+                        opts.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        answers[q.question_id] = opt.option_id;
+                    };
+                    opts.appendChild(btn);
+                });
+
+                div.appendChild(opts);
+                container.appendChild(div);
+            });
+        }
+
+        function saveSettings() {
+            console.log('Saved answers:', answers);
+            alert('设置已保存！（本地存储，演示模式）');
+        }
+
+        renderQuestions();
+    </script>
+</body>
+</html>

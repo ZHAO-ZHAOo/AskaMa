@@ -1,0 +1,15 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: event_type is not in the allowed enum.
+
+event_id: "evt_bad_001"
+session_id: "abc123def456ghi789"
+turn_id: 0
+timestamp: "2026-10-08T12:00:00Z"
+event_type: unknown_event_type
+ui_language: en
+versions:
+  contracts_bundle: "0.1.0"
+outcome_link_key: "olk_abc123def456ghi789"
+payload:
+  some_field: "[format example only]"

@@ -1,0 +1,25 @@
+# 仅格式示例，非真实用户数据
+# This file is for FORMAT DEMONSTRATION ONLY and contains NO real user data.
+# Invalid: contains "date_of_birth" which is not an allowed field (additionalProperties: false).
+
+schema_version: "0.1.0"
+residency_status: citizen
+has_chas: "no"
+insurance: [none]
+ui_language: en
+travel_mode: walking
+use_current_location: false
+date_of_birth: "2005-03-15"  # PROHIBITED — should fail additionalProperties: false
+weight_profile:
+  mode: default
+  weight_preset_version: "0.1.0"
+  updated_at: "2026-10-08T12:00:00Z"
+consent:
+  service: true
+  followup_contact: false
+  research_use: false
+  visit_history: false
+  consent_text_version: "0.1.0"
+  consented_at: "2026-10-08T12:00:00Z"
+created_at: "2026-10-08T12:00:00Z"
+updated_at: "2026-10-08T12:00:00Z"

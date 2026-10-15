@@ -1,0 +1,26 @@
+# 仅格式示例，非真实机构数据
+# This file is for FORMAT DEMONSTRATION ONLY.
+# Invalid: ranked entry is missing feature_scores.
+
+session_id: "abc123def456ghi789"
+turn_id: 3
+level: BOOK_SOON
+emergency_mode: false
+weights_used:
+  travel_time: 0.6
+  cost: 0.4
+weights_source: default
+preferences_clipped: false
+candidates_before_filter: 2
+excluded: []
+ranked:
+  - rank: 1
+    facility_id: "FAC_EXAMPLE_POLYCLINIC"
+    total_score: 0.8
+    # feature_scores is missing — should fail
+    travel_minutes: 15
+    travel_mode: public_transport
+    open_now: true
+    data_last_verified: "2026-01-01"
+facility_table_version: "0.1.0"
+weight_preset_version: "0.1.0"

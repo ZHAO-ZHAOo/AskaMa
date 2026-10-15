@@ -1,0 +1,1508 @@
+meta:
+  id: slots
+  version: 0.2.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+special_values:
+- id: unknown
+  meaning:
+    en: The user does not know or is unsure
+    zh: 用户不知道或不确定
+- id: declined
+  meaning:
+    en: The user declines to answer
+    zh: 用户不愿回答
+slot_value_record:
+  description: >-
+    说明每个槽位的取值在运行时如何记录（只是文档，不是 schema）。
+    每轮对话中，Intake 层抽取的每个槽位都会以一条记录的形式存储。
+  fields: [slot_id, value, status, confidence, source_turn]
+  status_values: [answered, unknown, declined, not_asked]
+
+groups:
+- {id: context, name: {en: Context, zh: 基本情况}}
+- {id: cycle, name: {en: Cycle and timeline, zh: 周期与时间线}}
+- {id: bleeding, name: {en: Bleeding, zh: 出血}}
+- {id: pain, name: {en: Pain, zh: 疼痛}}
+- {id: systemic, name: {en: Systemic symptoms, zh: 全身症状}}
+- {id: self_care_and_text, name: {en: Self-care attempts and complaint text, zh: 自护尝试与主诉文本}}
+
+type_notes:
+  duration: >-
+    duration 类型的取值结构为 {value: number, unit: hours|days|weeks}。
+    例如持续 3 天的疼痛记为 {value: 3, unit: days}。
+    运行时应附带 status 字段（answered / unknown / declined / not_asked）。
+
+slots:
+  # ========== A. context（基本情况） ==========
+- id: age_band
+  group: context
+  type: enum
+  allowed_values:
+  - {id: under_12, label: {en: Under 12, zh: 12岁以下}}
+  - {id: 12_17, label: {en: 12–17, zh: 12–17岁}}
+  - {id: 18_24, label: {en: 18–24, zh: 18–24岁}}
+  - {id: 25_34, label: {en: 25–34, zh: 25–34岁}}
+  - {id: 35_44, label: {en: 35–44, zh: 35–44岁}}
+  - {id: 45_49, label: {en: 45–49, zh: 45–49岁}}
+  - {id: 50_plus, label: {en: 50 plus, zh: 50岁及以上}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The user's age band.
+    zh: 用户所属的年龄段分档。
+  example_phrases:
+    zh: ["我今年三十出头", "还在上中学"]
+    en:
+    - I'm in my early thirties
+    - I'm still in secondary school
+  module_tags: [global]
+  used_by: [l2_grading, l3_selfcare, l4_recommend]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: 分档边界待医生确认。
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pregnancy_status
+  group: context
+  type: enum
+  allowed_values:
+  - {id: confirmed_pregnant, label: {en: Confirmed pregnant, zh: 已确认怀孕}}
+  - {id: possibly_pregnant, label: {en: Possibly pregnant, zh: 可能怀孕}}
+  - {id: not_pregnant, label: {en: Not pregnant, zh: 未怀孕}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user may currently be pregnant.
+    zh: 用户当前是否可能怀孕。
+  example_phrases:
+    zh: ["我可能怀孕了", "没有怀孕"]
+    en:
+    - I might be pregnant
+    - I'm not pregnant
+  module_tags: [late_or_missed_period]
+  used_by: [l1_redflag, l2_grading, l4_recommend]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pregnancy_test_result
+  group: context
+  type: enum
+  allowed_values:
+  - {id: not_done, label: {en: Not done, zh: 未做测试}}
+  - {id: negative, label: {en: Negative, zh: 阴性}}
+  - {id: positive, label: {en: Positive, zh: 阳性}}
+  - {id: unclear, label: {en: Unclear, zh: 不确定/结果模糊}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The result of the user's recent pregnancy test.
+    zh: 用户近期验孕的结果。
+  example_phrases:
+    zh: ["验了一下是一条杠", "测出来两条杠但不太清楚"]
+    en:
+    - I tested and it was one line
+    - I got two lines but it's not clear
+  module_tags: [late_or_missed_period]
+  used_by: [l2_grading]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: recent_pregnancy_event
+  group: context
+  type: enum
+  allowed_values:
+  - {id: none, label: {en: None, zh: 无}}
+  - {id: recent_delivery, label: {en: Recent delivery, zh: 近期分娩}}
+  - {id: recent_pregnancy_loss_or_termination, label: {en: Recent pregnancy loss or termination, zh: 近期妊娠终止或流产}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user recently experienced delivery or pregnancy loss/termination.
+    zh: 用户近期是否经历分娩或妊娠终止/流产。
+  example_phrases:
+    zh: ["刚生完没多久", "最近流产了"]
+    en:
+    - I just gave birth recently
+    - I had a miscarriage recently
+  module_tags: [late_or_missed_period, irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading, l4_recommend]
+  sensitivity: high
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: recent 的时间范围待医生确认
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: contraception_method
+  group: context
+  type: enum
+  allowed_values:
+  - {id: none, label: {en: None, zh: 无}}
+  - {id: pill, label: {en: Oral contraceptive pill, zh: 口服避孕药}}
+  - {id: hormonal_iud, label: {en: Hormonal IUD, zh: 激素型宫内节育器}}
+  - {id: copper_iud, label: {en: Copper IUD, zh: 含铜宫内节育器}}
+  - {id: implant, label: {en: Implant, zh: 皮下埋植}}
+  - {id: injection, label: {en: Injection, zh: 避孕针剂}}
+  - {id: barrier_only, label: {en: Barrier only, zh: 仅屏障法}}
+  - {id: other, label: {en: Other, zh: 其他}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The category of contraception method the user currently uses.
+    zh: 用户目前使用的避孕方式类别。
+  example_phrases:
+    zh: ["我带了节育环", "吃避孕药"]
+    en:
+    - I have an IUD
+    - I'm on the pill
+  module_tags: [late_or_missed_period, irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: recent_contraception_change
+  group: context
+  type: enum
+  allowed_values:
+  - {id: no_change, label: {en: No change, zh: 无变化}}
+  - {id: started_recently, label: {en: Started recently, zh: 近期开始使用}}
+  - {id: stopped_recently, label: {en: Stopped recently, zh: 近期停用}}
+  - {id: changed_recently, label: {en: Changed recently, zh: 近期更换方式}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user recently started, stopped, or changed contraception method.
+    zh: 用户近期是否开始、停用或更换避孕方式。
+  example_phrases:
+    zh: ["刚换了新的避孕方式", "上个月开始吃避孕药"]
+    en:
+    - I just switched to a new method
+    - I started the pill last month
+  module_tags: [late_or_missed_period, irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: recently 的时间范围待医生确认
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: on_blood_thinner
+  group: context
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user is currently on blood-thinning medication.
+    zh: 用户是否正在使用抗凝血类药物。
+  example_phrases:
+    zh: ["我在吃稀释血液的药", "医生让我吃的抗凝药"]
+    en:
+    - I'm on blood thinners
+    - My doctor put me on anticoagulants
+  module_tags: [heavy_bleeding]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: known_bleeding_tendency_reported
+  group: context
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user has been told they have a bleeding tendency.
+    zh: 用户是否被告知自己有出血倾向。
+  example_phrases:
+    zh: ["我凝血不太好", "医生说我容易出血"]
+    en:
+    - My blood doesn't clot well
+    - My doctor said I bleed easily
+  module_tags: [heavy_bleeding]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: prior_gynae_condition_reported
+  group: context
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user has been diagnosed or told they have a gynaecological condition.
+    zh: 用户是否曾被诊断或告知有妇科相关情况。
+  example_phrases:
+    zh: ["之前查出来有一些妇科问题", "我有妇科病史"]
+    en:
+    - I've had some gynae issues before
+    - I have a gynae history
+  module_tags: [global]
+  used_by: [l2_grading, l4_recommend]
+  sensitivity: high
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: recent_pelvic_procedure
+  group: context
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user recently had a pelvic examination or procedure.
+    zh: 用户近期是否经历过盆腔相关检查或操作。
+  example_phrases:
+    zh: ["刚做过妇科检查", "最近做了一个小手术"]
+    en:
+    - I just had a gynae check-up
+    - I had a small procedure recently
+  module_tags: [heavy_bleeding, irregular_or_intermenstrual_bleeding]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: high
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: recent 的时间范围待医生确认
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: periods_stopped_over_12_months
+  group: context
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user's periods have stopped for an extended period.
+    zh: 用户的月经是否已停止超过一段时间。
+  example_phrases:
+    zh: ["已经很久没来月经了", "停经好几个月了"]
+    en:
+    - I haven't had my period in a long time
+    - My periods stopped a few months ago
+  module_tags: [late_or_missed_period]
+  used_by: [l2_grading]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: 槽位 id 中的 12_months 为命名约定，实际时间范围待医生确认
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+  # ========== B. cycle（周期与时间线） ==========
+- id: last_period_start_date
+  group: cycle
+  type: date
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The start date of the user's last menstrual period.
+    zh: 用户上一次月经开始的日期。
+  example_phrases:
+    zh: ["上个月二十号来的", "大概是两周前开始的"]
+    en:
+    - My last one started around the 20th of last month
+    - It started about two weeks ago
+  module_tags: [late_or_missed_period, heavy_bleeding, irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading, logging]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: days_since_last_period_start
+  group: cycle
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 0, max: null}
+  unit: days
+  description:
+    en: Number of days from the last period start date to today, computed by code.
+    zh: 从上一次月经开始日到今天的天数，由代码计算。
+  example_phrases:
+    zh: ["大概两个礼拜了", "已经四十天了"]
+    en:
+    - It's been about two weeks
+    - It's been forty days now
+  module_tags: [late_or_missed_period]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: true
+  derivation_note: 由 last_period_start_date 和当前日期计算得出。
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: usual_cycle_length_days
+  group: cycle
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 1, max: null}
+  unit: days
+  description:
+    en: The user's usual menstrual cycle length in days.
+    zh: 用户平常月经周期的天数。
+  example_phrases:
+    zh: ["我一般三十天来一次", "周期大概是二十八天"]
+    en:
+    - My cycle is usually about thirty days
+    - It's around twenty-eight days
+  module_tags: [late_or_missed_period, irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: period_delay_days
+  group: cycle
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 0, max: null}
+  unit: days
+  description:
+    en: How many days the current period is delayed compared to the usual cycle length, computed by code.
+    zh: 本次月经比平常周期推迟的天数，由代码计算。
+  example_phrases:
+    zh: ["这个月晚了五天", "推迟了一个多星期"]
+    en:
+    - I'm five days late this month
+    - It's over a week late
+  module_tags: [late_or_missed_period]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: true
+  derivation_note: 由 days_since_last_period_start 和 usual_cycle_length_days 计算得出。
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: cycle_regularity
+  group: cycle
+  type: enum
+  allowed_values:
+  - {id: regular, label: {en: Regular, zh: 规律}}
+  - {id: somewhat_irregular, label: {en: Somewhat irregular, zh: 基本规律但偶尔不准}}
+  - {id: very_irregular, label: {en: Very irregular, zh: 很不规律}}
+  - {id: no_established_pattern, label: {en: No established pattern, zh: 没有固定规律}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: How regular the user's menstrual cycle is.
+    zh: 用户月经周期的规律程度。
+  example_phrases:
+    zh: ["每次都挺准的", "时早时晚的"]
+    en:
+    - It's pretty regular every time
+    - It comes early or late sometimes
+  module_tags: [irregular_or_intermenstrual_bleeding, late_or_missed_period]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: usual_period_length_days
+  group: cycle
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 1, max: null}
+  unit: days
+  description:
+    en: The usual number of days the user's period lasts.
+    zh: 用户平常月经持续的天数。
+  example_phrases:
+    zh: ["一般来四五天", "每次大概一周"]
+    en:
+    - It usually lasts four or five days
+    - About a week each time
+  module_tags: [heavy_bleeding, irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: period_currently_ongoing
+  group: cycle
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user is currently having their period.
+    zh: 用户当前是否正在来月经。
+  example_phrases:
+    zh: ["现在正来着呢", "这几天在经期"]
+    en:
+    - I'm on my period right now
+    - I'm in my period these days
+  module_tags: [heavy_bleeding, severe_period_pain, irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: current_bleeding_days_so_far
+  group: cycle
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 0, max: null}
+  unit: days
+  description:
+    en: How many days the current bleeding has lasted so far.
+    zh: 本次出血到目前为止已经持续的天数。
+  example_phrases:
+    zh: ["已经来了三天了", "出血有一周了"]
+    en:
+    - It's been three days now
+    - The bleeding has been going on for a week
+  module_tags: [heavy_bleeding, irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: first_time_or_recurring
+  group: cycle
+  type: enum
+  allowed_values:
+  - {id: first_time, label: {en: First time, zh: 第一次出现}}
+  - {id: happened_before, label: {en: Happened before, zh: 以前发生过}}
+  - {id: recurring, label: {en: Recurring, zh: 反复出现}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the current symptom is a first-time occurrence, happened before, or is recurring.
+    zh: 当前症状是第一次出现、以前偶发还是反复出现。
+  example_phrases:
+    zh: ["以前也有过这种情况", "每个月都这样"]
+    en:
+    - This has happened before
+    - It's like this every month
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: symptom_trend
+  group: cycle
+  type: enum
+  allowed_values:
+  - {id: improving, label: {en: Improving, zh: 在好转}}
+  - {id: about_the_same, label: {en: About the same, zh: 差不多}}
+  - {id: worsening, label: {en: Worsening, zh: 在加重}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The trend of the current symptoms.
+    zh: 当前症状的变化趋势。
+  example_phrases:
+    zh: ["好像好一点了", "越来越严重"]
+    en:
+    - It seems a bit better
+    - It's getting worse
+  module_tags: [global]
+  used_by: [l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: symptom_duration
+  group: cycle
+  type: duration
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: How long the current symptoms have lasted.
+    zh: 当前症状已经持续的时间。
+  example_phrases:
+    zh: ["疼了两三天了", "已经一个多星期了"]
+    en:
+    - It's been hurting for two or three days
+    - It's been over a week now
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+  # ========== C. bleeding（出血） ==========
+- id: bleeding_present
+  group: bleeding
+  type: bool
+  allowed_values: null
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user has abnormal bleeding now (core screening).
+    zh: 用户当前是否有异常出血（通用必问筛查）。
+  example_phrases:
+    zh: ["在出血", "有流血", "没有出血"]
+    en: ["I'm bleeding now", "there is bleeding", "no bleeding"]
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: "v0.5.0: 通用必问问题层新增——所有主诉先筛查有无异常出血"
+  status: draft_unreviewed
+  added_in_version: 0.5.0
+
+- id: bleeding_trigger
+  group: bleeding
+  type: enum
+  allowed_values:
+    - {id: sexual_intercourse, label: {en: "After sex", zh: "性生活之后"}}
+    - {id: strenuous_exercise, label: {en: "After strenuous exercise", zh: "剧烈运动之后"}}
+    - {id: stress_or_fatigue, label: {en: "Stress / fatigue", zh: "压力大或劳累"}}
+    - {id: emergency_contraception, label: {en: "After emergency contraception", zh: "服用紧急避孕药之后"}}
+    - {id: recent_procedure, label: {en: "After a recent procedure", zh: "近期做过检查/手术"}}
+    - {id: none_identified, label: {en: "No obvious trigger", zh: "没有明显诱因"}}
+    - {id: other, label: {en: "Other", zh: "其他"}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Possible trigger/event associated with the start of bleeding (core screening detail).
+    zh: 出血发生前可能的诱发行为/事件（通用必问细节）。
+  example_phrases:
+    zh: ["同房后出血", "运动完就开始出血", "没什么诱因"]
+    en: ["it started after sex", "bleeding after the gym", "no obvious reason"]
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: "v0.5.0: 通用必问细节,出血诱发因素信息收集用,不直接参与分诊阈值"
+  status: draft_unreviewed
+  added_in_version: 0.5.0
+
+- id: discharge_color_consistency
+  group: bleeding
+  type: enum
+  allowed_values:
+    - {id: clear, label: {en: "Clear / watery", zh: "透明清亮"}}
+    - {id: milky_white, label: {en: "Milky white", zh: "乳白色"}}
+    - {id: yellow_green, label: {en: "Yellow / greenish", zh: "黄色/黄绿色"}}
+    - {id: blood_streaked, label: {en: "Blood-streaked", zh: "带血丝"}}
+    - {id: curd_like, label: {en: "Curd-like / clumpy", zh: "豆腐渣样"}}
+    - {id: foamy, label: {en: "Foamy / frothy", zh: "泡沫状"}}
+    - {id: other, label: {en: "Other", zh: "其他"}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Color/consistency of abnormal vaginal discharge (core screening detail).
+    zh: 异常分泌物的颜色/性状（通用必问细节）。
+  example_phrases:
+    zh: ["分泌物黄黄的", "像豆腐渣", "有点发绿"]
+    en: ["discharge is yellowish", "like cottage cheese", "greenish"]
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: "v0.5.0: 通用必问细节;黄绿/豆腐渣样/泡沫状等颜色性状仅信息收集,不直接参与分诊阈值"
+  status: draft_unreviewed
+  added_in_version: 0.5.0
+
+- id: discharge_odor
+  group: bleeding
+  type: enum
+  allowed_values:
+    - {id: none, label: {en: "No odor", zh: "无味"}}
+    - {id: fishy, label: {en: "Fishy", zh: "鱼腥味"}}
+    - {id: foul, label: {en: "Foul / strong", zh: "恶臭/强烈异味"}}
+    - {id: sour, label: {en: "Sour", zh: "酸味"}}
+    - {id: other, label: {en: "Other", zh: "其他"}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Odor of abnormal vaginal discharge (core screening detail).
+    zh: 异常分泌物的气味（通用必问细节）。
+  example_phrases:
+    zh: ["有鱼腥味", "味道很重", "没什么味道"]
+    en: ["fishy smell", "strong smell", "no odor"]
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: "v0.5.0: 通用必问细节;鱼腥味/恶臭仅信息收集,不直接参与分诊阈值"
+  status: draft_unreviewed
+  added_in_version: 0.5.0
+
+- id: discharge_amount
+  group: bleeding
+  type: enum
+  allowed_values:
+    - {id: normal, label: {en: "Normal amount", zh: "量正常"}}
+    - {id: increased, label: {en: "More than usual", zh: "比平时多"}}
+    - {id: decreased, label: {en: "Less than usual", zh: "比平时少"}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Amount of abnormal vaginal discharge (core screening detail).
+    zh: 异常分泌物的量（通用必问细节）。
+  example_phrases:
+    zh: ["分泌物变多了", "和以前差不多"]
+    en: ["more discharge than usual", "about the same"]
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: "v0.5.0: 通用必问细节,量信息仅收集,不直接参与分诊阈值"
+  status: draft_unreviewed
+  added_in_version: 0.5.0
+
+- id: flow_compared_to_usual
+  group: bleeding
+  type: enum
+  allowed_values:
+  - {id: much_less, label: {en: Much less than usual, zh: 比平常少很多}}
+  - {id: a_bit_less, label: {en: A bit less than usual, zh: 比平常少一点}}
+  - {id: same, label: {en: About the same as usual, zh: 和平常差不多}}
+  - {id: a_bit_more, label: {en: A bit more than usual, zh: 比平常多一点}}
+  - {id: much_more, label: {en: Much more than usual, zh: 比平常多很多}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: How the current bleeding compares to the user's own usual amount.
+    zh: 本次出血量与用户自身平常的比较。
+  example_phrases:
+    zh: ["这次特别多", "好像比平时少"]
+    en:
+    - It's really heavy this time
+    - It seems lighter than usual
+  module_tags: [heavy_bleeding]
+  used_by: [l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: flow_level_self_described
+  group: bleeding
+  type: enum
+  allowed_values:
+  - {id: spotting_only, label: {en: Spotting only, zh: 仅有少量点滴}}
+  - {id: light, label: {en: Light, zh: 少量}}
+  - {id: moderate, label: {en: Moderate, zh: 中等}}
+  - {id: heavy, label: {en: Heavy, zh: 量大}}
+  - {id: very_heavy, label: {en: Very heavy, zh: 量非常大}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The bleeding level as self-described by the user.
+    zh: 用户自述的出血量等级。
+  example_phrases:
+    zh: ["量特别大", "就一点点"]
+    en:
+    - The flow is really heavy
+    - Just a little bit of spotting
+  module_tags: [heavy_bleeding]
+  used_by: [l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: soak_through_interval
+  group: bleeding
+  type: enum
+  allowed_values:
+  - {id: hourly_or_more_often, label: {en: Hourly or more often, zh: 每小时或更频繁}}
+  - {id: every_2_to_3_hours, label: {en: Every 2 to 3 hours, zh: 每2到3小时}}
+  - {id: a_few_times_a_day, label: {en: A few times a day, zh: 一天几次}}
+  - {id: less_often, label: {en: Less often, zh: 更少频率}}
+  - {id: not_applicable, label: {en: Not applicable, zh: 不适用}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: How often sanitary products are soaked through and need changing.
+    zh: 卫生用品被浸透需要更换的频率。
+  example_phrases:
+    zh: ["一个小时就湿透了", "一天换几次"]
+    en:
+    - It soaked through in an hour
+    - I change a few times a day
+  module_tags: [heavy_bleeding]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: 分档边界待医生确认
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pad_or_tampon_changes_per_day
+  group: bleeding
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 0, max: null}
+  unit: times_per_day
+  description:
+    en: Number of times the user changes pads or tampons per day.
+    zh: 用户每天更换卫生巾或卫生棉条的次数。
+  example_phrases:
+    zh: ["一天要换七八次", "大概换四五次"]
+    en:
+    - I change seven or eight times a day
+    - About four or five changes
+  module_tags: [heavy_bleeding]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: bleeding_through_clothes_or_bedding
+  group: bleeding
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether bleeding has soaked through to clothes or bedding.
+    zh: 出血是否渗透到衣物或床上用品。
+  example_phrases:
+    zh: ["弄到裤子上了", "晚上弄脏了床单"]
+    en:
+    - It got on my pants
+    - I stained the bedsheets at night
+  module_tags: [heavy_bleeding]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: clots_present
+  group: bleeding
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether blood clots are present in the bleeding.
+    zh: 出血中是否有血块。
+  example_phrases:
+    zh: ["有血块", "排出了一些块状的东西"]
+    en:
+    - There are blood clots
+    - I passed some clumpy stuff
+  module_tags: [heavy_bleeding]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: clot_size
+  group: bleeding
+  type: enum
+  allowed_values:
+  - {id: small, label: {en: Small, zh: 小}}
+  - {id: medium, label: {en: Medium, zh: 中}}
+  - {id: large, label: {en: Large, zh: 大}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The size category of clots as described by the user.
+    zh: 用户自述血块的大小等级。
+  example_phrases:
+    zh: ["有大的血块", "很小的一点点"]
+    en:
+    - There are big clots
+    - Just tiny bits
+  module_tags: [heavy_bleeding]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: 分档描述待医生确认
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: bleeding_between_periods
+  group: bleeding
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether bleeding occurs between periods.
+    zh: 是否在非经期出现出血。
+  example_phrases:
+    zh: ["两次月经之间出血了", "没到日子就出血"]
+    en:
+    - I bled between periods
+    - I got bleeding when it's not due yet
+  module_tags: [irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: unusual_discharge_or_odor
+  group: bleeding
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether there is unusual discharge or odor.
+    zh: 是否出现异常分泌物或异味。
+  example_phrases:
+    zh: ["分泌物不太正常", "有异味"]
+    en:
+    - My discharge seems off
+    - There's an unusual smell
+  module_tags: [irregular_or_intermenstrual_bleeding]
+  used_by: [l2_grading]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+  # ========== D. pain（疼痛） ==========
+- id: pain_present
+  group: pain
+  type: bool
+  allowed_values: null
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user currently has abdominal pain or cramps (core screening).
+    zh: 用户当前是否有腹痛/肚子疼（通用必问筛查）。
+  example_phrases:
+    zh: ["肚子疼", "有点腹痛", "不疼"]
+    en: ["I have stomach pain", "a bit of cramping", "no pain"]
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: "v0.5.0: 通用必问问题层新增——所有主诉先筛查有无腹痛,有则追问性质/部位/时长/严重度"
+  status: draft_unreviewed
+  added_in_version: 0.5.0
+
+- id: pain_quality
+  group: pain
+  type: enum
+  allowed_values:
+    - {id: cramping, label: {en: "Cramping / gripping", zh: "绞痛（一阵阵的）"}}
+    - {id: dull, label: {en: "Dull ache", zh: "钝痛"}}
+    - {id: aching, label: {en: "Aching / pressure", zh: "隐痛/胀痛"}}
+    - {id: stabbing, label: {en: "Stabbing", zh: "刺痛"}}
+    - {id: tearing, label: {en: "Tearing / sharp", zh: "撕裂样剧痛"}}
+    - {id: other, label: {en: "Other", zh: "其他"}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The character/quality of the pain (core screening detail).
+    zh: 疼痛的性质/类型（通用必问细节）。
+  example_phrases:
+    zh: ["像抽筋一样绞痛", "隐隐作痛", "针扎一样的刺痛"]
+    en: ["cramping like period pain", "a dull ache", "stabbing pain"]
+  module_tags: [global]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: "v0.5.0: 通用必问细节,撕裂样/突发剧痛与红旗关注点一致"
+  status: draft_unreviewed
+  added_in_version: 0.5.0
+
+- id: pain_severity_0_10
+  group: pain
+  type: int
+  allowed_values:
+  multi: false
+  range: {min: 0, max: 10}
+  unit: null
+  description:
+    en: >-
+      The user's self-rated pain severity (0 to 10), anchored to the Numeric
+      Rating Scale (NRS): 0 = no pain; 1-3 = mild (does not disturb sleep);
+      4-6 = moderate (disturbs sleep but can still sleep); 7-10 = severe
+      (cannot sleep). Everyday anchors shown in Q_SP_INTENSITY options.
+    zh: >-
+      用户自评的疼痛程度（0 到 10），锚定数字评分量表（NRS）：0 = 无痛；
+      1-3 = 轻度（不影响睡眠）；4-6 = 中度（影响睡眠但仍能入睡）；
+      7-10 = 重度（不能入睡）。生活化示例见 Q_SP_INTENSITY 选项。
+  example_phrases:
+    zh: ["疼得受不了", "大概七八分"]
+    en:
+    - The pain is unbearable
+    - Maybe a seven or eight
+  module_tags: [severe_period_pain]
+  used_by: [l1_redflag, l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: true
+  review_note: "v0.4.0: 槽位名统一自 v2 设计稿 pain_severity_0_10(原 pain_intensity_0_10);分诊映射阈值(≥9 红旗 / ≥7 升级 / <6 自护)为工程草稿,NRS 分档惯例可引用,阈值待临床确认。选项锚点基于 NRS 分级(0 无痛 / 1-3 轻度 / 4-6 中度 / 7-10 重度),生活化示例仅供患者选择辅助,非临床诊断标准"
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pain_onset_speed
+  group: pain
+  type: enum
+  allowed_values:
+  - {id: sudden, label: {en: Sudden, zh: 突然发作}}
+  - {id: gradual, label: {en: Gradual, zh: 逐渐加重}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: How quickly the pain onset.
+    zh: 疼痛发作的速度。
+  example_phrases:
+    zh: ["突然就疼起来了", "慢慢越来越疼"]
+    en:
+    - It started hurting suddenly
+    - It got worse gradually
+  module_tags: [severe_period_pain]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pain_location
+  group: pain
+  type: enum
+  allowed_values:
+  - {id: lower_abdomen_middle, label: {en: Lower abdomen, zh: 下腹中部}, middle: null}
+  - {id: lower_abdomen_one_side, label: {en: Lower abdomen, zh: 下腹一侧}, one side: null}
+  - {id: whole_abdomen, label: {en: Whole abdomen, zh: 整个腹部}}
+  - {id: lower_back, label: {en: Lower back, zh: 腰背部}}
+  - {id: other, label: {en: Other, zh: 其他}}
+  multi: true
+  range: null
+  unit: null
+  description:
+    en: The location of the pain, multiple selections allowed.
+    zh: 疼痛的位置，可多选。
+  example_phrases:
+    zh: ["小肚子疼", "腰也酸"]
+    en:
+    - My lower belly hurts
+    - My lower back aches too
+  module_tags: [severe_period_pain]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pain_compared_to_usual
+  group: pain
+  type: enum
+  allowed_values:
+  - {id: same_as_usual, label: {en: Same as usual, zh: 和平常一样}}
+  - {id: worse_than_usual, label: {en: Worse than usual, zh: 比平常更严重}}
+  - {id: new_kind_of_pain, label: {en: New kind of pain, zh: 以前没有过的痛}}
+  - {id: no_previous_period_pain, label: {en: No previous period pain, zh: 以前经期不痛}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: How the current pain compares to the user's usual experience.
+    zh: 本次疼痛与用户自身平常的比较。
+  example_phrases:
+    zh: ["比以前疼多了", "以前不痛的"]
+    en:
+    - It hurts way more than before
+    - It didn't use to hurt
+  module_tags: [severe_period_pain]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pain_timing_relative_to_period
+  group: pain
+  type: enum
+  allowed_values:
+  - {id: before_period, label: {en: Before period, zh: 经前}}
+  - {id: during_period, label: {en: During period, zh: 经期中}}
+  - {id: after_period, label: {en: After period, zh: 经后}}
+  - {id: not_related_to_period, label: {en: Not related to period, zh: 与经期无关}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: When the pain occurs relative to the period.
+    zh: 疼痛出现的时间与经期的关系。
+  example_phrases:
+    zh: ["来之前就开始疼", "走了还在疼"]
+    en:
+    - It started hurting before my period
+    - It still hurts after my period
+  module_tags: [severe_period_pain]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pain_duration
+  group: pain
+  type: duration
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: How long the pain has lasted.
+    zh: 疼痛持续的时间。
+  example_phrases:
+    zh: ["疼了一整天了", "断断续续疼了三天"]
+    en:
+    - It's been hurting all day
+    - It's been hurting on and off for three days
+  module_tags: [severe_period_pain]
+  used_by: [l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: pain_interferes_with_activities
+  group: pain
+  type: enum
+  allowed_values:
+  - {id: not_at_all, label: {en: Not at all, zh: 完全不影响}}
+  - {id: a_little, label: {en: A little, zh: 有一点影响}}
+  - {id: quite_a_lot, label: {en: Quite a lot, zh: 影响很大}}
+  - {id: cannot_do_usual_things, label: {en: Cannot do usual things, zh: 无法进行日常活动}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: How much the pain interferes with the user's daily activities.
+    zh: 疼痛对用户日常活动的影响程度。
+  example_phrases:
+    zh: ["疼得没法上班", "还能忍受"]
+    en:
+    - I can't go to work because of the pain
+    - It's tolerable
+  module_tags: [severe_period_pain]
+  used_by: [l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: usual_pain_relief_works
+  group: pain
+  type: enum
+  allowed_values:
+  - {id: yes, label: {en: Yes, zh: 有效}}
+  - {id: partly, label: {en: Partly, zh: 部分有效}}
+  - {id: no, label: {en: No, zh: 无效}}
+  - {id: not_tried, label: {en: Not tried, zh: 尚未尝试}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user's usual pain relief approach works for the current pain.
+    zh: 用户平常使用的缓解方式是否对本次疼痛有效。
+  example_phrases:
+    zh: ["吃了药也没用", "平时的方法不太管事"]
+    en:
+    - The medicine didn't help
+    - My usual method isn't working
+  module_tags: [severe_period_pain]
+  used_by: [l2_grading, l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+  # ========== E. systemic（全身症状） ==========
+- id: dizziness_or_fainting
+  group: systemic
+  type: enum
+  allowed_values:
+  - {id: none, label: {en: None, zh: 无}}
+  - {id: lightheaded, label: {en: Lightheaded, zh: 觉得头晕}}
+  - {id: nearly_fainted, label: {en: Nearly fainted, zh: 差点晕倒}}
+  - {id: fainted, label: {en: Fainted, zh: 晕倒过}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user experiences dizziness or fainting.
+    zh: 用户是否出现头晕或晕倒的情况。
+  example_phrases:
+    zh: ["站起来眼前发黑", "差点晕过去了"]
+    en:
+    - Everything goes black when I stand up
+    - I almost fainted
+  module_tags: [heavy_bleeding]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: fever_status
+  group: systemic
+  type: enum
+  allowed_values:
+  - {id: no_fever, label: {en: No fever, zh: 没有发烧}}
+  - {id: feels_feverish_not_measured, label: {en: Feels feverish, zh: 觉得发热但未量体温}, not measured: null}
+  - {id: measured_fever, label: {en: Measured fever, zh: 量过体温确认发烧}}
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user has a fever and whether it has been measured.
+    zh: 用户是否发烧以及是否已测量。
+  example_phrases:
+    zh: ["好像有点发烧", "量了三十八度多"]
+    en:
+    - I think I have a bit of a fever
+    - I took my temp and it was over 38
+  module_tags: [global]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: temperature_c
+  group: systemic
+  type: float
+  allowed_values:
+  multi: false
+  range: {min: 30.0, max: 45.0}
+  unit: celsius
+  description:
+    en: The user's measured body temperature in Celsius.
+    zh: 用户测量的体温（摄氏度）。
+  example_phrases:
+    zh: ["三十八度五", "量出来三十七度八"]
+    en:
+    - 38.5 degrees
+    - I measured 37.8
+  module_tags: [global]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: heart_racing_or_short_of_breath
+  group: systemic
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user feels their heart racing or short of breath.
+    zh: 用户是否感觉心跳加速或呼吸困难。
+  example_phrases:
+    zh: ["心跳得很快", "喘不上气"]
+    en:
+    - My heart is racing
+    - I can't catch my breath
+  module_tags: [global]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: vomiting_or_cannot_keep_fluids_down
+  group: systemic
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user is vomiting or unable to keep fluids down.
+    zh: 用户是否呕吐或无法饮水进食。
+  example_phrases:
+    zh: ["吐了好几次", "喝水都吐"]
+    en:
+    - I've thrown up several times
+    - I can't even keep water down
+  module_tags: [global]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: recent_fall_or_injury_to_abdomen
+  group: systemic
+  type: bool
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: Whether the user recently fell or had an injury to the abdomen.
+    zh: 用户近期是否跌倒或腹部受伤。
+  example_phrases:
+    zh: ["摔了一跤撞到肚子", "肚子被撞了一下"]
+    en:
+    - I fell and hit my tummy
+    - My tummy got bumped
+  module_tags: [global]
+  used_by: [l1_redflag, l2_grading]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+  # ========== F. self_care_and_text（自护尝试与主诉文本） ==========
+- id: self_care_tried
+  group: self_care_and_text
+  type: enum
+  allowed_values:
+  - {id: heat, label: {en: Heat, zh: 热敷}}
+  - {id: rest, label: {en: Rest, zh: 休息}}
+  - {id: hydration, label: {en: Hydration, zh: 多喝水}}
+  - {id: painkiller_unspecified, label: {en: Painkiller (unspecified), zh: 止痛药（未指明）}}
+  - {id: other, label: {en: Other, zh: 其他}}
+  - {id: nothing_yet, label: {en: Nothing yet, zh: 尚未尝试}}
+  multi: true
+  range: null
+  unit: null
+  description:
+    en: Self-care approaches the user has already tried, multiple selections allowed.
+    zh: 用户已经尝试过的自我缓解方式，可多选。
+  example_phrases:
+    zh: ["贴了暖宝宝", "吃了止痛药休息了一下"]
+    en:
+    - I used a heat pad
+    - I took painkillers and rested
+  module_tags: [severe_period_pain, heavy_bleeding]
+  used_by: [l3_selfcare]
+  sensitivity: normal
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0
+
+- id: chief_complaint_text
+  group: self_care_and_text
+  type: text
+  allowed_values:
+  multi: false
+  range: null
+  unit: null
+  description:
+    en: The user's chief complaint in their own words.
+    zh: 用户用自己的话描述的主诉文本。
+  example_phrases:
+    zh: ["这个月月经来得特别多而且很疼", "已经推迟两周了有点担心"]
+    en:
+    - My period is really heavy and painful this month
+    - It's two weeks late and I'm a bit worried
+  module_tags: [global]
+  used_by: [l2_grading, logging]
+  sensitivity: sensitive
+  derived: false
+  derivation_note: null
+  needs_clinician_review: false
+  review_note: null
+  status: draft_unreviewed
+  added_in_version: 0.1.0

@@ -1,0 +1,23 @@
+# 故意不合法：on_unknown 为 ask_followup 但缺少 followup_slots
+
+meta:
+  id: redflag_rules_invalid
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+rules:
+  - rule_id: RF_EXAMPLE_INVALID
+    scope: [global]
+    condition:
+      {slot: fever_status, op: eq, value: measured_fever}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    # followup_slots 缺失，应该校验失败
+    rationale:
+      en: Format example only
+      zh: 仅格式示例
+    needs_clinician_review: true
+    status: draft_unreviewed

@@ -1,0 +1,56 @@
+# 仅格式示例，非临床内容
+# This file is for FORMAT DEMONSTRATION ONLY and contains NO clinical content.
+
+meta:
+  id: question_tree_example
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+
+module: heavy_bleeding
+
+required_slots:
+  - flow_compared_to_usual
+  - flow_level_self_described
+
+questions:
+  - question_id: Q_EXAMPLE_1
+    slot: flow_compared_to_usual
+    text:
+      en: "[Format example only] How does your bleeding compare to usual?"
+      zh: 【格式示例，非临床内容】你的出血量和平时比怎么样？
+    answer_options:
+      - {value: much_less, label: {en: Much less, zh: 比平常少很多}}
+      - {value: a_bit_less, label: {en: A bit less, zh: 比平常少一点}}
+      - {value: same, label: {en: About the same, zh: 和平常差不多}}
+      - {value: a_bit_more, label: {en: A bit more, zh: 比平常多一点}}
+      - {value: much_more, label: {en: Much more, zh: 比平常多很多}}
+    priority: 1
+
+  - question_id: Q_EXAMPLE_2
+    slot: flow_level_self_described
+    text:
+      en: "[Format example only] How would you describe the flow level?"
+      zh: 【格式示例，非临床内容】你觉得量大概是什么程度？
+    also_fills:
+      - period_currently_ongoing
+    answer_options:
+      - {value: spotting_only, label: {en: Spotting only, zh: 仅有少量点滴}}
+      - {value: light, label: {en: Light, zh: 少量}}
+      - {value: moderate, label: {en: Moderate, zh: 中等}}
+      - {value: heavy, label: {en: Heavy, zh: 量大}}
+      - {value: very_heavy, label: {en: Very heavy, zh: 量非常大}}
+    precondition:
+      {slot: period_currently_ongoing, op: is_answered}
+    priority: 2
+    reask_if_unclear:
+      en: "[Format example] Could you be a bit more specific?"
+      zh: 【格式示例】能再说具体一点吗？
+
+stopping:
+  on_max_reached: grade_with_uncertainty
+  on_all_required_answered: grade
+
+max_questions: 10

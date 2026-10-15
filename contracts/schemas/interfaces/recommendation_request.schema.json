@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/interfaces/recommendation_request.schema.json",
+  "title": "Recommendation request schema",
+  "description": "Schema for the RecommendationRequest — the input to the L4 care-recommendation layer. L4 receives the triage level, active module, user weights (or null for emergency mode), profile fields relevant to cost computation, and location. PRIVACY: ephemeral_coordinates may be used in-memory ONLY for the current calculation; they MUST NOT be written to logs or persisted. Only area-level location (planning_area) may be stored.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "turn_id",
+    "level",
+    "module",
+    "weights_source",
+    "weight_preset_version",
+    "profile_fields",
+    "location",
+    "age_band"
+  ],
+  "properties": {
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "turn_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "level": {
+      "enum": ["SEE_DOCTOR_24_48H", "BOOK_SOON", "EMERGENCY_NOW"]
+    },
+    "module": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/module_id" },
+    "weights": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        { "type": "null" }
+      ],
+      "description": "Feature-id-to-weight mapping. May be null when level is EMERGENCY_NOW (emergency mode uses travel_time_only ranking)."
+    },
+    "weights_source": {
+      "enum": ["default", "preset", "questionnaire"]
+    },
+    "weight_preset_version": { "type": "string" },
+    "profile_fields": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "residency_status": {
+          "enum": ["citizen", "pr", "other", "unknown"]
+        },
+        "has_chas": {
+          "enum": ["yes", "no", "unknown"]
+        },
+        "insurance": {
+          "type": "array",
+          "items": {
+            "enum": ["private", "student", "employer", "other", "none", "unknown"]
+          }
+        },
+        "travel_mode": {
+          "enum": ["walking", "public_transport", "driving", "ride_hailing", "unknown"]
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "planning_area": {
+          "type": "string",
+          "description": "Area-level location only (e.g. a Singapore planning region name)."
+        },
+        "ephemeral_coordinates": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lat", "lng"],
+          "properties": {
+            "lat": { "type": "number" },
+            "lng": { "type": "number" }
+          },
+          "description": "IN-MEMORY ONLY. MUST NOT be written to logs or persisted. Used solely for the current distance calculation."
+        },
+        "source": {
+          "enum": ["device", "user_entered_area"]
+        }
+      }
+    },
+    "age_band": {
+      "type": ["string", "null"],
+      "description": "The value of the age_band slot for this session (collected per-session, not from profile). May be null if not yet collected."
+    }
+  }
+}

@@ -1,0 +1,221 @@
+# AI Grandma demo 红旗规则
+# 原型，未经临床审核，不是医疗建议。
+# 所有阈值仅用于演示，来源为公开权威指南的概括引用。
+
+meta:
+  id: redflag_rules
+  version: 0.3.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+      url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    - title: "KKK Urgent O&G Centre – When to seek urgent help"
+      url: "https://www.kkh.com.sg/pts-educational-info/Pages/Urgent-OG-Centre.aspx"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+rules:
+  # ===== 全局红旗规则 =====
+  - rule_id: RF_GLOBAL_FEVER
+    scope: [global]
+    condition:
+      all_of:
+        - {slot: fever_status, op: eq, value: measured_fever}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [fever_status, temperature_c]
+    near_miss_condition:
+      {slot: fever_status, op: eq, value: feels_feverish_not_measured}
+    user_note:
+      en: "Fever with menstrual symptoms may indicate an infection that needs urgent assessment."
+      zh: "经期伴有发烧可能提示感染，需要紧急就诊。"
+    rationale:
+      en: "Measured fever during menstruation warrants urgent evaluation."
+      zh: "经期发烧需紧急评估。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - rule_id: RF_GLOBAL_FAINING
+    scope: [global]
+    condition:
+      {slot: dizziness_or_fainting, op: eq, value: fainted}
+    exit_type: CALL_AMBULANCE
+    on_unknown: ask_followup
+    followup_slots: [dizziness_or_fainting]
+    user_note:
+      en: "Fainting associated with menstrual symptoms needs emergency care. Please call for an ambulance."
+      zh: "经期晕倒需要急救，请立即拨打急救电话。"
+    rationale:
+      en: "Fainting may indicate significant blood loss or other serious conditions."
+      zh: "晕倒可能提示严重失血或其他急症。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - rule_id: RF_GLOBAL_NEAR_FAINTING
+    scope: [global]
+    condition:
+      {slot: dizziness_or_fainting, op: eq, value: nearly_fainted}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [dizziness_or_fainting]
+    user_note:
+      en: "Feeling like you might faint with menstrual symptoms needs urgent assessment."
+      zh: "经期感觉快要晕倒需要紧急就诊。"
+    rationale:
+      en: "Near-fainting may indicate significant blood loss or low blood pressure."
+      zh: "接近晕倒可能提示失血过多或低血压。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - rule_id: RF_GLOBAL_HEART_RACING
+    scope: [global]
+    condition:
+      all_of:
+        - {slot: heart_racing_or_short_of_breath, op: eq, value: true}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [heart_racing_or_short_of_breath]
+    user_note:
+      en: "A racing heart or shortness of breath with menstrual symptoms needs urgent assessment."
+      zh: "经期出现心跳加速或呼吸困难需要紧急就诊。"
+    rationale:
+      en: "May indicate significant blood loss, anemia, or other serious conditions."
+      zh: "可能提示失血过多、贫血或其他急症。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - rule_id: RF_GLOBAL_VOMITING
+    scope: [global]
+    condition:
+      {slot: vomiting_or_cannot_keep_fluids_down, op: eq, value: true}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [vomiting_or_cannot_keep_fluids_down]
+    user_note:
+      en: "Being unable to keep fluids down with menstrual symptoms needs urgent assessment for dehydration."
+      zh: "经期呕吐无法饮水需要紧急就诊，防止脱水。"
+    rationale:
+      en: "Inability to keep fluids down may lead to severe dehydration."
+      zh: "无法饮水可能导致严重脱水。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  # ===== heavy_bleeding 模块专属红旗 =====
+  - rule_id: RF_HB_SOAK_HOURLY
+    scope: [heavy_bleeding]
+    condition:
+      {slot: soak_through_interval, op: eq, value: hourly_or_more_often}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [soak_through_interval]
+    near_miss_condition:
+      {slot: soak_through_interval, op: eq, value: every_2_to_3_hours}
+    user_note:
+      en: "Soaking through sanitary products every hour or more is a sign of very heavy bleeding that needs urgent care."
+      zh: "每小时就需要更换卫生用品且浸透，这是出血量非常大的信号，需要紧急就诊。"
+    rationale:
+      en: "Soaking through hourly may indicate clinically significant blood loss requiring urgent assessment."
+      zh: "每小时浸透可能提示临床显著失血，需紧急评估。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - rule_id: RF_HB_BLEEDING_THROUGH_CLOTHES
+    scope: [heavy_bleeding]
+    condition:
+      {slot: bleeding_through_clothes_or_bedding, op: eq, value: true}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [bleeding_through_clothes_or_bedding]
+    user_note:
+      en: "Bleeding soaking through clothes or bedding is a sign of very heavy bleeding that needs urgent care."
+      zh: "出血浸透衣物或床单说明出血量很大，需要紧急就诊。"
+    rationale:
+      en: "Bleeding through clothes or bedding suggests severe haemorrhage."
+      zh: "出血浸透衣物或床单提示严重出血。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - rule_id: RF_HB_LARGE_CLOTS
+    scope: [heavy_bleeding]
+    condition:
+      all_of:
+        - {slot: clots_present, op: eq, value: true}
+        - {slot: clot_size, op: eq, value: large}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [clots_present, clot_size]
+    user_note:
+      en: "Passing large blood clots during your period needs urgent assessment."
+      zh: "经期排出大血块需要紧急就诊。"
+    rationale:
+      en: "Large clots may indicate clinically significant bleeding."
+      zh: "大血块可能提示临床显著出血。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  # ===== severe_period_pain 模块专属红旗 =====
+  - rule_id: RF_SP_PAIN_10
+    scope: [severe_period_pain]
+    condition:
+      {slot: pain_severity_0_10, op: gte, value: 9}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [pain_severity_0_10]
+    near_miss_condition:
+      {slot: pain_severity_0_10, op: gte, value: 7}
+    user_note:
+      en: "Pain rated 9 or 10 out of 10 during your period needs urgent assessment."
+      zh: "经期疼痛达到 9 或 10 分需要紧急就诊。"
+    rationale:
+      en: "Extreme pain may indicate a serious underlying condition."
+      zh: "极端疼痛可能提示严重疾病。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - rule_id: RF_SP_SUDDEN_PAIN
+    scope: [severe_period_pain]
+    condition:
+      all_of:
+        - {slot: pain_onset_speed, op: eq, value: sudden}
+        - {slot: pain_severity_0_10, op: gte, value: 7}
+    exit_type: GO_URGENT_OG_OR_AE
+    on_unknown: ask_followup
+    followup_slots: [pain_onset_speed, pain_severity_0_10]
+    user_note:
+      en: "Sudden onset of severe pain needs urgent assessment."
+      zh: "突然发作的剧烈疼痛需要紧急就诊。"
+    rationale:
+      en: "Sudden severe pain may indicate conditions like ovarian torsion or rupture."
+      zh: "突然的剧痛可能提示卵巢扭转或破裂等急症。"
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+        url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+    needs_clinician_review: true
+    status: draft_unreviewed

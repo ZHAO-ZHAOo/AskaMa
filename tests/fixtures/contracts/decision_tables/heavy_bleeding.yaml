@@ -1,0 +1,38 @@
+meta:
+  id: decision_table_fixture
+  version: 0.1.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+module: heavy_bleeding
+rows:
+  - row_id: DT_FIXTURE_1
+    when:
+      all_of:
+        - {slot: flow_compared_to_usual, op: eq, value: much_more}
+        - {slot: bleeding_through_clothes_or_bedding, op: eq, value: true}
+    level: SEE_DOCTOR_24_48H
+    rationale:
+      en: "[Fixture only]"
+    needs_clinician_review: true
+    sources:
+      - title: "[Fixture source]"
+        url: "https://example.invalid/source"
+  - row_id: DT_FIXTURE_2
+    when:
+      {slot: flow_compared_to_usual, op: eq, value: same}
+    level: SELF_CARE
+    rationale:
+      en: "[Fixture only]"
+    needs_clinician_review: true
+    sources:
+      - title: "[Fixture source]"
+        url: "https://example.invalid/source"
+default_row:
+  level: BOOK_SOON
+  rationale:
+    en: "[Fixture only] Default"
+conflict_resolution: highest_severity_wins
+uncertainty_policy:
+  mode: escalate_one_level

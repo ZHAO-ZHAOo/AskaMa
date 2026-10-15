@@ -1,0 +1,76 @@
+# AI Grandma demo 自护卡片 – late_or_missed_period
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: selfcare_late_or_missed_period
+  version: 0.3.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+      url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+cards:
+  - card_id: SC_LM_RELIEF
+    module: late_or_missed_period
+    applicable_levels: [SELF_CARE]
+    card_type: relief_measure
+    title:
+      en: "Things you can do"
+      zh: "你可以做的事"
+    body:
+      en: "Try not to worry – a delay of a few days is very common. Track your cycle dates. Eat well and manage stress. If you might be pregnant, consider taking a pregnancy test after a few more days."
+      zh: "不用太担心——推迟几天是很常见的。记录一下你的周期日期。好好吃饭，注意减压。如果可能怀孕，过几天后可以验一下。"
+    priority: 1
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - card_id: SC_LM_REASSURANCE
+    module: late_or_missed_period
+    applicable_levels: [SELF_CARE]
+    card_type: reassurance
+    title:
+      en: "Short delays are normal"
+      zh: "短期推迟是正常的"
+    body:
+      en: "Cycles can vary by a few days due to stress, travel, illness, or weight changes. A delay of less than a week is usually not concerning."
+      zh: "因为压力、旅行、生病或体重变化，周期差几天很正常。推迟不到一周通常不必担心。"
+    priority: 2
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - card_id: SC_LM_ESCALATION
+    module: late_or_missed_period
+    applicable_levels: [SELF_CARE, BOOK_SOON]
+    card_type: escalation_criteria
+    title:
+      en: "See a doctor if"
+      zh: "出现以下情况请就医"
+    body:
+      en: "Please see a doctor if: the period is more than 35 days late; there have been 3 or more missed periods in a row; there's a possibility of pregnancy; or there are other concerns."
+      zh: "请就医，如果：月经推迟超过35天；连续3次以上没来月经；可能怀孕；或有其他担忧。"
+    priority: 10
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+    needs_clinician_review: true
+    status: draft_unreviewed

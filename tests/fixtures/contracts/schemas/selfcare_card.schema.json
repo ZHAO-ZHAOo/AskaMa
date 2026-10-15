@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/selfcare_card.schema.json",
+  "title": "Self-care card schema",
+  "description": "Schema for self-care card content units output by the L3.1 layer. Cards provide relief measures, reassurance, watch signs, and escalation criteria — they do NOT diagnose. EMERGENCY_NOW level never uses self-care cards. A SELF_CARE output must always include at least one escalation_criteria card; that combination constraint is checked by a downstream validation script. Age-related expression differences are handled via applies_when referencing age-related slot ids.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "cards"],
+  "properties": {
+    "meta": { "$ref": "common.schema.json#/$defs/meta" },
+    "cards": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/card" }
+    }
+  },
+  "$defs": {
+    "card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "card_id",
+        "module",
+        "applicable_levels",
+        "card_type",
+        "title",
+        "body",
+        "priority",
+        "content_attestation",
+        "sources",
+        "needs_clinician_review",
+        "status"
+      ],
+      "properties": {
+        "card_id": {
+          "type": "string",
+          "pattern": "^SC_[A-Z0-9_]+$"
+        },
+        "module": { "$ref": "common.schema.json#/$defs/module_id" },
+        "applicable_levels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": ["SELF_CARE", "BOOK_SOON", "SEE_DOCTOR_24_48H"]
+          }
+        },
+        "card_type": {
+          "enum": ["relief_measure", "reassurance", "watch_signs", "escalation_criteria"]
+        },
+        "title": { "$ref": "common.schema.json#/$defs/i18n_text" },
+        "body": { "$ref": "common.schema.json#/$defs/i18n_text" },
+        "applies_when": { "$ref": "common.schema.json#/$defs/condition" },
+        "priority": {
+          "type": "integer"
+        },
+        "content_attestation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mentions_specific_drug",
+            "gives_dosage",
+            "contains_diagnostic_statement"
+          ],
+          "properties": {
+            "mentions_specific_drug": { "const": false },
+            "gives_dosage": { "const": false },
+            "contains_diagnostic_statement": { "const": false }
+          },
+          "description": "Author attestation that the card does not mention specific drug names, give dosage, or contain diagnostic statements. A downstream validation script performs keyword scanning as a second check."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title"],
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "publisher": { "type": "string" },
+              "url": { "type": "string", "format": "uri" },
+              "accessed": { "type": "string", "format": "date" }
+            }
+          }
+        },
+        "needs_clinician_review": { "type": "boolean" },
+        "status": {
+          "enum": ["draft_unreviewed", "clinician_reviewed", "approved"]
+        },
+        "notes": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "properties": {
+              "status": { "enum": ["clinician_reviewed", "approved"] }
+            },
+            "required": ["status"]
+          },
+          "then": {
+            "type": "object",
+            "properties": {
+              "sources": {
+                "type": "array",
+                "minItems": 1
+              },
+              "needs_clinician_review": { "const": false }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

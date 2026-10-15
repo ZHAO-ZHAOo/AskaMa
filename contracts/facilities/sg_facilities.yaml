@@ -1,0 +1,165 @@
+# AI Grandma demo 医疗机构数据 – 新加坡
+# 原型，未经临床审核，不是医疗建议。
+# 机构信息基于公开来源，为演示用途。
+
+meta:
+  id: facilities_sg
+  version: 0.3.0
+  status: draft_unreviewed
+  sources:
+    - title: "KK Hospital – Urgent O&G Centre"
+      url: "https://www.kkh.com.sg/pts-educational-info/Pages/Urgent-OG-Centre.aspx"
+    - title: "Singapore General Hospital – A&E"
+      url: "https://www.sgh.com.sg"
+    - title: "HealthHub – Polyclinics"
+      url: "https://www.healthhub.sg"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+facilities:
+  - facility_id: FAC_KKH_URGENT
+    name: "KK Hospital Urgent O&G Centre"
+    aliases: ["KKH Urgent O&G", "KKH 24h Women's Clinic"]
+    type: urgent_og
+    lat: 1.3076
+    lng: 103.8318
+    address: "100 Bukit Timah Road, Singapore 229899"
+    postal_code: "229899"
+    has_gynaecology: true
+    walk_in_available: true
+    appointment_required: false
+    fee_tier: moderate
+    subsidy_requires_referral: false
+    accepts_minors: true
+    operating_hours: "24 hours"
+    phone: "+65-6293-4044"
+    website: "https://www.kkh.com.sg"
+    languages: [en, zh, ms, ta]
+    notes: "24小时妇产科急症中心，处理女性急症"
+    sources:
+      - title: "KK Hospital – Urgent O&G Centre"
+        url: "https://www.kkh.com.sg/pts-educational-info/Pages/Urgent-OG-Centre.aspx"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - facility_id: FAC_SGH_AE
+    name: "Singapore General Hospital A&E"
+    aliases: ["SGH Emergency"]
+    type: a_e
+    lat: 1.2815
+    lng: 103.8406
+    address: "Outram Road, Singapore 169608"
+    postal_code: "169608"
+    has_gynaecology: true
+    walk_in_available: true
+    appointment_required: false
+    fee_tier: moderate
+    subsidy_requires_referral: false
+    accepts_minors: true
+    operating_hours: "24 hours"
+    phone: "+65-6321-4377"
+    website: "https://www.sgh.com.sg"
+    languages: [en, zh, ms, ta]
+    notes: "24小时急诊，可处理妇科急症"
+    sources:
+      - title: "Singapore General Hospital – A&E"
+        url: "https://www.sgh.com.sg"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - facility_id: FAC_NUH_AE
+    name: "National University Hospital A&E"
+    aliases: ["NUH Emergency"]
+    type: a_e
+    lat: 1.2948
+    lng: 103.7809
+    address: "5 Lower Kent Ridge Road, Singapore 119074"
+    postal_code: "119074"
+    has_gynaecology: true
+    walk_in_available: true
+    appointment_required: false
+    fee_tier: moderate
+    subsidy_requires_referral: false
+    accepts_minors: true
+    operating_hours: "24 hours"
+    phone: "+65-6779-5555"
+    website: "https://www.nuh.com.sg"
+    languages: [en, zh, ms, ta]
+    notes: "24小时急诊，可处理妇科急症"
+    sources:
+      - title: "NUH – Emergency Department"
+        url: "https://www.nuh.com.sg"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - facility_id: FAC_POLY_BUKIT_MERAH
+    name: "Bukit Merah Polyclinic"
+    type: polyclinic
+    lat: 1.2820
+    lng: 103.8230
+    address: "153 Bukit Merah Central, Singapore 159751"
+    postal_code: "159751"
+    has_gynaecology: false
+    walk_in_available: true
+    appointment_required: false
+    fee_tier: low
+    subsidy_requires_referral: true
+    accepts_minors: true
+    operating_hours: "Mon–Fri 08:00–17:00, Sat 08:00–13:00"
+    phone: "+65-6377-5000"
+    website: "https://www.healthhub.sg"
+    languages: [en, zh, ms, ta]
+    notes: "综合诊所，可转介至专科门诊"
+    sources:
+      - title: "HealthHub – Polyclinics"
+        url: "https://www.healthhub.sg"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - facility_id: FAC_POLY_QUEENSTOWN
+    name: "Queenstown Polyclinic"
+    type: polyclinic
+    lat: 1.2915
+    lng: 103.8020
+    address: "680 Margaret Drive, Singapore 149337"
+    postal_code: "149337"
+    has_gynaecology: false
+    walk_in_available: true
+    appointment_required: false
+    fee_tier: low
+    subsidy_requires_referral: true
+    accepts_minors: true
+    operating_hours: "Mon–Fri 08:00–17:00, Sat 08:00–13:00"
+    phone: "+65-6471-6400"
+    website: "https://www.healthhub.sg"
+    languages: [en, zh, ms, ta]
+    notes: "综合诊所，可转介至专科门诊"
+    sources:
+      - title: "HealthHub – Polyclinics"
+        url: "https://www.healthhub.sg"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - facility_id: FAC_GP_ANG_MO_KIO
+    name: "Ang Mo Kio GP Clinic (Example)"
+    type: chas_gp
+    lat: 1.3696
+    lng: 103.8497
+    address: "Blk 712 Ang Mo Kio Ave 6, Singapore 560712"
+    postal_code: "560712"
+    has_gynaecology: false
+    walk_in_available: true
+    appointment_required: false
+    fee_tier: low
+    subsidy_requires_referral: false
+    accepts_minors: true
+    operating_hours: "Mon–Fri 08:30–17:00, Sat 08:30–13:00"
+    phone: "+65-6xxx-xxxx"
+    website: "https://www.healthhub.sg"
+    languages: [en, zh]
+    notes: "CHAS GP，可处理一般月经问题并可转介"
+    sources:
+      - title: "HealthHub – CHAS GPs"
+        url: "https://www.healthhub.sg"
+    needs_clinician_review: true
+    status: draft_unreviewed

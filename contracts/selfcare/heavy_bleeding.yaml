@@ -1,0 +1,76 @@
+# AI Grandma demo 自护卡片 – heavy_bleeding
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: selfcare_heavy_bleeding
+  version: 0.3.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+      url: "https://cks.nice.org.uk/topics/menorrhagia/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+cards:
+  - card_id: SC_HB_RELIEF
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE]
+    card_type: relief_measure
+    title:
+      en: "Things that may help at home"
+      zh: "在家可以尝试的缓解办法"
+    body:
+      en: "Get plenty of rest. Stay hydrated by drinking water regularly. Use a hot water bottle on your lower tummy if that's comforting for you. Track how many sanitary products you use so you can tell a doctor if asked."
+      zh: "多休息，定时喝水保持水分。可以在下腹部放一个热水袋。记录一下卫生用品的使用量，方便就医时告诉医生。"
+    priority: 1
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - card_id: SC_HB_REASSURANCE
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE]
+    card_type: reassurance
+    title:
+      en: "It's often not an emergency"
+      zh: "通常不是急症"
+    body:
+      en: "Bleeding that's similar to or only a bit more than your usual is very common and often nothing dangerous. Many people have heavier months from time to time."
+      zh: "出血量与平常相近或稍多一点是很常见的，通常没有危险。很多人都偶尔会有经量多的月份。"
+    priority: 2
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed
+
+  - card_id: SC_HB_ESCALATION
+    module: heavy_bleeding
+    applicable_levels: [SELF_CARE, BOOK_SOON]
+    card_type: escalation_criteria
+    title:
+      en: "See a doctor if"
+      zh: "出现以下情况请就医"
+    body:
+      en: "Please see a doctor soon if: your bleeding gets much heavier; you soak through a product every hour or faster; you feel dizzy, lightheaded, or faint; you're also running a fever; or the heavy bleeding has lasted more than 7 days."
+      zh: "请尽快就医，如果：出血量明显加重；每小时或更快就浸透卫生用品；感觉头晕或快要晕倒；同时发烧；或大量出血持续超过7天。"
+    priority: 10
+    content_attestation:
+      mentions_specific_drug: false
+      gives_dosage: false
+      contains_diagnostic_statement: false
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Menorrhagia"
+        url: "https://cks.nice.org.uk/topics/menorrhagia/"
+    needs_clinician_review: true
+    status: draft_unreviewed

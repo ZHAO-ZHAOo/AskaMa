@@ -1,0 +1,112 @@
+# AI Grandma demo 决策表 – late_or_missed_period
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: decision_table_late_or_missed_period
+  version: 0.4.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+      url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+module: late_or_missed_period
+
+rows:
+  - row_id: DT_LM_001
+    when:
+      all_of:
+        - {slot: periods_stopped_over_12_months, op: eq, value: true}
+    level: BOOK_SOON
+    priority: 10
+    rationale:
+      en: "Prolonged absence of periods should be assessed by a doctor."
+      zh: "月经长期不来应由医生评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+
+  - row_id: DT_LM_002
+    when:
+      all_of:
+        - {slot: days_since_last_period_start, op: gte, value: 60}
+    level: BOOK_SOON
+    priority: 8
+    rationale:
+      en: "Missing period for over 60 days warrants medical assessment."
+      zh: "月经推迟超过60天应就医评估。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+
+  - row_id: DT_LM_003
+    when:
+      all_of:
+        - {slot: pregnancy_status, op: eq, value: confirmed_pregnant}
+    level: BOOK_SOON
+    priority: 9
+    rationale:
+      en: "Confirmed pregnancy should be followed up with appropriate care."
+      zh: "已确认怀孕应就医安排后续产检。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+
+  - row_id: DT_LM_004
+    when:
+      all_of:
+        - {slot: days_since_last_period_start, op: lte, value: 35}
+        - {slot: pregnancy_status, op: ne, value: confirmed_pregnant}
+    level: SELF_CARE
+    priority: 1
+    rationale:
+      en: "Delay of up to a week is common and usually not concerning."
+      zh: "推迟一周以内（周期35天及以内）很常见，通常不必担心。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+
+  - row_id: DT_LM_005
+    when:
+      all_of:
+        - {slot: pregnancy_status, op: eq, value: possibly_pregnant}
+    level: SEE_DOCTOR_24_48H
+    priority: 6
+    rationale:
+      en: "Possible pregnancy should be assessed promptly."
+      zh: "可能怀孕应尽快就诊确认。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+
+  - row_id: DT_LM_006
+    when:
+      any_of:
+        - {slot: usual_cycle_length_days, op: lte, value: 20}
+        - {slot: usual_cycle_length_days, op: gte, value: 36}
+    level: BOOK_SOON
+    priority: 5
+    rationale:
+      en: "A usually abnormal cycle length may indicate an underlying condition worth evaluating."
+      zh: "平常周期长度明显偏离常规（21-35天）可能需要评估潜在原因。"
+    needs_clinician_review: true
+    sources:
+      - title: "NICE Clinical Knowledge Summary – Amenorrhoea"
+        url: "https://cks.nice.org.uk/topics/amenorrhoea/"
+
+default_row:
+  level: BOOK_SOON
+  rationale:
+    en: "Unable to clearly assess – default to booking an appointment."
+    zh: "无法明确评估——默认建议预约就诊。"
+
+conflict_resolution: highest_severity_wins
+
+uncertainty_policy:
+  mode: escalate_one_level

@@ -1,0 +1,47 @@
+meta:
+  id: modules
+  version: 0.2.0
+  status: draft_unreviewed
+  sources: []
+  reviewer: null
+  last_verified: null
+module_selection_note: >-
+  一个用户可能同时涉及多个模块；具体如何选择主模块、并行处理或合并结论，属于后续步骤，
+  本步只定义模块本身，不决定选择或合并策略。
+modules:
+  - id: heavy_bleeding
+    name:
+      zh: 经量过多
+      en: Heavy bleeding
+    scope:
+      zh: 涵盖主诉为月经量明显多于自身平常、经期出血量让人担心或影响日常生活的情形。
+      en: Covers concerns where menstrual flow is noticeably heavier than the person's own usual baseline or heavy enough to interfere with daily life.
+    notes: >-
+      本模块只定义范围，不含诊断名称或数值阈值；具体追问与判定阈值在后续步骤以草稿形式填写并经医生审核。
+  - id: severe_period_pain
+    name:
+      zh: 严重痛经
+      en: Severe period pain
+    scope:
+      zh: 涵盖主诉为经期疼痛剧烈、明显超出自身平常程度，或影响正常活动、休息的情形。
+      en: Covers period pain that is severe, clearly beyond the person's usual experience, or disrupts normal activity and rest.
+    notes: >-
+      本模块只定义范围，不含诊断名称或数值阈值；具体追问与判定阈值在后续步骤以草稿形式填写并经医生审核。
+  - id: late_or_missed_period
+    name:
+      zh: 月经推迟/未来潮
+      en: Late or missed period
+    scope:
+      zh: 涵盖主诉为月经推迟、未来潮或周期明显长于预期的情形，可能伴随是否需要进一步评估的疑虑。
+      en: Covers concerns about a period being late, absent, or the cycle clearly longer than expected, including uncertainty about whether further assessment is needed.
+    notes: >-
+      本模块只定义范围，不含诊断名称或数值阈值；具体追问与判定阈值在后续步骤以草稿形式填写并经医生审核。
+  - id: irregular_or_intermenstrual_bleeding
+    name:
+      zh: 不规则/经间期出血
+      en: Irregular or intermenstrual bleeding
+    scope:
+      zh: 涵盖主诉为月经周期不规律、经期外出血、出血时间或模式异常的情形。
+      en: Covers concerns about irregular cycles, bleeding between periods, or bleeding whose timing or pattern is abnormal.
+    notes: >-
+      本模块只定义范围，不含诊断名称或数值阈值；具体追问与判定阈值在后续步骤以草稿形式填写并经医生审核。

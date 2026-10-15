@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ai-grandma/schemas/interfaces/final_response.schema.json",
+  "title": "Final response schema",
+  "description": "Schema for the FinalResponse object produced by the Persona layer. The text field is the content shown to the user — it MUST NOT be written to the event log (the log stores only a redacted summary or reference). output_validation records the results of automated checks: no diagnostic wording, level consistent with grading, no drug or dosage mention, disclaimer present, language matches UI language.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "turn_id",
+    "response_type",
+    "level",
+    "language",
+    "text",
+    "disclaimer_included",
+    "output_validation",
+    "versions"
+  ],
+  "properties": {
+    "session_id": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/session_id" },
+    "turn_id": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "response_type": {
+      "enum": ["followup_question", "emergency_exit", "selfcare", "recommendation", "clarification", "out_of_scope", "error"]
+    },
+    "level": {
+      "oneOf": [
+        { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/level_id" },
+        { "type": "null" }
+      ]
+    },
+    "language": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/language_code" },
+    "text": {
+      "type": "string",
+      "description": "The final text shown to the user. MUST NOT be written to the event log — the log stores only a redacted summary or reference."
+    },
+    "disclaimer_included": { "type": "boolean" },
+    "refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "question_id": { "type": "string" },
+        "card_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "facility_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "rule_ids": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "output_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "checks"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["name", "passed"],
+            "properties": {
+              "name": {
+                "enum": ["no_diagnostic_wording", "level_consistent_with_grading", "no_drug_or_dosage", "disclaimer_present", "language_matches"]
+              },
+              "passed": { "type": "boolean" }
+            }
+          }
+        }
+      }
+    },
+    "versions": { "$ref": "https://ai-grandma/schemas/common.schema.json#/$defs/versions" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": {
+          "response_type": { "const": "emergency_exit" }
+        },
+        "required": ["response_type"]
+      },
+      "then": {
+        "type": "object",
+        "properties": {
+          "level": { "const": "EMERGENCY_NOW" }
+        }
+      }
+    }
+  ]
+}

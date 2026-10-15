@@ -1,0 +1,182 @@
+# AI Grandma demo 追问树 – severe_period_pain
+# 原型，未经临床审核，不是医疗建议。
+
+meta:
+  id: question_tree_severe_period_pain
+  version: 0.4.0
+  status: draft_unreviewed
+  sources:
+    - title: "NICE Clinical Knowledge Summary – Dysmenorrhoea"
+      url: "https://cks.nice.org.uk/topics/dysmenorrhoea/"
+  reviewer: null
+  last_verified: "2026-10-01"
+
+module: severe_period_pain
+
+required_slots:
+  - pain_severity_0_10
+  - pain_compared_to_usual
+
+questions:
+  - question_id: Q_SP_INTENSITY
+    slot: pain_severity_0_10
+    text:
+      en: "On a scale of 0 to 10, how bad is the pain?"
+      zh: "从 0 到 10 评分，疼痛有多严重？"
+    answer_options:
+      - value: "0"
+        label:
+          en: "0 – No pain at all"
+          zh: "0 – 不痛，完全没有感觉"
+      - value: "1"
+        label:
+          en: "1 – Barely noticeable: like a mosquito bite"
+          zh: "1 – 极轻微：像蚊子叮咬，几乎感觉不到"
+      - value: "2"
+        label:
+          en: "2 – Mild: like a paper cut, doesn't affect daily life"
+          zh: "2 – 轻微：像纸划伤手指，不影响日常生活"
+      - value: "3"
+        label:
+          en: "3 – Mild: like an injection, doesn't disturb sleep"
+          zh: "3 – 轻度：像打针扎一下，不影响睡眠"
+      - value: "4"
+        label:
+          en: "4 – Moderate: like a bee sting, disturbs sleep but you can still sleep"
+          zh: "4 – 中度：像蜜蜂蜇，影响睡眠但仍能入睡"
+      - value: "5"
+        label:
+          en: "5 – Moderate: like a sprained ankle, makes you stop and rest"
+          zh: "5 – 中度：像扭伤脚踝，需要停下来休息"
+      - value: "6"
+        label:
+          en: "6 – Moderately severe: like a migraine, hard to fall asleep"
+          zh: "6 – 中重度：像偏头痛发作，难以入睡"
+      - value: "7"
+        label:
+          en: "7 – Severe: like kidney stone colic, can't think clearly or sleep"
+          zh: "7 – 重度：像肾结石绞痛，痛到无法思考、不能入睡"
+      - value: "8"
+        label:
+          en: "8 – Severe: like a serious burn, sweating from the pain"
+          zh: "8 – 重度：像严重烧伤，痛到冒冷汗"
+      - value: "9"
+        label:
+          en: "9 – Very severe: near the limit of human endurance, barely able to speak"
+          zh: "9 – 极重度：接近人体能忍受的极限，几乎无法说话"
+      - value: "10"
+        label:
+          en: "10 – Worst imaginable: like stubbing your little toe hard on the bed frame, or a knife cut"
+          zh: "10 – 无法想象的剧痛：像小脚趾狠狠踢到床脚，或刀割"
+    priority: 1
+
+  - question_id: Q_SP_COMPARE
+    slot: pain_compared_to_usual
+    text:
+      en: "How does this pain compare to your usual period pain?"
+      zh: "这次疼痛和平时比怎么样？"
+    answer_options:
+      - {value: "same_as_usual", label: {en: "Same as usual", zh: "和平常一样"}}
+      - {value: "worse_than_usual", label: {en: "Worse than usual", zh: "比平常更严重"}}
+      - {value: "new_kind_of_pain", label: {en: "A new kind of pain", zh: "以前没有过的痛"}}
+      - {value: "no_previous_period_pain", label: {en: "I never had period pain before", zh: "以前经期不痛"}}
+    priority: 2
+
+  - question_id: Q_SP_ONSET
+    slot: pain_onset_speed
+    text:
+      en: "Did the pain come on suddenly or gradually?"
+      zh: "疼痛是突然发作还是慢慢加重的？"
+    answer_options:
+      - {value: "sudden", label: {en: "Sudden", zh: "突然发作"}}
+      - {value: "gradual", label: {en: "Gradual", zh: "逐渐加重"}}
+    priority: 3
+
+  - question_id: Q_SP_INTERFERE
+    slot: pain_interferes_with_activities
+    text:
+      en: "Does the pain interfere with your daily activities?"
+      zh: "疼痛影响到日常活动了吗？"
+    answer_options:
+      - {value: "not_at_all", label: {en: "Not at all", zh: "完全不影响"}}
+      - {value: "a_little", label: {en: "A little", zh: "有一点影响"}}
+      - {value: "quite_a_lot", label: {en: "Quite a lot", zh: "影响很大"}}
+      - {value: "cannot_do_usual_things", label: {en: "I can't do my usual things", zh: "无法进行日常活动"}}
+    priority: 4
+
+  - question_id: Q_SP_DIZZY
+    slot: dizziness_or_fainting
+    text:
+      en: "Have you felt dizzy or faint?"
+      zh: "有没有觉得头晕或快要晕倒？"
+    answer_options:
+      - {value: "none", label: {en: "No", zh: "没有"}}
+      - {value: "lightheaded", label: {en: "A bit lightheaded", zh: "有点头晕"}}
+      - {value: "nearly_fainted", label: {en: "Nearly fainted", zh: "差点晕倒"}}
+      - {value: "fainted", label: {en: "I fainted", zh: "晕倒过"}}
+    priority: 5
+
+  - question_id: Q_SP_FEVER
+    slot: fever_status
+    text:
+      en: "Do you have a fever, or have you taken your temperature?"
+      zh: "你发烧了吗，或者量过体温吗？"
+    answer_options:
+      - {value: "no_fever", label: {en: "No fever", zh: "没有发烧"}}
+      - {value: "feels_feverish_not_measured", label: {en: "Feel feverish but haven't measured", zh: "感觉发热但没量体温"}}
+      - {value: "measured_fever", label: {en: "Measured fever", zh: "量过，确实发烧"}}
+    priority: 6
+    reask_if_unclear:
+      en: "Could you confirm whether you have measured your temperature?"
+      zh: "能确认一下你有没有量过体温吗？"
+
+  - question_id: Q_SP_HEART
+    slot: heart_racing_or_short_of_breath
+    text:
+      en: "Do you feel your heart racing, or are you short of breath?"
+      zh: "有没有心跳加速，或者觉得气短？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 7
+
+  - question_id: Q_SP_VOMIT
+    slot: vomiting_or_cannot_keep_fluids_down
+    text:
+      en: "Have you been vomiting, or unable to keep fluids down?"
+      zh: "有没有呕吐，或者喝不进水？"
+    answer_options:
+      - {value: "true", label: {en: "Yes", zh: "有"}}
+      - {value: "false", label: {en: "No", zh: "没有"}}
+    priority: 8
+
+  - question_id: Q_SP_TIMING
+    slot: pain_timing_relative_to_period
+    text:
+      en: "When does the pain happen relative to your period?"
+      zh: "疼痛和经期的时间关系是？"
+    answer_options:
+      - {value: "before_period", label: {en: "Before my period", zh: "经期前"}}
+      - {value: "during_period", label: {en: "During my period", zh: "经期中"}}
+      - {value: "after_period", label: {en: "After my period", zh: "经期后"}}
+      - {value: "not_related_to_period", label: {en: "Not related to my period", zh: "和经期无关"}}
+    priority: 9
+
+  - question_id: Q_SP_LOCATION
+    slot: pain_location
+    text:
+      en: "Where is the pain located?"
+      zh: "疼痛在什么位置？"
+    answer_options:
+      - {value: "lower_abdomen_middle", label: {en: "Lower abdomen, in the middle", zh: "下腹正中"}}
+      - {value: "lower_abdomen_one_side", label: {en: "Lower abdomen, on one side", zh: "下腹一侧"}}
+      - {value: "whole_abdomen", label: {en: "Whole abdomen", zh: "整个腹部"}}
+      - {value: "lower_back", label: {en: "Lower back", zh: "后腰"}}
+      - {value: "other", label: {en: "Other", zh: "其他位置"}}
+    priority: 10
+
+stopping:
+  on_max_reached: grade_with_uncertainty
+  on_all_required_answered: grade
+
+max_questions: 10
