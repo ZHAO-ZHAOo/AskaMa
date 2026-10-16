@@ -66,10 +66,10 @@ ul.esc{margin:2px 0;padding-left:16px}
 <body>
 <main class="compact-report">
   <header class="report-top">
-    <div><div class="report-brand"><i></i> ASKaMa · 问问阿嬷</div><h1>就诊前信息摘要</h1><p>请在就医时向医生出示或转述这份摘要。</p></div>
-    <div class="report-meta">生成时间：{{ s.generated }}<br>记录编号：{{ s.session_id }}</div>
+    <div><div class="report-brand"><i></i> ASKaMa · {{ 'Ask Grandma' if s.lang == 'en' else '问问阿嬷' }}</div><h1>{{ 'Pre-visit summary' if s.lang == 'en' else '就诊前信息摘要' }}</h1><p>{{ 'Show or share this summary with your clinician during your visit.' if s.lang == 'en' else '请在就医时向医生出示或转述这份摘要。' }}</p></div>
+    <div class="report-meta">{{ 'Generated' if s.lang == 'en' else '生成时间' }}: {{ s.generated }}<br>{{ 'Record ID' if s.lang == 'en' else '记录编号' }}: {{ s.session_id }}</div>
   </header>
-  <p class="notice">本页根据本次对话整理，仅用于帮助医患沟通，不构成诊断或医疗建议。</p>
+  <p class="notice">{{ 'This page summarises this conversation to support communication with a clinician. It is not a diagnosis or medical advice.' if s.lang == 'en' else '本页根据本次对话整理，仅用于帮助医患沟通，不构成诊断或医疗建议。' }}</p>
 
   <section class="triage-card {{ s.triage.tone }}">
     <span class="eyebrow">{{ s.triage.tag }}</span>
@@ -78,15 +78,15 @@ ul.esc{margin:2px 0;padding-left:16px}
   </section>
 
   <div class="report-grid">
-    <section class="section wide"><h2>本次主诉</h2><div class="content complaint">{{ s.complaint }}</div></section>
-    <section class="section wide"><h2>分诊沟通建议</h2><div class="content advice">{{ s.advice }}</div></section>
-    <section class="section wide"><h2>本次已确认信息</h2><div class="content">{% if s.confirmed_facts %}<dl class="fact-list">{% for fact in s.confirmed_facts %}<div><dt>{{ fact.label }}</dt><dd>{{ fact.value }}</dd></div>{% endfor %}</dl>{% else %}<p class="empty">除主诉外，本次未保存更多可整理的信息。</p>{% endif %}</div></section>
-    <section class="section"><h2>就医时可补充</h2><div class="content"><ul class="prompt-list"><li>症状何时开始、是否持续或加重</li><li>月经、出血或分泌物的变化（如适用）</li><li>近期用药、避孕、性生活或怀孕可能（按实际情况说明）</li></ul></div></section>
-    <section class="section"><h2>使用说明</h2><div class="content">请以实际症状和医生的现场评估为准。如症状突然加重、感到非常不适或无法安全前往医院，请及时求助。</div></section>
+    <section class="section wide"><h2>{{ 'Chief concern' if s.lang == 'en' else '本次主诉' }}</h2><div class="content complaint">{{ s.complaint }}</div></section>
+    <section class="section wide"><h2>{{ 'Triage communication guidance' if s.lang == 'en' else '分诊沟通建议' }}</h2><div class="content advice">{{ s.advice }}</div></section>
+    <section class="section wide"><h2>{{ 'Information confirmed in this conversation' if s.lang == 'en' else '本次已确认信息' }}</h2><div class="content">{% if s.confirmed_facts %}<dl class="fact-list">{% for fact in s.confirmed_facts %}<div><dt>{{ fact.label }}</dt><dd>{{ fact.value }}</dd></div>{% endfor %}</dl>{% else %}<p class="empty">{{ 'No additional structured information was saved beyond the chief concern.' if s.lang == 'en' else '除主诉外，本次未保存更多可整理的信息。' }}</p>{% endif %}</div></section>
+    <section class="section"><h2>{{ 'Useful details for your visit' if s.lang == 'en' else '就医时可补充' }}</h2><div class="content"><ul class="prompt-list">{% if s.lang == 'en' %}<li>When symptoms started and whether they are continuing or worsening</li><li>Changes in menstruation, bleeding or discharge, if relevant</li><li>Recent medicines, contraception, sexual activity or pregnancy possibility, as applicable</li>{% else %}<li>症状何时开始、是否持续或加重</li><li>月经、出血或分泌物的变化（如适用）</li><li>近期用药、避孕、性生活或怀孕可能（按实际情况说明）</li>{% endif %}</ul></div></section>
+    <section class="section"><h2>{{ 'Important note' if s.lang == 'en' else '使用说明' }}</h2><div class="content">{{ 'Please rely on your current symptoms and the clinician’s in-person assessment. Seek help promptly if symptoms suddenly worsen, you feel very unwell, or you cannot travel to hospital safely.' if s.lang == 'en' else '请以实际症状和医生的现场评估为准。如症状突然加重、感到非常不适或无法安全前往医院，请及时求助。' }}</div></section>
   </div>
 
-  <details class="full-record"><summary>查看完整对话记录</summary><div class="turns">{% if s.details %}{% for turn in s.details %}<p class="turn"><b>{{ turn.role }}：</b>{{ turn.text }}</p>{% endfor %}{% else %}<p class="empty">本次未保存更多对话细节。</p>{% endif %}</div></details>
-  <div class="report-actions"><button class="print-button" onclick="window.print()">打印或保存为 PDF</button></div>
+  <details class="full-record"><summary>{{ 'View full conversation' if s.lang == 'en' else '查看完整对话记录' }}</summary><div class="turns">{% if s.details %}{% for turn in s.details %}<p class="turn"><b>{{ 'Grandma' if s.lang == 'en' and turn.role in ['阿嬷', 'assistant', 'Assistant'] else ('You' if s.lang == 'en' and turn.role in ['我', '用户', 'user', 'User'] else turn.role) }}：</b>{{ turn.text }}</p>{% endfor %}{% else %}<p class="empty">{{ 'No further conversation details were saved.' if s.lang == 'en' else '本次未保存更多对话细节。' }}</p>{% endif %}</div></details>
+  <div class="report-actions"><button class="print-button" onclick="window.print()">{{ 'Print or save as PDF' if s.lang == 'en' else '打印或保存为 PDF' }}</button></div>
 </main>
 <div class="legacy-report">
 <div class="toolbar">
