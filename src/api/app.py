@@ -140,8 +140,8 @@ def _login_response(user: dict[str, Any], guest_owner_id: str = "") -> JSONRespo
     return response
 
 
-def _profile_rows(profile: dict[str, Any]) -> list[dict[str, str]]:
-    labels = {
+def _profile_rows(profile: dict[str, Any], language: str = "zh") -> list[dict[str, str]]:
+    labels_zh = {
         "last_period": "上次月经开始日期",
         "cycle_days": "平时周期天数",
         "period_days": "经期长度天数",
@@ -150,6 +150,16 @@ def _profile_rows(profile: dict[str, Any]) -> list[dict[str, str]]:
         "anticoagulants": "最近是否服用抗凝药",
         "contraceptives": "最近是否服用避孕药",
     }
+    labels_en = {
+        "last_period": "Date last period started",
+        "cycle_days": "Usual cycle length",
+        "period_days": "Period length",
+        "cycle_regular": "Cycle regularity",
+        "iud": "IUD in place",
+        "anticoagulants": "Recent anticoagulant use",
+        "contraceptives": "Recent contraceptive use",
+    }
+    labels = labels_en if language == "en" else labels_zh
     return [{"label": labels[key], "value": str(value), "prov": "健康档案", "turn": ""}
             for key, value in profile.items() if key in labels and value not in (None, "")]
 
@@ -385,6 +395,9 @@ async def summary_page(request: Request, record_id: str):
     if session_id.startswith("user:") and (not user or session_id != f"user:{user['id']}"):
         return HTMLResponse("请登录对应账号后查看这份报告。", status_code=403)
     profile = local_store["profiles"].get(session_id, {})
+    report_language = request.query_params.get("lang") or record.get("language", "zh")
+    if report_language not in {"zh", "en"}:
+        report_language = "zh"
     # A report is a communication aid, not a re-interpretation of the medical
     # conversation.  Keep the patient's own words separate from the assistant
     # turns, and translate only the already-computed triage level for display.
@@ -399,35 +412,39 @@ async def summary_page(request: Request, record_id: str):
         clean_item = dict(item)
         text = str(clean_item.get("text", ""))
         if str(clean_item.get("role", "")).strip() in {"阿嬷", "assistant", "Assistant"} and any(marker in text for marker in facility_markers):
-            clean_item["text"] = "阿嬷已给出就医建议。原型中的示例机构目录不作为实际地点提供，请使用结果页的地图入口查找附近合适的医疗服务。"
+            clean_item["text"] = (
+                "Grandma has provided care-seeking guidance. Example facilities in this prototype are not verified locations; please use the Maps link on the result page to find appropriate nearby care."
+                if report_language == "en" else
+                "阿嬷已给出就医建议。原型中的示例机构目录不作为实际地点提供，请使用结果页的地图入口查找附近合适的医疗服务。"
+            )
         safe_details.append(clean_item)
     def fact_label(question: str) -> str:
         """Turn a conversational question into a clinician-readable field name."""
         labels = (
-            (("出血量和平时", "出血多不多"), "出血量与平时相比"),
-            (("出血到目前", "出血持续"), "出血持续时间"),
-            (("异常出血",), "异常出血"),
-            (("异常分泌物", "异味"), "分泌物／异味"),
-            (("0 到 10", "疼痛有多严重"), "疼痛程度"),
-            (("疼痛主要在哪", "痛哪里"), "疼痛位置"),
-            (("怎样的疼", "疼法"), "疼痛性质"),
-            (("疼痛持续多长",), "疼痛持续时间"),
-            (("和平时比",), "与平时相比"),
-            (("突然发作", "慢慢加重"), "起病方式"),
-            (("影响到日常",), "对日常活动的影响"),
-            (("头晕", "晕倒"), "头晕／晕倒"),
-            (("发烧", "体温"), "发热"),
-            (("心跳加速", "气短"), "心悸／气短"),
-            (("呕吐", "喝不进水"), "呕吐／饮水困难"),
-            (("性生活",), "近期性生活"),
-            (("怀孕",), "怀孕可能"),
-            (("上次月经",), "上次月经"),
-            (("诱发行为", "诱因"), "可能诱因"),
+            (("出血量和平时", "出血多不多", "bleeding compared", "bleeding amount"), "出血量与平时相比", "Bleeding compared with usual"),
+            (("出血到目前", "出血持续", "how long.*bleed", "bleeding.*days"), "出血持续时间", "Duration of bleeding"),
+            (("异常出血", "abnormal bleeding"), "异常出血", "Abnormal bleeding"),
+            (("异常分泌物", "异味", "discharge", "odor"), "分泌物／异味", "Discharge or odour"),
+            (("0 到 10", "疼痛有多严重", "pain.*0", "pain.*severe"), "疼痛程度", "Pain severity"),
+            (("疼痛主要在哪", "痛哪里", "where.*pain"), "疼痛位置", "Pain location"),
+            (("怎样的疼", "疼法", "pain.*feel"), "疼痛性质", "Pain character"),
+            (("疼痛持续多长", "how long.*pain"), "疼痛持续时间", "Pain duration"),
+            (("和平时比", "compared with usual"), "与平时相比", "Compared with usual"),
+            (("突然发作", "慢慢加重", "sudden", "gradual"), "起病方式", "Onset pattern"),
+            (("影响到日常", "daily activities"), "对日常活动的影响", "Impact on daily activities"),
+            (("头晕", "晕倒", "dizzy", "faint"), "头晕／晕倒", "Dizziness or fainting"),
+            (("发烧", "体温", "fever", "temperature"), "发热", "Fever"),
+            (("心跳加速", "气短", "palpitation", "shortness of breath"), "心悸／气短", "Palpitations or shortness of breath"),
+            (("呕吐", "喝不进水", "vomit", "keep fluids"), "呕吐／饮水困难", "Vomiting or trouble keeping fluids down"),
+            (("性生活", "sexual activity"), "近期性生活", "Recent sexual activity"),
+            (("怀孕", "pregnan"), "怀孕可能", "Possibility of pregnancy"),
+            (("上次月经", "last period"), "上次月经", "Last menstrual period"),
+            (("诱发行为", "诱因", "trigger"), "可能诱因", "Possible trigger"),
         )
-        for hints, label in labels:
+        for hints, label_zh, label_en in labels:
             if any(hint in question for hint in hints):
-                return label
-        return "补充说明"
+                return label_en if report_language == "en" else label_zh
+        return "Additional detail" if report_language == "en" else "补充说明"
 
     confirmed_facts = []
     pending_question = ""
@@ -448,7 +465,7 @@ async def summary_page(request: Request, record_id: str):
             first_user_statement = False
             confirmed_facts.append({"label": fact_label(pending_question), "value": text})
             pending_question = ""
-    triage_labels = {
+    triage_labels_zh = {
         "EMERGENCY_NOW": {
             "tag": "紧急",
             "title": "请立即前往急诊",
@@ -474,18 +491,33 @@ async def summary_page(request: Request, record_id: str):
             "tone": "care",
         },
     }
-    triage = triage_labels.get(record["level"], {
+    triage_labels_en = {
+        "EMERGENCY_NOW": {"tag": "Urgent", "title": "Go to the emergency department now", "note": "Seek emergency assessment as soon as possible. Call 995 if travel is not safe.", "tone": "emergency"},
+        "SEE_DOCTOR_24_48H": {"tag": "Prompt care", "title": "Seek medical care within 24–48 hours", "note": "Arrange a medical assessment soon and bring this page to help explain your symptoms.", "tone": "soon"},
+        "BOOK_SOON": {"tag": "Book soon", "title": "Book a clinic appointment soon", "note": "Arrange an outpatient assessment. Seek care earlier if symptoms worsen or new warning signs appear.", "tone": "book"},
+        "SELF_CARE": {"tag": "Home observation", "title": "You may observe at home for now", "note": "Follow the care guidance and monitor for change. Seek care if symptoms worsen or you feel worried.", "tone": "care"},
+    }
+    triage = (triage_labels_en if report_language == "en" else triage_labels_zh).get(record["level"], {
+        "tag": "Triage", "title": "Please follow this triage guidance", "note": "Seek medical help if symptoms change or you feel worried.", "tone": "book",
+    } if report_language == "en" else {
         "tag": "分诊建议", "title": "请参考本次分诊建议",
         "note": "如症状变化或感到不安，请及时寻求医疗帮助。", "tone": "book",
     })
     # Do not repeat the prototype's example facility directory in patient
     # reports.  Locations are selected at viewing time through Maps instead.
-    safe_advice = {
+    safe_advice_zh = {
         "EMERGENCY_NOW": "分诊建议：请立即前往急诊；如无法安全前往，请拨打 995。",
         "SEE_DOCTOR_24_48H": "分诊建议：建议在 24–48 小时内到妇科或医院门诊评估；如症状加重，请立即去急诊。",
         "BOOK_SOON": "分诊建议：建议近期预约 GP 或 Polyclinic；如症状加重，请提前就医。",
         "SELF_CARE": "分诊建议：可先居家观察并按护理指引休息；如出现新的危险信号，请及时就医。",
-    }.get(record["level"], record["summary"])
+    }
+    safe_advice_en = {
+        "EMERGENCY_NOW": "Triage guidance: go to the emergency department now. Call 995 if travel is not safe.",
+        "SEE_DOCTOR_24_48H": "Triage guidance: arrange assessment at a gynaecology or hospital outpatient clinic within 24–48 hours. Go to the emergency department if symptoms worsen.",
+        "BOOK_SOON": "Triage guidance: book a GP or Polyclinic appointment soon. Seek care earlier if symptoms worsen.",
+        "SELF_CARE": "Triage guidance: rest and monitor at home for now. Seek care promptly if new warning signs appear.",
+    }
+    safe_advice = (safe_advice_en if report_language == "en" else safe_advice_zh).get(record["level"], record["summary"])
     legacy_tx = {
         "title": "问诊摘要", "generated": "生成时间", "session": "会话", "no_dx": "本摘要仅供就医沟通参考，不提供诊断。",
         "S": "主诉", "complaint": "本次模块", "B": "健康档案", "A": "问诊信息", "present": "已记录", "denied": "未记录",
@@ -499,9 +531,9 @@ async def summary_page(request: Request, record_id: str):
         "confirmed_facts": confirmed_facts,
         "triage": triage,
         "level": record["level"], "advice": safe_advice,
-        "background": _profile_rows(profile),
+        "background": _profile_rows(profile, report_language),
         # Retained only to keep the hidden legacy template markup renderable.
-        "tx": legacy_tx, "lang": "zh", "emergency_box": None,
+        "tx": legacy_tx, "lang": report_language, "emergency_box": None,
         "situation": {"complaint": complaint, "rows": [], "own_words": []},
         "present": [], "denied": [], "uncertain": [], "not_asked": [],
         "guidance": {"level": record["level"], "core": safe_advice, "escalation": []},
