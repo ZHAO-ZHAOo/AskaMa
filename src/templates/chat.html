@@ -349,8 +349,8 @@
         let authenticatedUser = null;
 
         const ui = {
-            zh: {demoNotice:'演示环境：账号、健康档案和问诊记录仅临时保存，服务重启后可能被清空。请勿填写真实个人信息。', title:'AskaMa · 问问阿嬷',brand:'AskaMa · 问问阿嬷', subtitle:'先问问阿嬷：要不要去医院、去哪里、在家怎么照顾自己', urgent:'紧急就医995', history:'☰ 问诊记录', disclaimer:'阿嬷只能帮你掂量轻重，疾病诊断得听医生的呀。', newChat:'＋ 新对话', disclaimerBtn:'免责声明', welcome:'我在这里，有什么困扰或是不舒服，都可以安心说说。月经、出血、下腹疼痛、分泌物变化，或其他女性健康方面的疑问，都不用不好意思。阿嬷会帮你掂量轻重，告诉你需不需要就医，以及这时候怎样照顾自己。', placeholder:'说说你的情况...', send:'发送', chat:'问阿嬷', profile:'健康档案', me:'我的', healthVault:'MY HEALTH VAULT', healthTitle:'健康档案', healthDesc:'记录周期信息，方便你下次和医生沟通。', cycle:'我的周期信息', save:'保存我的基本信息', myEyebrow:'MY AskaMa', myDesc:'管理你的账号、健康资料和使用说明。', privacy:'隐私说明', privacyDesc:'资料的本地存储、使用范围与安全提醒', about:'关于 AskaMa', aboutDesc:'Tencent Cloud AI Hackathon 2026 参赛原型', sos:'紧急情况：立即拨打 995', sideTitle:'问诊记录', sideDesc:'阿嬷陪你聊过的事情', sideNew:'＋ 开始新对话', empty:'尚无问诊记录。完成一次问诊后，摘要会显示在这里。', expand:'展开对话记录', collapse:'收起对话记录', report:'查看对话报告', account:'账号设置', login:'登录或注册', accountInfo:'管理登录方式与资料绑定', loginInfo:'登录后可管理资料与问诊记录', signedIn:'已登录', guest:'访客模式', noLogin:'还没有登录', bound:'你的健康档案和问诊记录已绑定到这个账号。', unbound:'登录后，健康档案和问诊记录会绑定到你的账号。'},
-            en: {demoNotice:'Demo environment: data may be cleared at any time. Please don\'t enter real personal information.', title:'AskaMa · Ask Grandma',brand:'AskaMa · Ask Grandma', subtitle:'Ask Grandma whether to seek care, where to go, and how to care for yourself', urgent:'Emergency 995', history:'☰ History', disclaimer:'Grandma can help weigh urgency, but diagnosis belongs to a doctor.', newChat:'＋ New chat', disclaimerBtn:'Disclaimer', welcome:'I am here for you. Tell Grandma about any discomfort or concern. I can help you assess urgency, decide whether to seek care, and understand how to care for yourself.', placeholder:'Tell Grandma what is troubling you…', send:'Send', chat:'Ask Grandma', profile:'Health profile', me:'Me', healthVault:'MY HEALTH VAULT', healthTitle:'Health profile', healthDesc:'Keep cycle information ready for your next conversation with a doctor.', cycle:'My cycle information', save:'Save health profile', myEyebrow:'MY AskaMa', myDesc:'Manage your account, health profile and app information.', privacy:'Privacy', privacyDesc:'Local data storage, scope of use and safety guidance', about:'About AskaMa', aboutDesc:'Tencent Cloud AI Hackathon 2026 prototype', sos:'Emergency: call 995 now', sideTitle:'Consultation history', sideDesc:'Your previous conversations with Grandma', sideNew:'＋ Start new chat', empty:'No consultation records yet. Completed consultations will appear here.', expand:'View conversation', collapse:'Hide conversation', report:'View report', account:'Account settings', login:'Sign in or register', accountInfo:'Manage sign-in and data linking', loginInfo:'Sign in to manage your profile and consultation records', signedIn:'Signed in', guest:'Guest mode', noLogin:'Not signed in', bound:'Your health profile and consultation records are linked to this account.', unbound:'Sign in to link your health profile and consultation records.'}
+            zh: {demoNotice:'演示环境：账号、健康档案和问诊记录仅临时保存，服务重启后可能被清空。请勿填写真实个人信息。', title:'AskaMa · 问问阿嬷',brand:'AskaMa · 问问阿嬷', subtitle:'先问问阿嬷：要不要去医院、去哪里、在家怎么照顾自己', urgent:'紧急就医995', history:'☰ 问诊记录', disclaimer:'阿嬷只能帮你掂量轻重，疾病诊断得听医生的呀。', newChat:'＋ 新对话', disclaimerBtn:'免责声明', welcome:'我在这里，有什么困扰或是不舒服，都可以安心说说。月经、出血、下腹疼痛、分泌物变化，或其他女性健康方面的疑问，都不用不好意思。阿嬷会帮你掂量轻重，告诉你需不需要就医，以及这时候怎样照顾自己。', placeholder:'说说你的情况...', send:'发送', chat:'问阿嬷', profile:'健康档案', me:'我的', healthVault:'MY HEALTH VAULT', healthTitle:'健康档案', healthDesc:'记录周期信息，方便你下次和医生沟通。', cycle:'我的周期信息', save:'保存我的基本信息', myEyebrow:'MY AskaMa', myDesc:'管理你的账号、健康资料和使用说明。', privacy:'隐私说明', privacyDesc:'资料的本地存储、使用范围与安全提醒', about:'关于 AskaMa', aboutDesc:'Tencent Cloud AI Hackathon 2026 参赛原型', sos:'紧急情况：立即拨打 995', sideTitle:'问诊记录', sideDesc:'阿嬷陪你聊过的事情', sideNew:'＋ 开始新对话', empty:'尚无问诊记录。完成一次问诊后，摘要会显示在这里。', expand:'展开对话记录', collapse:'收起对话记录', report:'查看对话报告', account:'账号设置', login:'登录或注册', accountInfo:'管理登录方式与资料绑定', loginInfo:'登录后可管理资料与问诊记录', signedIn:'已登录', guest:'访客模式', noLogin:'还没有登录', bound:'你的健康档案和问诊记录已绑定到这个账号。', unbound:'登录后，健康档案和问诊记录会绑定到你的账号。', authLogged:'账号信息', authLogin:'登录 / 注册', authBound:'当前已登录为「{name}」。你的健康档案和问诊记录已绑定到这个账号。', authIntro:'登录后，这台设备已有的健康档案和问诊记录会绑定到你的账号。', authBusy:'正在处理…', authRetry:'操作没有完成，请重试。', authNetwork:'网络出了点问题，请重试。'},
+            en: {demoNotice:'Demo environment: data may be cleared at any time. Please don\'t enter real personal information.', title:'AskaMa · Ask Grandma',brand:'AskaMa · Ask Grandma', subtitle:'Ask Grandma whether to seek care, where to go, and how to care for yourself', urgent:'Emergency 995', history:'☰ History', disclaimer:'Grandma can help weigh urgency, but diagnosis belongs to a doctor.', newChat:'＋ New chat', disclaimerBtn:'Disclaimer', welcome:'I am here for you. Tell Grandma about any discomfort or concern. I can help you assess urgency, decide whether to seek care, and understand how to care for yourself.', placeholder:'Tell Grandma what is troubling you…', send:'Send', chat:'Ask Grandma', profile:'Health profile', me:'Me', healthVault:'MY HEALTH VAULT', healthTitle:'Health profile', healthDesc:'Keep cycle information ready for your next conversation with a doctor.', cycle:'My cycle information', save:'Save health profile', myEyebrow:'MY AskaMa', myDesc:'Manage your account, health profile and app information.', privacy:'Privacy', privacyDesc:'Local data storage, scope of use and safety guidance', about:'About AskaMa', aboutDesc:'Tencent Cloud AI Hackathon 2026 prototype', sos:'Emergency: call 995 now', sideTitle:'Consultation history', sideDesc:'Your previous conversations with Grandma', sideNew:'＋ Start new chat', empty:'No consultation records yet. Completed consultations will appear here.', expand:'View conversation', collapse:'Hide conversation', report:'View report', account:'Account settings', login:'Sign in or register', accountInfo:'Manage sign-in and data linking', loginInfo:'Sign in to manage your profile and consultation records', signedIn:'Signed in', guest:'Guest mode', noLogin:'Not signed in', bound:'Your health profile and consultation records are linked to this account.', unbound:'Sign in to link your health profile and consultation records.', authLogged:'Account information', authLogin:'Sign in / register', authBound:'You are signed in as “{name}”. Your health profile and consultation records are linked to this account.', authIntro:'Signing in links this device’s health profile and consultation records to your account.', authBusy:'Working…', authRetry:'Could not complete that action. Please try again.', authNetwork:'There was a network problem. Please try again.'}
         };
         const currentLanguage = () => document.getElementById('langSelect').value;
         const t = key => ui[currentLanguage()][key] || ui.zh[key] || key;
@@ -691,7 +691,7 @@
                     mapLabel: '🗺 在 Google Maps 找附近 GP／Polyclinic',
                     actions: ['近期预约一次门诊，不需要自行硬撑。', '记录症状出现的时间、频率和变化。', '如果症状加重或出现新的不适，请提前就医。'],
                 };
-                const summaryHref = record ? `/summary/${record.id}` : '#';
+                const summaryHref = record ? `/summary/${record.id}?lang=${encodeURIComponent(currentLanguage())}` : '#';
                 card.classList.add(plan.className);
                 card.innerHTML = `<section class="result-head"><span class="emergency-tag ${plan.tagClass}">${plan.tag}</span><h2>${plan.title}</h2></section><section class="result-copy">${plan.intro}</section><section class="care-plan"><div class="care-plan-section"><h3>去哪里</h3><p>${plan.where}</p></div><div class="care-plan-section"><h3>现在怎么做</h3><ul>${plan.actions.map(item => `<li>${item}</li>`).join('')}</ul></div></section><a class="map-action" href="${mapSearchUrl(plan.mapQuery)}" target="_blank" rel="noopener">${plan.mapLabel}</a><a class="summary-action" href="${summaryHref}">📄 查看诊前信息与对话摘要</a>`;
             }
@@ -737,7 +737,7 @@
                 title.textContent = currentLanguage() === 'en' ? `Consultation: ${subject}` : `关于${subject}的咨询`;
                 const row = document.createElement('div'); row.className = 'record-row';
                 const expand = document.createElement('button'); expand.type = 'button'; expand.textContent = t('expand');
-                const report = document.createElement('a'); report.href = `/summary/${record.id}`; report.textContent = t('report');
+                const report = document.createElement('a'); report.href = `/summary/${record.id}?lang=${encodeURIComponent(currentLanguage())}`; report.textContent = t('report');
                 const dialogueCard = document.createElement('div'); dialogueCard.className = 'record-dialogue';
                 const turns = Array.isArray(record.dialogue) && record.dialogue.length ? record.dialogue : [{role: '阿嬷', text: record.summary || '未保存对话内容'}];
                 turns.forEach(turn => { const line = document.createElement('p'); const who = document.createElement('b'); who.textContent = `${turn.role || '对话'}：`; line.append(who, document.createTextNode(turn.text || '')); dialogueCard.appendChild(line); });
@@ -792,8 +792,8 @@
 
         function openAuthModal() {
             const loggedIn = Boolean(authenticatedUser);
-            document.getElementById('authModalTitle').textContent = loggedIn ? '账号信息' : '登录 / 注册';
-            document.getElementById('authIntro').textContent = loggedIn ? `当前已登录为「${authenticatedUser.username}」。你的健康档案和问诊记录已绑定到这个账号。` : '登录后，这台设备已有的健康档案和问诊记录会绑定到你的账号。';
+            document.getElementById('authModalTitle').textContent = loggedIn ? t('authLogged') : t('authLogin');
+            document.getElementById('authIntro').textContent = loggedIn ? t('authBound').replace('{name}', authenticatedUser.username) : t('authIntro');
             document.getElementById('authUsername').hidden = loggedIn;
             document.getElementById('authPassword').hidden = loggedIn;
             document.getElementById('authActions').hidden = loggedIn;
@@ -806,15 +806,15 @@
             const username = document.getElementById('authUsername').value.trim();
             const password = document.getElementById('authPassword').value;
             const status = document.getElementById('authStatus');
-            status.textContent = '正在处理…';
+            status.textContent = t('authBusy');
             try {
                 const response = await fetch(`/api/auth/${action}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username, password, guest_owner_id: archiveOwnerId})});
                 const data = await response.json();
-                if (!response.ok) { status.textContent = data.error || '操作没有完成，请重试。'; return; }
+                if (!response.ok) { status.textContent = data.error || t('authRetry'); return; }
                 authenticatedUser = data.user;
                 await loadAuthStatus(); await loadProfile(); await loadRecords();
                 document.getElementById('authModal').classList.remove('open');
-            } catch (error) { status.textContent = '网络出了点问题，请重试。'; }
+            } catch (error) { status.textContent = t('authNetwork'); }
         }
 
         async function logout() {
