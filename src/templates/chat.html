@@ -364,7 +364,7 @@
             document.getElementById('messageInput').placeholder = t('placeholder'); text('#sendBtn', t('send'));
             document.querySelector('[data-page="chat"] span:last-child').textContent = t('chat'); document.querySelector('[data-page="records"] span:last-child').textContent = t('profile'); document.querySelector('[data-page="me"] span:last-child').textContent = t('me');
             text('#recordsPage .eyebrow', t('healthVault')); text('#recordsPage h2', t('healthTitle')); text('#recordsPage .subpage-title p', t('healthDesc')); text('#recordsPage .card h3', t('cycle')); text('.save-btn', t('save'));
-            text('#mePage .eyebrow', t('myEyebrow')); text('#mePage h2', t('me')); text('#mePage .subpage-title p', t('myDesc')); text('[data-modal="privacyModal"] b', t('privacy')); text('[data-modal="privacyModal"] small', t('privacyDesc')); text('[data-modal="aboutModal"] b', t('about')); text('[data-modal="aboutModal"] small', t('aboutDesc')); text('.sos', t('sos'));
+            text('#mePage .eyebrow', t('myEyebrow')); text('#mePage h2', t('me')); text('#mePage .subpage-title p', t('myDesc')); text('[data-modal="disclaimerModal"] b', lang === 'en' ? 'Disclaimer' : '免责声明'); text('[data-modal="disclaimerModal"] small', lang === 'en' ? 'Important information before using AskaMa' : '使用前需要了解的事项'); text('[data-modal="privacyModal"] b', t('privacy')); text('[data-modal="privacyModal"] small', t('privacyDesc')); text('[data-modal="aboutModal"] b', t('about')); text('[data-modal="aboutModal"] small', t('aboutDesc')); text('.sos', t('sos'));
             ['称呼（可选）','上次月经开始日期','平时周期天数','经期长度天数','周期是否规律','是否放置节育环','最近是否服用抗凝药','最近是否服用避孕药'].forEach((label, index) => { const english=['Name (optional)','Date last period started','Usual cycle length (days)','Period length (days)','Are cycles regular?','Using an IUD?','Recently used anticoagulants?','Recently used contraceptives?'][index]; const el = document.querySelectorAll('#profileForm label')[index]; if (el) el.textContent = lang === 'en' ? english : label; });
             const choiceSets = lang === 'en' ? [['Not specified','Regular','Irregular','Not sure'],['Not specified','Yes','No','Not sure'],['Not specified','Yes','No','Not sure'],['Not specified','Yes','No','Not sure']] : [['不填写','规律','不规律','不确定'],['不填写','是','否','不确定'],['不填写','是','否','不确定'],['不填写','是','否','不确定']];
             document.querySelectorAll('#profileForm select').forEach((select, selectIndex) => Array.from(select.options).forEach((option, optionIndex) => { option.textContent = choiceSets[selectIndex][optionIndex]; }));
@@ -379,7 +379,7 @@
             };
             Object.entries(modalCopy).forEach(([key, copy]) => { const modal = document.getElementById(`${key}Modal`); if (!modal) return; modal.querySelector('h2').textContent = copy[0]; modal.querySelector('p').textContent = copy[1]; modal.querySelector('[data-close]').textContent = copy[2]; });
             document.querySelectorAll('.language-toggle button').forEach(item => item.classList.toggle('active', item.dataset.lang === lang));
-            if (authenticatedUser !== null) updateAccountCopy(); loadRecords();
+            updateAccountCopy(); loadRecords();
         }
         document.getElementById('langSelect').value = 'zh';
         document.querySelectorAll('.language-toggle button').forEach(button => button.addEventListener('click', () => applyLanguage(button.dataset.lang)));
@@ -631,30 +631,36 @@
         }
 
         function showEmergencyScreen(response, record, state) {
+            const english = currentLanguage() === 'en';
             const reasonData = response.events?.find(event => event.type === 'l1_evaluated')?.data?.triggered_rule_details || [];
-            const reasons = reasonData.map(rule => rule.note?.zh || rule.rule_id).filter(Boolean);
+            const reasons = reasonData.map(rule => english ? (rule.note?.en || rule.rule_id) : (rule.note?.zh || rule.rule_id)).filter(Boolean);
             const slots = state?.slots || {};
             const value = key => slots[key]?.value;
             const symptoms = [];
-            if (value('pain_present') === true || value('pain_present') === 'true') symptoms.push('下腹很痛');
-            if (value('pain_sudden_onset') === true || value('pain_sudden_onset') === 'true') symptoms.push('疼痛是突然发生的');
-            if (value('dizziness_or_fainting') === 'fainted') symptoms.push('已经晕倒');
-            if (value('dizziness_or_fainting') === 'nearly_fainted') symptoms.push('一直头晕，快要晕倒');
-            if (value('heart_racing_or_short_of_breath') === true || value('heart_racing_or_short_of_breath') === 'true') symptoms.push('呼吸不顺或心跳很快');
-            if (value('soak_through_interval') === 'hourly_or_more_often') symptoms.push('出血量很大，每小时就浸透');
-            if (value('bleeding_through_clothes_or_bedding') === true || value('bleeding_through_clothes_or_bedding') === 'true') symptoms.push('出血已经浸透衣物或床单');
-            const symptomLine = symptoms.length ? symptoms.join('，') : (reasons[0] || '出现了需要紧急处理的症状');
-            const care = [
+            if (value('pain_present') === true || value('pain_present') === 'true') symptoms.push(english ? 'severe lower abdominal pain' : '下腹很痛');
+            if (value('pain_sudden_onset') === true || value('pain_sudden_onset') === 'true') symptoms.push(english ? 'pain that started suddenly' : '疼痛是突然发生的');
+            if (value('dizziness_or_fainting') === 'fainted') symptoms.push(english ? 'fainting' : '已经晕倒');
+            if (value('dizziness_or_fainting') === 'nearly_fainted') symptoms.push(english ? 'severe dizziness and near-fainting' : '一直头晕，快要晕倒');
+            if (value('heart_racing_or_short_of_breath') === true || value('heart_racing_or_short_of_breath') === 'true') symptoms.push(english ? 'shortness of breath or a racing heartbeat' : '呼吸不顺或心跳很快');
+            if (value('soak_through_interval') === 'hourly_or_more_often') symptoms.push(english ? 'very heavy bleeding, soaking through every hour' : '出血量很大，每小时就浸透');
+            if (value('bleeding_through_clothes_or_bedding') === true || value('bleeding_through_clothes_or_bedding') === 'true') symptoms.push(english ? 'bleeding that has soaked through clothing or bedding' : '出血已经浸透衣物或床单');
+            const symptomLine = symptoms.length ? symptoms.join(english ? ', ' : '，') : (reasons[0] || (english ? 'symptoms that need urgent assessment' : '出现了需要紧急处理的症状'));
+            const care = english ? [
+                'Keep the patient in a safe place and let them lie down. Do not let them walk or drive alone.',
+                'Do not give the patient water, food or any medication, and do not force them to move.',
+                'Keep someone with the patient and watch for changes in alertness or breathing.',
+                'Stay on the line and follow the 995 operator’s instructions; be ready to open the door or meet the ambulance crew.',
+            ] : [
                 '让患者待在安全的地方，尽量躺着休息，不要自行走动或开车。',
                 '不要喂患者水、食物或任何药物，也不要勉强挪动患者。',
                 '留一个人在旁边陪着患者，留意患者是否清醒、呼吸有没有变化。',
                 '别挂电话，照着 995 接线员的指示做；准备好开门或到电梯口接救护人员。',
             ];
-            if (symptoms.some(item => item.includes('出血'))) care.splice(2, 0, '外出血时可用干净的卫生巾或毛巾垫着，留意出血量；不要往身体里面放任何东西。');
+            if (symptoms.some(item => english ? item.includes('bleeding') : item.includes('出血'))) care.splice(2, 0, english ? 'For external bleeding, use a clean sanitary pad or towel to catch it and monitor the amount. Do not put anything inside the body.' : '外出血时可用干净的卫生巾或毛巾垫着，留意出血量；不要往身体里面放任何东西。');
             const container = document.getElementById('chatContainer');
             const card = document.createElement('article');
             card.className = 'emergency-screen';
-            card.innerHTML = `<section class="emergency-head"><span class="emergency-tag">紧急</span><h2>请立即去急诊</h2><a class="call995" href="tel:995" aria-label="拨打 995 急诊电话">📞 请立即去急诊</a></section><section class="emergency-section"><h3>通话范例</h3><p>感觉很难受时不要自行前往医院，阿嬷担心你。先不要慌，阿嬷在这里陪你打 995 急诊电话，通话时一定要交代清楚细节。</p><div class="call-script"><span class="call-script-kicker">可以照着说</span><p class="call-script-main">你好！这里有人紧急急症。${symptomLine}，请尽快派救护车过来！</p><div class="call-script-field"><strong>地址</strong><span>xxxx（一定要讲清楚具体的组屋／街道、楼层单元号！）</span></div><div class="call-script-field"><strong>号码</strong><span>xxxxx（很重要，方便医护后续联络）</span></div></div></section><section class="emergency-section"><h3>救护车到达前</h3><ul>${care.map(item => `<li>${item}</li>`).join('')}</ul></section><a class="map-action" href="${mapSearchUrl('emergency department near me')}" target="_blank" rel="noopener">🗺 在 Google Maps 找附近急诊</a>`;
+            card.innerHTML = english ? `<section class="emergency-head"><span class="emergency-tag">Emergency</span><h2>Go to the emergency department now</h2><a class="call995" href="tel:995" aria-label="Call 995 emergency services">📞 Call 995 now</a></section><section class="emergency-section"><h3>What to say on the call</h3><p>Do not travel to hospital alone when you feel very unwell. Stay calm and explain the details clearly to the 995 operator.</p><div class="call-script"><span class="call-script-kicker">Suggested wording</span><p class="call-script-main">Hello, someone has a medical emergency. They have ${symptomLine}. Please send an ambulance as soon as possible.</p><div class="call-script-field"><strong>Address</strong><span>xxxx (state the block/street, floor and unit number clearly)</span></div><div class="call-script-field"><strong>Phone</strong><span>xxxxx (important for the medical team to contact you)</span></div></div></section><section class="emergency-section"><h3>Before the ambulance arrives</h3><ul>${care.map(item => `<li>${item}</li>`).join('')}</ul></section><a class="map-action" href="${mapSearchUrl('emergency department near me')}" target="_blank" rel="noopener">🗺 Find a nearby emergency department in Google Maps</a>` : `<section class="emergency-head"><span class="emergency-tag">紧急</span><h2>请立即去急诊</h2><a class="call995" href="tel:995" aria-label="拨打 995 急诊电话">📞 请立即去急诊</a></section><section class="emergency-section"><h3>通话范例</h3><p>感觉很难受时不要自行前往医院，阿嬷担心你。先不要慌，阿嬷在这里陪你打 995 急诊电话，通话时一定要交代清楚细节。</p><div class="call-script"><span class="call-script-kicker">可以照着说</span><p class="call-script-main">你好！这里有人紧急急症。${symptomLine}，请尽快派救护车过来！</p><div class="call-script-field"><strong>地址</strong><span>xxxx（一定要讲清楚具体的组屋／街道、楼层单元号！）</span></div><div class="call-script-field"><strong>号码</strong><span>xxxxx（很重要，方便医护后续联络）</span></div></div></section><section class="emergency-section"><h3>救护车到达前</h3><ul>${care.map(item => `<li>${item}</li>`).join('')}</ul></section><a class="map-action" href="${mapSearchUrl('emergency department near me')}" target="_blank" rel="noopener">🗺 在 Google Maps 找附近急诊</a>`;
             container.replaceChildren(card);
             document.body.classList.add('result-view');
             document.querySelector('.input-area').style.display = 'none';
@@ -665,16 +671,29 @@
             const container = document.getElementById('chatContainer');
             const card = document.createElement('article');
             const isSelfCare = response.level === 'SELF_CARE';
+            const english = currentLanguage() === 'en';
             card.className = `result-screen ${isSelfCare ? 'selfcare' : ''}`;
             if (isSelfCare) {
-                const actions = [
+                const actions = english ? [
+                    'Find a comfortable place to lie down and do not push yourself.',
+                    'Have a few sips of warm water, relax your body and keep warm.',
+                    'Slow your schedule today and watch for any worsening discomfort.',
+                ] : [
                     '找个舒服的地方慢慢躺下，先别硬撑。',
                     '喝几口温水，让身体放松一点，注意保暖。',
                     '今天把行程放慢，留意不舒服有没有加重。',
                 ];
-                card.innerHTML = `<section class="result-head"><span class="emergency-tag" style="border-color:#4a6b2e;color:#4a6b2e">居家观察</span><h2>阿嬷叮嘱你好好照顾自己</h2></section><section class="result-copy">别紧张，这种情况不少女生都会遇到，阿嬷暂时没看到危险信号。你可以先在家好好休息观察，有不适再来和阿嬷讲呀。</section><ul class="care-list">${actions.map(item => `<li>阿嬷建议你先：${item}</li>`).join('')}</ul><section class="watch-box"><b>⚠️ 需要警惕的信号：</b><br>如果出现疼到受不了、晕倒或快晕倒、呼吸不顺、出血突然变得很多，马上去急诊。<br><br>不要自行服用任何药物，症状没有好转记得按时去看医生。</section>`;
+                card.innerHTML = english ? `<section class="result-head"><span class="emergency-tag" style="border-color:#4a6b2e;color:#4a6b2e">Home observation</span><h2>Grandma’s care reminder</h2></section><section class="result-copy">Try not to worry. This is common, and Grandma has not heard an immediate danger sign for now. Rest and observe at home; come back and tell Grandma if anything changes.</section><ul class="care-list">${actions.map(item => `<li>Grandma suggests: ${item}</li>`).join('')}</ul><section class="watch-box"><b>⚠️ Warning signs to watch for:</b><br>If pain becomes unbearable, you faint or nearly faint, breathing feels difficult, or bleeding suddenly becomes much heavier, go to the emergency department immediately.<br><br>Do not take medication on your own. If symptoms do not improve, arrange medical care.</section>` : `<section class="result-head"><span class="emergency-tag" style="border-color:#4a6b2e;color:#4a6b2e">居家观察</span><h2>阿嬷叮嘱你好好照顾自己</h2></section><section class="result-copy">别紧张，这种情况不少女生都会遇到，阿嬷暂时没看到危险信号。你可以先在家好好休息观察，有不适再来和阿嬷讲呀。</section><ul class="care-list">${actions.map(item => `<li>阿嬷建议你先：${item}</li>`).join('')}</ul><section class="watch-box"><b>⚠️ 需要警惕的信号：</b><br>如果出现疼到受不了、晕倒或快晕倒、呼吸不顺、出血突然变得很多，马上去急诊。<br><br>不要自行服用任何药物，症状没有好转记得按时去看医生。</section>`;
             } else {
-                const plan = response.level === 'SEE_DOCTOR_24_48H' ? {
+                const plan = response.level === 'SEE_DOCTOR_24_48H' ? (english ? {
+                    className: 'soon-care', tagClass: 'soon-tag', tag: 'Prompt care',
+                    title: 'Seek medical care within 24–48 hours',
+                    intro: 'Grandma has not heard a sign that means you must call 995 right now, but this should not be left unattended. Please arrange a medical assessment soon.',
+                    where: 'A gynaecology clinic or hospital outpatient clinic. Use the map below to search near your location.',
+                    mapQuery: 'hospital outpatient clinic near me',
+                    mapLabel: '🗺 Find a nearby hospital or gynaecology clinic in Google Maps',
+                    actions: ['Book an appointment within 24–48 hours if possible.', 'Bring the symptom timeline, any changes and this conversation summary.', 'Go to the emergency department if symptoms suddenly worsen, you faint, breathing feels difficult or bleeding becomes much heavier.'],
+                } : {
                     className: 'soon-care', tagClass: 'soon-tag', tag: '尽快就医',
                     title: '建议在 24–48 小时内就医',
                     intro: '阿嬷暂时没看到需要立即拨打 995 的信号，但这个情况不适合继续拖着。请尽快安排医疗评估。',
@@ -682,6 +701,14 @@
                     mapQuery: 'hospital outpatient clinic near me',
                     mapLabel: '🗺 在 Google Maps 找附近医院／妇科门诊',
                     actions: ['尽量在 24–48 小时内预约就医。', '把症状开始时间、变化和对话摘要带给医生。', '若症状突然加重、晕倒、呼吸不顺或出血明显增多，请立即去急诊。'],
+                }) : (english ? {
+                    className: 'book-care', tagClass: 'book-tag', tag: 'Book soon',
+                    title: 'Book a GP or Polyclinic appointment soon',
+                    intro: 'Emergency care is not needed right now, but it is worth having a doctor assess this soon and help clarify what is happening.',
+                    where: 'Book a nearby GP or Polyclinic. Use the map below to search near your location.',
+                    mapQuery: 'GP clinic or polyclinic near me',
+                    mapLabel: '🗺 Find a nearby GP or Polyclinic in Google Maps',
+                    actions: ['Book a routine appointment soon; you do not need to manage this alone.', 'Note when symptoms happen, how often and how they change.', 'Seek care sooner if symptoms worsen or new discomfort appears.'],
                 } : {
                     className: 'book-care', tagClass: 'book-tag', tag: '近期预约',
                     title: '建议择期看 GP 或 Polyclinic',
@@ -690,10 +717,10 @@
                     mapQuery: 'GP clinic or polyclinic near me',
                     mapLabel: '🗺 在 Google Maps 找附近 GP／Polyclinic',
                     actions: ['近期预约一次门诊，不需要自行硬撑。', '记录症状出现的时间、频率和变化。', '如果症状加重或出现新的不适，请提前就医。'],
-                };
+                });
                 const summaryHref = record ? `/summary/${record.id}?lang=${encodeURIComponent(currentLanguage())}` : '#';
                 card.classList.add(plan.className);
-                card.innerHTML = `<section class="result-head"><span class="emergency-tag ${plan.tagClass}">${plan.tag}</span><h2>${plan.title}</h2></section><section class="result-copy">${plan.intro}</section><section class="care-plan"><div class="care-plan-section"><h3>去哪里</h3><p>${plan.where}</p></div><div class="care-plan-section"><h3>现在怎么做</h3><ul>${plan.actions.map(item => `<li>${item}</li>`).join('')}</ul></div></section><a class="map-action" href="${mapSearchUrl(plan.mapQuery)}" target="_blank" rel="noopener">${plan.mapLabel}</a><a class="summary-action" href="${summaryHref}">📄 查看诊前信息与对话摘要</a>`;
+                card.innerHTML = `<section class="result-head"><span class="emergency-tag ${plan.tagClass}">${plan.tag}</span><h2>${plan.title}</h2></section><section class="result-copy">${plan.intro}</section><section class="care-plan"><div class="care-plan-section"><h3>${english ? 'Where to go' : '去哪里'}</h3><p>${plan.where}</p></div><div class="care-plan-section"><h3>${english ? 'What to do now' : '现在怎么做'}</h3><ul>${plan.actions.map(item => `<li>${item}</li>`).join('')}</ul></div></section><a class="map-action" href="${mapSearchUrl(plan.mapQuery)}" target="_blank" rel="noopener">${plan.mapLabel}</a><a class="summary-action" href="${summaryHref}">${english ? '📄 View pre-visit information and conversation summary' : '📄 查看诊前信息与对话摘要'}</a>`;
             }
             container.replaceChildren(card);
             document.body.classList.add('result-view');
